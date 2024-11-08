@@ -174,6 +174,7 @@ func (dev *DaggerDev) SDK() *SDK {
 		Rust:       &RustSDK{Dagger: dev},
 		PHP:        &PHPSDK{Dagger: dev},
 		Java:       &JavaSDK{Dagger: dev},
+		Ruby:       &RubySDK{Dagger: dev},
 	}
 }
 

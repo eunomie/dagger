@@ -1,0 +1,60 @@
+{{ define "client" -}}
+{{ "  " }}# Client to interact with the dagger GraphQL API
+  class GraphQLClient
+    def initialize
+      unless ENV.include?('DAGGER_SESSION_PORT')
+        warn('DAGGER_SESSION_PORT is not set')
+        exit(false)
+      end
+      port_str = ENV['DAGGER_SESSION_PORT']
+      port = port_str.to_i
+      if port_str != port.to_s
+        warn("DAGGER_SESSION_PORT #{port_str} is invalid")
+        exit(false)
+      end
+      unless ENV.include?('DAGGER_SESSION_TOKEN')
+        warn('DAGGER_SESSION_TOKEN is not set')
+        exit(false)
+      end
+
+      @host = "http://127.0.0.1:#{port}/query"
+      session_token = ENV['DAGGER_SESSION_TOKEN']
+      @headers = {
+        'Authorization' => "Basic #{basic_auth(session_token, '')}",
+        'content-type' => 'application/json'
+      }
+
+      @root = Node.new(nil, @client, '')
+    end
+
+    def query(definition)
+      uri = URI(@host)
+      params = { 'query' => definition, 'variables' => {} }
+      http = Net::HTTP.new(uri.host, uri.port)
+      res = http.post(uri.path, params.to_json, @headers)
+      JSON.parse(res.body)
+    end
+
+    def container
+      Container.new(@root.dup, self, 'container')
+    end
+
+    def host
+      Host.new(@root.dup, self, 'host')
+    end
+
+    def cache_volume(key:)
+      CacheVolume.new(@root.dup, self, 'cacheVolume', { 'key' => key })
+    end
+
+    def invoke(node)
+      res = query(node.to_s)
+      node.value(res)
+    end
+  end
+
+  def connect
+    @connect ||= GraphQLClient.new
+  end
+  module_function :connect
+{{- end }}
