@@ -29,9 +29,15 @@
 
     def query(definition)
       uri = URI(@host)
+      host = uri.host
+      path = uri.path
+      if host.nil? || host.empty? || path.nil? || path.empty?
+        warn('dagger host not found')
+        exit(false)
+      end
       params = { 'query' => definition, 'variables' => {} }
-      http = Net::HTTP.new(uri.host, uri.port)
-      res = http.post(uri.path, params.to_json, @headers)
+      http = Net::HTTP.new(host, uri.port)
+      res = http.post(path, params.to_json, @headers)
       JSON.parse(res.body)
     end
 
