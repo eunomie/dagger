@@ -26,18 +26,27 @@
 	{{- range $index, $value := $required }}
       assert_not_nil(:{{.Name | FormatArg}}, {{.Name | FormatArg}})
 	{{- end }}
-	{{- if eq (len $required) 0 }}
-      args = {}
+	{{- if and (eq (len $required) 0) (eq (len $optionals) 0) }}
+      n = {{$parentName | QueryToClient | FormatName}}.new(self, @client, '{{.Name}}')
 	{{- else }}
+		{{- if eq (len $required) 0 }}
+      args = {}
+		{{- else }}
       args = {
-	{{- range $index, $value := $required }}
+		{{- range $index, $value := $required }}
         '{{ .Name }}' => {{ .Name | FormatArg }}{{- if ne $index $maxReqIndex }},{{ end }}
-	{{- end }}
+		{{- end }}
       }
-	{{- end }}
-	{{- range $index, $value := $optionals }}
+		{{- end }}
+		{{- range $index, $value := $optionals }}
       args['{{ .Name }}'] = {{ .Name | FormatArg }} unless {{ .Name | FormatArg }}.nil?
+		{{- end }}
+      n = {{$parentName | QueryToClient | FormatName}}.new(self, @client, '{{.Name}}', args)
 	{{- end }}
-      {{$parentName | QueryToClient | FormatName}}.new(self, @client, '{{.Name}}', args)
+	{{- if Solve . }}
+      @client.invoke(n)
+	{{- else }}
+      n
+	{{- end }}
     end
 {{- end }}

@@ -172,8 +172,7 @@ module Dagger
     # Be sure to set any exposed ports before this conversion.
     # @return [Service]
     def as_service
-      args = {}
-      Container.new(self, @client, 'asService', args)
+      Container.new(self, @client, 'asService')
     end
 
     # Returns a File representing the container serialized to a tarball.
@@ -221,8 +220,8 @@ module Dagger
     # Retrieves default arguments for future commands.
     # @return [Array<string>]
     def default_args
-      args = {}
-      Container.new(self, @client, 'defaultArgs', args)
+      n = Container.new(self, @client, 'defaultArgs')
+      @client.invoke(n)
     end
 
     # Retrieves a directory at the given path.
@@ -243,8 +242,8 @@ module Dagger
     # Retrieves entrypoint to be prepended to the arguments of all commands.
     # @return [Array<string>]
     def entrypoint
-      args = {}
-      Container.new(self, @client, 'entrypoint', args)
+      n = Container.new(self, @client, 'entrypoint')
+      @client.invoke(n)
     end
 
     # Retrieves the value of the specified environment variable.
@@ -255,14 +254,15 @@ module Dagger
       args = {
         'name' => name
       }
-      Container.new(self, @client, 'envVariable', args)
+      n = Container.new(self, @client, 'envVariable', args)
+      @client.invoke(n)
     end
 
     # Retrieves the list of environment variables passed to commands.
     # @return [Array<EnvVariable>]
     def env_variables
-      args = {}
-      Container.new(self, @client, 'envVariables', args)
+      n = Container.new(self, @client, 'envVariables')
+      @client.invoke(n)
     end
 
     # The exit code of the last executed command.
@@ -270,8 +270,8 @@ module Dagger
     # Returns an error if no command was set.
     # @return [number]
     def exit_code
-      args = {}
-      Container.new(self, @client, 'exitCode', args)
+      n = Container.new(self, @client, 'exitCode')
+      @client.invoke(n)
     end
 
     # EXPERIMENTAL API! Subject to change/removal at any time.
@@ -281,8 +281,7 @@ module Dagger
     # This currently works for Nvidia devices only.
     # @return [Container]
     def experimental_with_all_gp_us
-      args = {}
-      Container.new(self, @client, 'experimentalWithAllGPUs', args)
+      Container.new(self, @client, 'experimentalWithAllGPUs')
     end
 
     # EXPERIMENTAL API! Subject to change/removal at any time.
@@ -326,7 +325,8 @@ module Dagger
       args['forcedCompression'] = forced_compression unless forced_compression.nil?
       args['mediaTypes'] = media_types unless media_types.nil?
       args['expand'] = expand unless expand.nil?
-      Container.new(self, @client, 'export', args)
+      n = Container.new(self, @client, 'export', args)
+      @client.invoke(n)
     end
 
     # Retrieves the list of exposed ports.
@@ -334,8 +334,8 @@ module Dagger
     # This includes ports already exposed by the image, even if not explicitly added with dagger.
     # @return [Array<Port>]
     def exposed_ports
-      args = {}
-      Container.new(self, @client, 'exposedPorts', args)
+      n = Container.new(self, @client, 'exposedPorts')
+      @client.invoke(n)
     end
 
     # Retrieves a file at the given path.
@@ -369,8 +369,8 @@ module Dagger
     # The unique image reference which can only be retrieved immediately after the 'Container.From' call.
     # @return [string]
     def image_ref
-      args = {}
-      Container.new(self, @client, 'imageRef', args)
+      n = Container.new(self, @client, 'imageRef')
+      @client.invoke(n)
     end
 
     # Reads the container from an OCI tarball.
@@ -394,28 +394,29 @@ module Dagger
       args = {
         'name' => name
       }
-      Container.new(self, @client, 'label', args)
+      n = Container.new(self, @client, 'label', args)
+      @client.invoke(n)
     end
 
     # Retrieves the list of labels passed to container.
     # @return [Array<Label>]
     def labels
-      args = {}
-      Container.new(self, @client, 'labels', args)
+      n = Container.new(self, @client, 'labels')
+      @client.invoke(n)
     end
 
     # Retrieves the list of paths where a directory is mounted.
     # @return [Array<string>]
     def mounts
-      args = {}
-      Container.new(self, @client, 'mounts', args)
+      n = Container.new(self, @client, 'mounts')
+      @client.invoke(n)
     end
 
     # The platform this container executes and publishes as.
     # @return [Platform]
     def platform
-      args = {}
-      Container.new(self, @client, 'platform', args)
+      n = Container.new(self, @client, 'platform')
+      @client.invoke(n)
     end
 
     # Publishes this container as a new image to the specified address.
@@ -444,14 +445,14 @@ module Dagger
       args['platformVariants'] = platform_variants unless platform_variants.nil?
       args['forcedCompression'] = forced_compression unless forced_compression.nil?
       args['mediaTypes'] = media_types unless media_types.nil?
-      Container.new(self, @client, 'publish', args)
+      n = Container.new(self, @client, 'publish', args)
+      @client.invoke(n)
     end
 
     # Retrieves this container's root filesystem. Mounts are not included.
     # @return [Directory]
     def rootfs
-      args = {}
-      Container.new(self, @client, 'rootfs', args)
+      Container.new(self, @client, 'rootfs')
     end
 
     # The error stream of the last executed command.
@@ -459,8 +460,8 @@ module Dagger
     # Returns an error if no command was set.
     # @return [string]
     def stderr
-      args = {}
-      Container.new(self, @client, 'stderr', args)
+      n = Container.new(self, @client, 'stderr')
+      @client.invoke(n)
     end
 
     # The output stream of the last executed command.
@@ -468,8 +469,8 @@ module Dagger
     # Returns an error if no command was set.
     # @return [string]
     def stdout
-      args = {}
-      Container.new(self, @client, 'stdout', args)
+      n = Container.new(self, @client, 'stdout')
+      @client.invoke(n)
     end
 
     # Forces evaluation of the pipeline in the engine.
@@ -477,8 +478,8 @@ module Dagger
     # It doesn't run the default command if no exec has been set.
     # @return [ContainerID]
     def sync
-      args = {}
-      Container.new(self, @client, 'sync', args)
+      n = Container.new(self, @client, 'sync')
+      @client.invoke(n)
     end
 
     # Opens an interactive terminal for this container using its configured default terminal command if not overridden by args (or sh as a fallback default).
@@ -508,14 +509,15 @@ module Dagger
       args = {}
       args['ports'] = ports unless ports.nil?
       args['random'] = random unless random.nil?
-      Container.new(self, @client, 'up', args)
+      n = Container.new(self, @client, 'up', args)
+      @client.invoke(n)
     end
 
     # Retrieves the user to be set for all commands.
     # @return [string]
     def user
-      args = {}
-      Container.new(self, @client, 'user', args)
+      n = Container.new(self, @client, 'user')
+      @client.invoke(n)
     end
 
     # Retrieves this container plus the given OCI anotation.
@@ -996,8 +998,7 @@ module Dagger
     # Retrieves this container with unset default arguments for future commands.
     # @return [Container]
     def without_default_args
-      args = {}
-      Container.new(self, @client, 'withoutDefaultArgs', args)
+      Container.new(self, @client, 'withoutDefaultArgs')
     end
 
     # Retrieves this container with the directory at the given path removed.
@@ -1138,8 +1139,7 @@ module Dagger
     # Should default to root.
     # @return [Container]
     def without_user
-      args = {}
-      Container.new(self, @client, 'withoutUser', args)
+      Container.new(self, @client, 'withoutUser')
     end
 
     # Retrieves this container with an unset working directory.
@@ -1147,15 +1147,14 @@ module Dagger
     # Should default to "/".
     # @return [Container]
     def without_workdir
-      args = {}
-      Container.new(self, @client, 'withoutWorkdir', args)
+      Container.new(self, @client, 'withoutWorkdir')
     end
 
     # Retrieves the working directory for all commands.
     # @return [string]
     def workdir
-      args = {}
-      Container.new(self, @client, 'workdir', args)
+      n = Container.new(self, @client, 'workdir')
+      @client.invoke(n)
     end
 
     def with(fun)
@@ -1174,15 +1173,14 @@ module Dagger
     # The name of the module being executed in
     # @return [string]
     def name
-      args = {}
-      CurrentModule.new(self, @client, 'name', args)
+      n = CurrentModule.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The directory containing the module's source code loaded into the engine (plus any generated code that may have been created).
     # @return [Directory]
     def source
-      args = {}
-      CurrentModule.new(self, @client, 'source', args)
+      CurrentModule.new(self, @client, 'source')
     end
 
     # Load a directory from the module's scratch working directory, including any changes that may have been made to it during module function execution.
@@ -1223,8 +1221,7 @@ module Dagger
     # The local (on-disk) cache for the Dagger engine
     # @return [DaggerEngineCache]
     def local_cache
-      args = {}
-      DaggerEngine.new(self, @client, 'localCache', args)
+      DaggerEngine.new(self, @client, 'localCache')
     end
   end
 
@@ -1239,43 +1236,42 @@ module Dagger
     # The current set of entries in the cache
     # @return [DaggerEngineCacheEntrySet]
     def entry_set
-      args = {}
-      DaggerEngineCache.new(self, @client, 'entrySet', args)
+      DaggerEngineCache.new(self, @client, 'entrySet')
     end
 
     # The maximum bytes to keep in the cache without pruning, after which automatic pruning may kick in.
     # @return [number]
     # @deprecated Use minFreeSpace instead.
     def keep_bytes
-      args = {}
-      DaggerEngineCache.new(self, @client, 'keepBytes', args)
+      n = DaggerEngineCache.new(self, @client, 'keepBytes')
+      @client.invoke(n)
     end
 
     # The maximum bytes to keep in the cache without pruning.
     # @return [number]
     def max_used_space
-      args = {}
-      DaggerEngineCache.new(self, @client, 'maxUsedSpace', args)
+      n = DaggerEngineCache.new(self, @client, 'maxUsedSpace')
+      @client.invoke(n)
     end
 
     # The target amount of free disk space the garbage collector will attempt to leave.
     # @return [number]
     def min_free_space
-      args = {}
-      DaggerEngineCache.new(self, @client, 'minFreeSpace', args)
+      n = DaggerEngineCache.new(self, @client, 'minFreeSpace')
+      @client.invoke(n)
     end
 
     # Prune the cache of releaseable entries
     # @return [Void]
     def prune
-      args = {}
-      DaggerEngineCache.new(self, @client, 'prune', args)
+      n = DaggerEngineCache.new(self, @client, 'prune')
+      @client.invoke(n)
     end
 
     # @return [number]
     def reserved_space
-      args = {}
-      DaggerEngineCache.new(self, @client, 'reservedSpace', args)
+      n = DaggerEngineCache.new(self, @client, 'reservedSpace')
+      @client.invoke(n)
     end
   end
 
@@ -1290,36 +1286,36 @@ module Dagger
     # Whether the cache entry is actively being used.
     # @return [boolean]
     def actively_used
-      args = {}
-      DaggerEngineCacheEntry.new(self, @client, 'activelyUsed', args)
+      n = DaggerEngineCacheEntry.new(self, @client, 'activelyUsed')
+      @client.invoke(n)
     end
 
     # The time the cache entry was created, in Unix nanoseconds.
     # @return [number]
     def created_time_unix_nano
-      args = {}
-      DaggerEngineCacheEntry.new(self, @client, 'createdTimeUnixNano', args)
+      n = DaggerEngineCacheEntry.new(self, @client, 'createdTimeUnixNano')
+      @client.invoke(n)
     end
 
     # The description of the cache entry.
     # @return [string]
     def description
-      args = {}
-      DaggerEngineCacheEntry.new(self, @client, 'description', args)
+      n = DaggerEngineCacheEntry.new(self, @client, 'description')
+      @client.invoke(n)
     end
 
     # The disk space used by the cache entry.
     # @return [number]
     def disk_space_bytes
-      args = {}
-      DaggerEngineCacheEntry.new(self, @client, 'diskSpaceBytes', args)
+      n = DaggerEngineCacheEntry.new(self, @client, 'diskSpaceBytes')
+      @client.invoke(n)
     end
 
     # The most recent time the cache entry was used, in Unix nanoseconds.
     # @return [number]
     def most_recent_use_time_unix_nano
-      args = {}
-      DaggerEngineCacheEntry.new(self, @client, 'mostRecentUseTimeUnixNano', args)
+      n = DaggerEngineCacheEntry.new(self, @client, 'mostRecentUseTimeUnixNano')
+      @client.invoke(n)
     end
   end
 
@@ -1334,22 +1330,22 @@ module Dagger
     # The total disk space used by the cache entries in this set.
     # @return [number]
     def disk_space_bytes
-      args = {}
-      DaggerEngineCacheEntrySet.new(self, @client, 'diskSpaceBytes', args)
+      n = DaggerEngineCacheEntrySet.new(self, @client, 'diskSpaceBytes')
+      @client.invoke(n)
     end
 
     # The list of individual cache entries in the set
     # @return [Array<DaggerEngineCacheEntry>]
     def entries
-      args = {}
-      DaggerEngineCacheEntrySet.new(self, @client, 'entries', args)
+      n = DaggerEngineCacheEntrySet.new(self, @client, 'entries')
+      @client.invoke(n)
     end
 
     # The number of cache entries in this set.
     # @return [number]
     def entry_count
-      args = {}
-      DaggerEngineCacheEntrySet.new(self, @client, 'entryCount', args)
+      n = DaggerEngineCacheEntrySet.new(self, @client, 'entryCount')
+      @client.invoke(n)
     end
   end
 
@@ -1390,8 +1386,8 @@ module Dagger
     # Return the directory's digest. The format of the digest is not guaranteed to be stable between releases of Dagger. It is guaranteed to be stable between invocations of the same Dagger engine.
     # @return [string]
     def digest
-      args = {}
-      Directory.new(self, @client, 'digest', args)
+      n = Directory.new(self, @client, 'digest')
+      @client.invoke(n)
     end
 
     # Retrieves a directory at the given path.
@@ -1430,7 +1426,8 @@ module Dagger
     def entries(path: nil)
       args = {}
       args['path'] = path unless path.nil?
-      Directory.new(self, @client, 'entries', args)
+      n = Directory.new(self, @client, 'entries', args)
+      @client.invoke(n)
     end
 
     # Writes the contents of the directory to a path on the host.
@@ -1443,7 +1440,8 @@ module Dagger
         'path' => path
       }
       args['wipe'] = wipe unless wipe.nil?
-      Directory.new(self, @client, 'export', args)
+      n = Directory.new(self, @client, 'export', args)
+      @client.invoke(n)
     end
 
     # Retrieves a file at the given path.
@@ -1465,14 +1463,15 @@ module Dagger
       args = {
         'pattern' => pattern
       }
-      Directory.new(self, @client, 'glob', args)
+      n = Directory.new(self, @client, 'glob', args)
+      @client.invoke(n)
     end
 
     # Force evaluation in the engine.
     # @return [DirectoryID]
     def sync
-      args = {}
-      Directory.new(self, @client, 'sync', args)
+      n = Directory.new(self, @client, 'sync')
+      @client.invoke(n)
     end
 
     # Opens an interactive terminal in new container with this directory mounted inside.
@@ -1633,36 +1632,35 @@ module Dagger
     # A doc string for the enum, if any.
     # @return [string]
     def description
-      args = {}
-      EnumTypeDef.new(self, @client, 'description', args)
+      n = EnumTypeDef.new(self, @client, 'description')
+      @client.invoke(n)
     end
 
     # The name of the enum.
     # @return [string]
     def name
-      args = {}
-      EnumTypeDef.new(self, @client, 'name', args)
+      n = EnumTypeDef.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The location of this enum declaration.
     # @return [SourceMap]
     def source_map
-      args = {}
-      EnumTypeDef.new(self, @client, 'sourceMap', args)
+      EnumTypeDef.new(self, @client, 'sourceMap')
     end
 
     # If this EnumTypeDef is associated with a Module, the name of the module. Unset otherwise.
     # @return [string]
     def source_module_name
-      args = {}
-      EnumTypeDef.new(self, @client, 'sourceModuleName', args)
+      n = EnumTypeDef.new(self, @client, 'sourceModuleName')
+      @client.invoke(n)
     end
 
     # The values of the enum.
     # @return [Array<EnumValueTypeDef>]
     def values
-      args = {}
-      EnumTypeDef.new(self, @client, 'values', args)
+      n = EnumTypeDef.new(self, @client, 'values')
+      @client.invoke(n)
     end
   end
 
@@ -1677,22 +1675,21 @@ module Dagger
     # A doc string for the enum value, if any.
     # @return [string]
     def description
-      args = {}
-      EnumValueTypeDef.new(self, @client, 'description', args)
+      n = EnumValueTypeDef.new(self, @client, 'description')
+      @client.invoke(n)
     end
 
     # The name of the enum value.
     # @return [string]
     def name
-      args = {}
-      EnumValueTypeDef.new(self, @client, 'name', args)
+      n = EnumValueTypeDef.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The location of this enum value declaration.
     # @return [SourceMap]
     def source_map
-      args = {}
-      EnumValueTypeDef.new(self, @client, 'sourceMap', args)
+      EnumValueTypeDef.new(self, @client, 'sourceMap')
     end
   end
 
@@ -1707,15 +1704,15 @@ module Dagger
     # The environment variable name.
     # @return [string]
     def name
-      args = {}
-      EnvVariable.new(self, @client, 'name', args)
+      n = EnvVariable.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The environment variable value.
     # @return [string]
     def value
-      args = {}
-      EnvVariable.new(self, @client, 'value', args)
+      n = EnvVariable.new(self, @client, 'value')
+      @client.invoke(n)
     end
   end
 
@@ -1732,29 +1729,27 @@ module Dagger
     # A doc string for the field, if any.
     # @return [string]
     def description
-      args = {}
-      FieldTypeDef.new(self, @client, 'description', args)
+      n = FieldTypeDef.new(self, @client, 'description')
+      @client.invoke(n)
     end
 
     # The name of the field in lowerCamelCase format.
     # @return [string]
     def name
-      args = {}
-      FieldTypeDef.new(self, @client, 'name', args)
+      n = FieldTypeDef.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The location of this field declaration.
     # @return [SourceMap]
     def source_map
-      args = {}
-      FieldTypeDef.new(self, @client, 'sourceMap', args)
+      FieldTypeDef.new(self, @client, 'sourceMap')
     end
 
     # The type of the field.
     # @return [TypeDef]
     def type_def
-      args = {}
-      FieldTypeDef.new(self, @client, 'typeDef', args)
+      FieldTypeDef.new(self, @client, 'typeDef')
     end
   end
 
@@ -1769,8 +1764,8 @@ module Dagger
     # Retrieves the contents of the file.
     # @return [string]
     def contents
-      args = {}
-      File.new(self, @client, 'contents', args)
+      n = File.new(self, @client, 'contents')
+      @client.invoke(n)
     end
 
     # Return the file's digest. The format of the digest is not guaranteed to be stable between releases of Dagger. It is guaranteed to be stable between invocations of the same Dagger engine.
@@ -1779,7 +1774,8 @@ module Dagger
     def digest(exclude_metadata: nil)
       args = {}
       args['excludeMetadata'] = exclude_metadata unless exclude_metadata.nil?
-      File.new(self, @client, 'digest', args)
+      n = File.new(self, @client, 'digest', args)
+      @client.invoke(n)
     end
 
     # Writes the file to a file path on the host.
@@ -1792,28 +1788,29 @@ module Dagger
         'path' => path
       }
       args['allowParentDirPath'] = allow_parent_dir_path unless allow_parent_dir_path.nil?
-      File.new(self, @client, 'export', args)
+      n = File.new(self, @client, 'export', args)
+      @client.invoke(n)
     end
 
     # Retrieves the name of the file.
     # @return [string]
     def name
-      args = {}
-      File.new(self, @client, 'name', args)
+      n = File.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # Retrieves the size of the file, in bytes.
     # @return [number]
     def size
-      args = {}
-      File.new(self, @client, 'size', args)
+      n = File.new(self, @client, 'size')
+      @client.invoke(n)
     end
 
     # Force evaluation in the engine.
     # @return [FileID]
     def sync
-      args = {}
-      File.new(self, @client, 'sync', args)
+      n = File.new(self, @client, 'sync')
+      @client.invoke(n)
     end
 
     # Retrieves this file with its name set to the given name.
@@ -1858,36 +1855,34 @@ module Dagger
     # Arguments accepted by the function, if any.
     # @return [Array<FunctionArg>]
     def args
-      args = {}
-      Function.new(self, @client, 'args', args)
+      n = Function.new(self, @client, 'args')
+      @client.invoke(n)
     end
 
     # A doc string for the function, if any.
     # @return [string]
     def description
-      args = {}
-      Function.new(self, @client, 'description', args)
+      n = Function.new(self, @client, 'description')
+      @client.invoke(n)
     end
 
     # The name of the function.
     # @return [string]
     def name
-      args = {}
-      Function.new(self, @client, 'name', args)
+      n = Function.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The type returned by the function.
     # @return [TypeDef]
     def return_type
-      args = {}
-      Function.new(self, @client, 'returnType', args)
+      Function.new(self, @client, 'returnType')
     end
 
     # The location of this function declaration.
     # @return [SourceMap]
     def source_map
-      args = {}
-      Function.new(self, @client, 'sourceMap', args)
+      Function.new(self, @client, 'sourceMap')
     end
 
     # Returns the function with the provided argument
@@ -1953,50 +1948,48 @@ module Dagger
     # Only applies to arguments of type File or Directory. If the argument is not set, load it from the given path in the context directory
     # @return [string]
     def default_path
-      args = {}
-      FunctionArg.new(self, @client, 'defaultPath', args)
+      n = FunctionArg.new(self, @client, 'defaultPath')
+      @client.invoke(n)
     end
 
     # A default value to use for this argument when not explicitly set by the caller, if any.
     # @return [JSON]
     def default_value
-      args = {}
-      FunctionArg.new(self, @client, 'defaultValue', args)
+      n = FunctionArg.new(self, @client, 'defaultValue')
+      @client.invoke(n)
     end
 
     # A doc string for the argument, if any.
     # @return [string]
     def description
-      args = {}
-      FunctionArg.new(self, @client, 'description', args)
+      n = FunctionArg.new(self, @client, 'description')
+      @client.invoke(n)
     end
 
     # Only applies to arguments of type Directory. The ignore patterns are applied to the input directory, and matching entries are filtered out, in a cache-efficient manner.
     # @return [Array<string>]
     def ignore
-      args = {}
-      FunctionArg.new(self, @client, 'ignore', args)
+      n = FunctionArg.new(self, @client, 'ignore')
+      @client.invoke(n)
     end
 
     # The name of the argument in lowerCamelCase format.
     # @return [string]
     def name
-      args = {}
-      FunctionArg.new(self, @client, 'name', args)
+      n = FunctionArg.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The location of this arg declaration.
     # @return [SourceMap]
     def source_map
-      args = {}
-      FunctionArg.new(self, @client, 'sourceMap', args)
+      FunctionArg.new(self, @client, 'sourceMap')
     end
 
     # The type of the argument.
     # @return [TypeDef]
     def type_def
-      args = {}
-      FunctionArg.new(self, @client, 'typeDef', args)
+      FunctionArg.new(self, @client, 'typeDef')
     end
   end
 
@@ -2011,29 +2004,29 @@ module Dagger
     # The argument values the function is being invoked with.
     # @return [Array<FunctionCallArgValue>]
     def input_args
-      args = {}
-      FunctionCall.new(self, @client, 'inputArgs', args)
+      n = FunctionCall.new(self, @client, 'inputArgs')
+      @client.invoke(n)
     end
 
     # The name of the function being called.
     # @return [string]
     def name
-      args = {}
-      FunctionCall.new(self, @client, 'name', args)
+      n = FunctionCall.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The value of the parent object of the function being called. If the function is top-level to the module, this is always an empty object.
     # @return [JSON]
     def parent
-      args = {}
-      FunctionCall.new(self, @client, 'parent', args)
+      n = FunctionCall.new(self, @client, 'parent')
+      @client.invoke(n)
     end
 
     # The name of the parent object of the function being called. If the function is top-level to the module, this is the name of the module.
     # @return [string]
     def parent_name
-      args = {}
-      FunctionCall.new(self, @client, 'parentName', args)
+      n = FunctionCall.new(self, @client, 'parentName')
+      @client.invoke(n)
     end
 
     # Set the return value of the function call to the provided value.
@@ -2044,7 +2037,8 @@ module Dagger
       args = {
         'value' => value
       }
-      FunctionCall.new(self, @client, 'returnValue', args)
+      n = FunctionCall.new(self, @client, 'returnValue', args)
+      @client.invoke(n)
     end
   end
 
@@ -2059,15 +2053,15 @@ module Dagger
     # The name of the argument.
     # @return [string]
     def name
-      args = {}
-      FunctionCallArgValue.new(self, @client, 'name', args)
+      n = FunctionCallArgValue.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The value of the argument represented as a JSON serialized string.
     # @return [JSON]
     def value
-      args = {}
-      FunctionCallArgValue.new(self, @client, 'value', args)
+      n = FunctionCallArgValue.new(self, @client, 'value')
+      @client.invoke(n)
     end
   end
 
@@ -2082,22 +2076,21 @@ module Dagger
     # The directory containing the generated code.
     # @return [Directory]
     def code
-      args = {}
-      GeneratedCode.new(self, @client, 'code', args)
+      GeneratedCode.new(self, @client, 'code')
     end
 
     # List of paths to mark generated in version control (i.e. .gitattributes).
     # @return [Array<string>]
     def vcs_generated_paths
-      args = {}
-      GeneratedCode.new(self, @client, 'vcsGeneratedPaths', args)
+      n = GeneratedCode.new(self, @client, 'vcsGeneratedPaths')
+      @client.invoke(n)
     end
 
     # List of paths to ignore in version control (i.e. .gitignore).
     # @return [Array<string>]
     def vcs_ignored_paths
-      args = {}
-      GeneratedCode.new(self, @client, 'vcsIgnoredPaths', args)
+      n = GeneratedCode.new(self, @client, 'vcsIgnoredPaths')
+      @client.invoke(n)
     end
 
     # Set the list of paths to mark generated in version control.
@@ -2136,57 +2129,56 @@ module Dagger
     # The ref to clone the root of the git repo from
     # @return [string]
     def clone_ref
-      args = {}
-      GitModuleSource.new(self, @client, 'cloneRef', args)
+      n = GitModuleSource.new(self, @client, 'cloneRef')
+      @client.invoke(n)
     end
 
     # The resolved commit of the git repo this source points to.
     # @return [string]
     def commit
-      args = {}
-      GitModuleSource.new(self, @client, 'commit', args)
+      n = GitModuleSource.new(self, @client, 'commit')
+      @client.invoke(n)
     end
 
     # The directory containing everything needed to load load and use the module.
     # @return [Directory]
     def context_directory
-      args = {}
-      GitModuleSource.new(self, @client, 'contextDirectory', args)
+      GitModuleSource.new(self, @client, 'contextDirectory')
     end
 
     # The URL to access the web view of the repository (e.g., GitHub, GitLab, Bitbucket)
     # @return [string]
     def html_repo_url
-      args = {}
-      GitModuleSource.new(self, @client, 'htmlRepoURL', args)
+      n = GitModuleSource.new(self, @client, 'htmlRepoURL')
+      @client.invoke(n)
     end
 
     # The URL to the source's git repo in a web browser
     # @return [string]
     def html_url
-      args = {}
-      GitModuleSource.new(self, @client, 'htmlURL', args)
+      n = GitModuleSource.new(self, @client, 'htmlURL')
+      @client.invoke(n)
     end
 
     # The clean module name of the root of the module
     # @return [string]
     def root
-      args = {}
-      GitModuleSource.new(self, @client, 'root', args)
+      n = GitModuleSource.new(self, @client, 'root')
+      @client.invoke(n)
     end
 
     # The path to the root of the module source under the context directory. This directory contains its configuration file. It also contains its source code (possibly as a subdirectory).
     # @return [string]
     def root_subpath
-      args = {}
-      GitModuleSource.new(self, @client, 'rootSubpath', args)
+      n = GitModuleSource.new(self, @client, 'rootSubpath')
+      @client.invoke(n)
     end
 
     # The specified version of the git repo this source points to.
     # @return [string]
     def version
-      args = {}
-      GitModuleSource.new(self, @client, 'version', args)
+      n = GitModuleSource.new(self, @client, 'version')
+      @client.invoke(n)
     end
   end
 
@@ -2201,8 +2193,8 @@ module Dagger
     # The resolved commit id at this ref.
     # @return [string]
     def commit
-      args = {}
-      GitRef.new(self, @client, 'commit', args)
+      n = GitRef.new(self, @client, 'commit')
+      @client.invoke(n)
     end
 
     # The filesystem tree at this ref.
@@ -2248,8 +2240,7 @@ module Dagger
     # Returns details for HEAD.
     # @return [GitRef]
     def head
-      args = {}
-      GitRepository.new(self, @client, 'head', args)
+      GitRepository.new(self, @client, 'head')
     end
 
     # Returns details of a ref.
@@ -2280,7 +2271,8 @@ module Dagger
     def tags(patterns: nil)
       args = {}
       args['patterns'] = patterns unless patterns.nil?
-      GitRepository.new(self, @client, 'tags', args)
+      n = GitRepository.new(self, @client, 'tags', args)
+      @client.invoke(n)
     end
 
     # Header to authenticate the remote with.
@@ -2424,15 +2416,15 @@ module Dagger
     # Static fields defined on this input object, if any.
     # @return [Array<FieldTypeDef>]
     def fields
-      args = {}
-      InputTypeDef.new(self, @client, 'fields', args)
+      n = InputTypeDef.new(self, @client, 'fields')
+      @client.invoke(n)
     end
 
     # The name of the input object.
     # @return [string]
     def name
-      args = {}
-      InputTypeDef.new(self, @client, 'name', args)
+      n = InputTypeDef.new(self, @client, 'name')
+      @client.invoke(n)
     end
   end
 
@@ -2447,36 +2439,35 @@ module Dagger
     # The doc string for the interface, if any.
     # @return [string]
     def description
-      args = {}
-      InterfaceTypeDef.new(self, @client, 'description', args)
+      n = InterfaceTypeDef.new(self, @client, 'description')
+      @client.invoke(n)
     end
 
     # Functions defined on this interface, if any.
     # @return [Array<Function>]
     def functions
-      args = {}
-      InterfaceTypeDef.new(self, @client, 'functions', args)
+      n = InterfaceTypeDef.new(self, @client, 'functions')
+      @client.invoke(n)
     end
 
     # The name of the interface.
     # @return [string]
     def name
-      args = {}
-      InterfaceTypeDef.new(self, @client, 'name', args)
+      n = InterfaceTypeDef.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The location of this interface declaration.
     # @return [SourceMap]
     def source_map
-      args = {}
-      InterfaceTypeDef.new(self, @client, 'sourceMap', args)
+      InterfaceTypeDef.new(self, @client, 'sourceMap')
     end
 
     # If this InterfaceTypeDef is associated with a Module, the name of the module. Unset otherwise.
     # @return [string]
     def source_module_name
-      args = {}
-      InterfaceTypeDef.new(self, @client, 'sourceModuleName', args)
+      n = InterfaceTypeDef.new(self, @client, 'sourceModuleName')
+      @client.invoke(n)
     end
   end
 
@@ -2491,15 +2482,15 @@ module Dagger
     # The label name.
     # @return [string]
     def name
-      args = {}
-      Label.new(self, @client, 'name', args)
+      n = Label.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The label value.
     # @return [string]
     def value
-      args = {}
-      Label.new(self, @client, 'value', args)
+      n = Label.new(self, @client, 'value')
+      @client.invoke(n)
     end
   end
 
@@ -2514,8 +2505,7 @@ module Dagger
     # The type of the elements in the list.
     # @return [TypeDef]
     def element_type_def
-      args = {}
-      ListTypeDef.new(self, @client, 'elementTypeDef', args)
+      ListTypeDef.new(self, @client, 'elementTypeDef')
     end
   end
 
@@ -2530,22 +2520,21 @@ module Dagger
     # The directory containing everything needed to load load and use the module.
     # @return [Directory]
     def context_directory
-      args = {}
-      LocalModuleSource.new(self, @client, 'contextDirectory', args)
+      LocalModuleSource.new(self, @client, 'contextDirectory')
     end
 
     # The relative path to the module root from the host directory
     # @return [string]
     def rel_host_path
-      args = {}
-      LocalModuleSource.new(self, @client, 'relHostPath', args)
+      n = LocalModuleSource.new(self, @client, 'relHostPath')
+      @client.invoke(n)
     end
 
     # The path to the root of the module source under the context directory. This directory contains its configuration file. It also contains its source code (possibly as a subdirectory).
     # @return [string]
     def root_subpath
-      args = {}
-      LocalModuleSource.new(self, @client, 'rootSubpath', args)
+      n = LocalModuleSource.new(self, @client, 'rootSubpath')
+      @client.invoke(n)
     end
   end
 
@@ -2560,85 +2549,81 @@ module Dagger
     # Modules used by this module.
     # @return [Array<Module_>]
     def dependencies
-      args = {}
-      Module_.new(self, @client, 'dependencies', args)
+      n = Module_.new(self, @client, 'dependencies')
+      @client.invoke(n)
     end
 
     # The dependencies as configured by the module.
     # @return [Array<ModuleDependency>]
     def dependency_config
-      args = {}
-      Module_.new(self, @client, 'dependencyConfig', args)
+      n = Module_.new(self, @client, 'dependencyConfig')
+      @client.invoke(n)
     end
 
     # The doc string of the module, if any
     # @return [string]
     def description
-      args = {}
-      Module_.new(self, @client, 'description', args)
+      n = Module_.new(self, @client, 'description')
+      @client.invoke(n)
     end
 
     # Enumerations served by this module.
     # @return [Array<TypeDef>]
     def enums
-      args = {}
-      Module_.new(self, @client, 'enums', args)
+      n = Module_.new(self, @client, 'enums')
+      @client.invoke(n)
     end
 
     # The generated files and directories made on top of the module source's context directory.
     # @return [Directory]
     def generated_context_diff
-      args = {}
-      Module_.new(self, @client, 'generatedContextDiff', args)
+      Module_.new(self, @client, 'generatedContextDiff')
     end
 
     # The module source's context plus any configuration and source files created by codegen.
     # @return [Directory]
     def generated_context_directory
-      args = {}
-      Module_.new(self, @client, 'generatedContextDirectory', args)
+      Module_.new(self, @client, 'generatedContextDirectory')
     end
 
     # Retrieves the module with the objects loaded via its SDK.
     # @return [Module_]
     def initialize_
-      args = {}
-      Module_.new(self, @client, 'initialize', args)
+      Module_.new(self, @client, 'initialize')
     end
 
     # Interfaces served by this module.
     # @return [Array<TypeDef>]
     def interfaces
-      args = {}
-      Module_.new(self, @client, 'interfaces', args)
+      n = Module_.new(self, @client, 'interfaces')
+      @client.invoke(n)
     end
 
     # The name of the module
     # @return [string]
     def name
-      args = {}
-      Module_.new(self, @client, 'name', args)
+      n = Module_.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # Objects served by this module.
     # @return [Array<TypeDef>]
     def objects
-      args = {}
-      Module_.new(self, @client, 'objects', args)
+      n = Module_.new(self, @client, 'objects')
+      @client.invoke(n)
     end
 
     # The container that runs the module's entrypoint. It will fail to execute if the module doesn't compile.
     # @return [Container]
     def runtime
-      args = {}
-      Module_.new(self, @client, 'runtime', args)
+      Module_.new(self, @client, 'runtime')
     end
 
     # The SDK used by this module. Either a name of a builtin SDK or a module source ref string pointing to the SDK's implementation.
     # @return [string]
     def sdk
-      args = {}
-      Module_.new(self, @client, 'sdk', args)
+      n = Module_.new(self, @client, 'sdk')
+      @client.invoke(n)
     end
 
     # Serve a module's API in the current session.
@@ -2646,15 +2631,14 @@ module Dagger
     # Note: this can only be called once per session. In the future, it could return a stream or service to remove the side effect.
     # @return [Void]
     def serve
-      args = {}
-      Module_.new(self, @client, 'serve', args)
+      n = Module_.new(self, @client, 'serve')
+      @client.invoke(n)
     end
 
     # The source for the module.
     # @return [ModuleSource]
     def source
-      args = {}
-      Module_.new(self, @client, 'source', args)
+      Module_.new(self, @client, 'source')
     end
 
     # Retrieves the module with the given description
@@ -2727,15 +2711,14 @@ module Dagger
     # The name of the dependency module.
     # @return [string]
     def name
-      args = {}
-      ModuleDependency.new(self, @client, 'name', args)
+      n = ModuleDependency.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The source for the dependency module.
     # @return [ModuleSource]
     def source
-      args = {}
-      ModuleDependency.new(self, @client, 'source', args)
+      ModuleDependency.new(self, @client, 'source')
     end
   end
 
@@ -2750,15 +2733,13 @@ module Dagger
     # If the source is a of kind git, the git source representation of it.
     # @return [GitModuleSource]
     def as_git_source
-      args = {}
-      ModuleSource.new(self, @client, 'asGitSource', args)
+      ModuleSource.new(self, @client, 'asGitSource')
     end
 
     # If the source is of kind local, the local source representation of it.
     # @return [LocalModuleSource]
     def as_local_source
-      args = {}
-      ModuleSource.new(self, @client, 'asLocalSource', args)
+      ModuleSource.new(self, @client, 'asLocalSource')
     end
 
     # Load the source as a module. If this is a local source, the parent directory must have been provided during module source creation
@@ -2773,36 +2754,35 @@ module Dagger
     # A human readable ref string representation of this module source.
     # @return [string]
     def as_string
-      args = {}
-      ModuleSource.new(self, @client, 'asString', args)
+      n = ModuleSource.new(self, @client, 'asString')
+      @client.invoke(n)
     end
 
     # Returns whether the module source has a configuration file.
     # @return [boolean]
     def config_exists
-      args = {}
-      ModuleSource.new(self, @client, 'configExists', args)
+      n = ModuleSource.new(self, @client, 'configExists')
+      @client.invoke(n)
     end
 
     # The directory containing everything needed to load load and use the module.
     # @return [Directory]
     def context_directory
-      args = {}
-      ModuleSource.new(self, @client, 'contextDirectory', args)
+      ModuleSource.new(self, @client, 'contextDirectory')
     end
 
     # The dependencies of the module source. Includes dependencies from the configuration and any extras from withDependencies calls.
     # @return [Array<ModuleDependency>]
     def dependencies
-      args = {}
-      ModuleSource.new(self, @client, 'dependencies', args)
+      n = ModuleSource.new(self, @client, 'dependencies')
+      @client.invoke(n)
     end
 
     # Return the module source's content digest. The format of the digest is not guaranteed to be stable between releases of Dagger. It is guaranteed to be stable between invocations of the same Dagger engine.
     # @return [string]
     def digest
-      args = {}
-      ModuleSource.new(self, @client, 'digest', args)
+      n = ModuleSource.new(self, @client, 'digest')
+      @client.invoke(n)
     end
 
     # The directory containing the module configuration and source code (source code may be in a subdir).
@@ -2819,29 +2799,29 @@ module Dagger
     # The kind of source (e.g. local, git, etc.)
     # @return [ModuleSourceKind]
     def kind
-      args = {}
-      ModuleSource.new(self, @client, 'kind', args)
+      n = ModuleSource.new(self, @client, 'kind')
+      @client.invoke(n)
     end
 
     # If set, the name of the module this source references, including any overrides at runtime by callers.
     # @return [string]
     def module_name
-      args = {}
-      ModuleSource.new(self, @client, 'moduleName', args)
+      n = ModuleSource.new(self, @client, 'moduleName')
+      @client.invoke(n)
     end
 
     # The original name of the module this source references, as defined in the module configuration.
     # @return [string]
     def module_original_name
-      args = {}
-      ModuleSource.new(self, @client, 'moduleOriginalName', args)
+      n = ModuleSource.new(self, @client, 'moduleOriginalName')
+      @client.invoke(n)
     end
 
     # The path to the module source's context directory on the caller's filesystem. Only valid for local sources.
     # @return [string]
     def resolve_context_path_from_caller
-      args = {}
-      ModuleSource.new(self, @client, 'resolveContextPathFromCaller', args)
+      n = ModuleSource.new(self, @client, 'resolveContextPathFromCaller')
+      @client.invoke(n)
     end
 
     # Resolve the provided module source arg as a dependency relative to this module source.
@@ -2873,22 +2853,21 @@ module Dagger
     # Load the source from its path on the caller's filesystem, including only needed+configured files and directories. Only valid for local sources.
     # @return [ModuleSource]
     def resolve_from_caller
-      args = {}
-      ModuleSource.new(self, @client, 'resolveFromCaller', args)
+      ModuleSource.new(self, @client, 'resolveFromCaller')
     end
 
     # The path relative to context of the root of the module source, which contains dagger.json. It also contains the module implementation source code, but that may or may not being a subdir of this root.
     # @return [string]
     def source_root_subpath
-      args = {}
-      ModuleSource.new(self, @client, 'sourceRootSubpath', args)
+      n = ModuleSource.new(self, @client, 'sourceRootSubpath')
+      @client.invoke(n)
     end
 
     # The path relative to context of the module implementation source code.
     # @return [string]
     def source_subpath
-      args = {}
-      ModuleSource.new(self, @client, 'sourceSubpath', args)
+      n = ModuleSource.new(self, @client, 'sourceSubpath')
+      @client.invoke(n)
     end
 
     # Retrieve a named view defined for this module source.
@@ -2905,8 +2884,8 @@ module Dagger
     # The named views defined for this module source, which are sets of directory filters that can be applied to directory arguments provided to functions.
     # @return [Array<ModuleSourceView>]
     def views
-      args = {}
-      ModuleSource.new(self, @client, 'views', args)
+      n = ModuleSource.new(self, @client, 'views')
+      @client.invoke(n)
     end
 
     # Update the module source with a new context directory. Only valid for local sources.
@@ -3003,15 +2982,15 @@ module Dagger
     # The name of the view
     # @return [string]
     def name
-      args = {}
-      ModuleSourceView.new(self, @client, 'name', args)
+      n = ModuleSourceView.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The patterns of the view used to filter paths
     # @return [Array<string>]
     def patterns
-      args = {}
-      ModuleSourceView.new(self, @client, 'patterns', args)
+      n = ModuleSourceView.new(self, @client, 'patterns')
+      @client.invoke(n)
     end
   end
 
@@ -3026,50 +3005,48 @@ module Dagger
     # The function used to construct new instances of this object, if any
     # @return [Function]
     def constructor
-      args = {}
-      ObjectTypeDef.new(self, @client, 'constructor', args)
+      ObjectTypeDef.new(self, @client, 'constructor')
     end
 
     # The doc string for the object, if any.
     # @return [string]
     def description
-      args = {}
-      ObjectTypeDef.new(self, @client, 'description', args)
+      n = ObjectTypeDef.new(self, @client, 'description')
+      @client.invoke(n)
     end
 
     # Static fields defined on this object, if any.
     # @return [Array<FieldTypeDef>]
     def fields
-      args = {}
-      ObjectTypeDef.new(self, @client, 'fields', args)
+      n = ObjectTypeDef.new(self, @client, 'fields')
+      @client.invoke(n)
     end
 
     # Functions defined on this object, if any.
     # @return [Array<Function>]
     def functions
-      args = {}
-      ObjectTypeDef.new(self, @client, 'functions', args)
+      n = ObjectTypeDef.new(self, @client, 'functions')
+      @client.invoke(n)
     end
 
     # The name of the object.
     # @return [string]
     def name
-      args = {}
-      ObjectTypeDef.new(self, @client, 'name', args)
+      n = ObjectTypeDef.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The location of this object declaration.
     # @return [SourceMap]
     def source_map
-      args = {}
-      ObjectTypeDef.new(self, @client, 'sourceMap', args)
+      ObjectTypeDef.new(self, @client, 'sourceMap')
     end
 
     # If this ObjectTypeDef is associated with a Module, the name of the module. Unset otherwise.
     # @return [string]
     def source_module_name
-      args = {}
-      ObjectTypeDef.new(self, @client, 'sourceModuleName', args)
+      n = ObjectTypeDef.new(self, @client, 'sourceModuleName')
+      @client.invoke(n)
     end
   end
 
@@ -3084,29 +3061,29 @@ module Dagger
     # The port description.
     # @return [string]
     def description
-      args = {}
-      Port.new(self, @client, 'description', args)
+      n = Port.new(self, @client, 'description')
+      @client.invoke(n)
     end
 
     # Skip the health check when run as a service.
     # @return [boolean]
     def experimental_skip_healthcheck
-      args = {}
-      Port.new(self, @client, 'experimentalSkipHealthcheck', args)
+      n = Port.new(self, @client, 'experimentalSkipHealthcheck')
+      @client.invoke(n)
     end
 
     # The port number.
     # @return [number]
     def port
-      args = {}
-      Port.new(self, @client, 'port', args)
+      n = Port.new(self, @client, 'port')
+      @client.invoke(n)
     end
 
     # The transport layer protocol.
     # @return [NetworkProtocol]
     def protocol
-      args = {}
-      Port.new(self, @client, 'protocol', args)
+      n = Port.new(self, @client, 'protocol')
+      @client.invoke(n)
     end
   end
 
@@ -3172,43 +3149,39 @@ module Dagger
     # If the caller is not currently executing in a function, this will return an error.
     # @return [FunctionCall]
     def current_function_call
-      args = {}
-      Client.new(self, @client, 'currentFunctionCall', args)
+      Client.new(self, @client, 'currentFunctionCall')
     end
 
     # The module currently being served in the session, if any.
     # @return [CurrentModule]
     def current_module
-      args = {}
-      Client.new(self, @client, 'currentModule', args)
+      Client.new(self, @client, 'currentModule')
     end
 
     # The TypeDef representations of the objects currently being served in the session.
     # @return [Array<TypeDef>]
     def current_type_defs
-      args = {}
-      Client.new(self, @client, 'currentTypeDefs', args)
+      n = Client.new(self, @client, 'currentTypeDefs')
+      @client.invoke(n)
     end
 
     # The Dagger engine container configuration and state
     # @return [DaggerEngine]
     def dagger_engine
-      args = {}
-      Client.new(self, @client, 'daggerEngine', args)
+      Client.new(self, @client, 'daggerEngine')
     end
 
     # The default platform of the engine.
     # @return [Platform]
     def default_platform
-      args = {}
-      Client.new(self, @client, 'defaultPlatform', args)
+      n = Client.new(self, @client, 'defaultPlatform')
+      @client.invoke(n)
     end
 
     # Creates an empty directory.
     # @return [Directory]
     def directory
-      args = {}
-      Client.new(self, @client, 'directory', args)
+      Client.new(self, @client, 'directory')
     end
 
     # Creates a function.
@@ -3261,8 +3234,7 @@ module Dagger
     # Queries the host environment.
     # @return [Host]
     def host
-      args = {}
-      Client.new(self, @client, 'host', args)
+      Client.new(self, @client, 'host')
     end
 
     # Returns a file containing an http remote url content.
@@ -3681,8 +3653,7 @@ module Dagger
     # Create a new module.
     # @return [Module_]
     def module_
-      args = {}
-      Client.new(self, @client, 'module', args)
+      Client.new(self, @client, 'module')
     end
 
     # Create a new module dependency configuration from a module source and name
@@ -3762,15 +3733,14 @@ module Dagger
     # Create a new TypeDef.
     # @return [TypeDef]
     def type_def
-      args = {}
-      Client.new(self, @client, 'typeDef', args)
+      Client.new(self, @client, 'typeDef')
     end
 
     # Get the current Dagger Engine version.
     # @return [string]
     def version
-      args = {}
-      Client.new(self, @client, 'version', args)
+      n = Client.new(self, @client, 'version')
+      @client.invoke(n)
     end
   end
 
@@ -3785,22 +3755,22 @@ module Dagger
     # A doc string for the scalar, if any.
     # @return [string]
     def description
-      args = {}
-      ScalarTypeDef.new(self, @client, 'description', args)
+      n = ScalarTypeDef.new(self, @client, 'description')
+      @client.invoke(n)
     end
 
     # The name of the scalar.
     # @return [string]
     def name
-      args = {}
-      ScalarTypeDef.new(self, @client, 'name', args)
+      n = ScalarTypeDef.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # If this ScalarTypeDef is associated with a Module, the name of the module. Unset otherwise.
     # @return [string]
     def source_module_name
-      args = {}
-      ScalarTypeDef.new(self, @client, 'sourceModuleName', args)
+      n = ScalarTypeDef.new(self, @client, 'sourceModuleName')
+      @client.invoke(n)
     end
   end
 
@@ -3815,15 +3785,15 @@ module Dagger
     # The name of this secret.
     # @return [string]
     def name
-      args = {}
-      Secret.new(self, @client, 'name', args)
+      n = Secret.new(self, @client, 'name')
+      @client.invoke(n)
     end
 
     # The value of this secret.
     # @return [string]
     def plaintext
-      args = {}
-      Secret.new(self, @client, 'plaintext', args)
+      n = Secret.new(self, @client, 'plaintext')
+      @client.invoke(n)
     end
   end
 
@@ -3847,21 +3817,22 @@ module Dagger
       args = {}
       args['port'] = port unless port.nil?
       args['scheme'] = scheme unless scheme.nil?
-      Service.new(self, @client, 'endpoint', args)
+      n = Service.new(self, @client, 'endpoint', args)
+      @client.invoke(n)
     end
 
     # Retrieves a hostname which can be used by clients to reach this container.
     # @return [string]
     def hostname
-      args = {}
-      Service.new(self, @client, 'hostname', args)
+      n = Service.new(self, @client, 'hostname')
+      @client.invoke(n)
     end
 
     # Retrieves the list of ports provided by the service.
     # @return [Array<Port>]
     def ports
-      args = {}
-      Service.new(self, @client, 'ports', args)
+      n = Service.new(self, @client, 'ports')
+      @client.invoke(n)
     end
 
     # Start the service and wait for its health checks to succeed.
@@ -3869,8 +3840,8 @@ module Dagger
     # Services bound to a Container do not need to be manually started.
     # @return [ServiceID]
     def start
-      args = {}
-      Service.new(self, @client, 'start', args)
+      n = Service.new(self, @client, 'start')
+      @client.invoke(n)
     end
 
     # Stop the service.
@@ -3879,7 +3850,8 @@ module Dagger
     def stop(kill: nil)
       args = {}
       args['kill'] = kill unless kill.nil?
-      Service.new(self, @client, 'stop', args)
+      n = Service.new(self, @client, 'stop', args)
+      @client.invoke(n)
     end
 
     # Creates a tunnel that forwards traffic from the caller's network to this service.
@@ -3892,7 +3864,8 @@ module Dagger
       args = {}
       args['ports'] = ports unless ports.nil?
       args['random'] = random unless random.nil?
-      Service.new(self, @client, 'up', args)
+      n = Service.new(self, @client, 'up', args)
+      @client.invoke(n)
     end
 
     # Configures a hostname which can be used by clients within the session to reach this container.
@@ -3931,29 +3904,29 @@ module Dagger
     # The column number within the line.
     # @return [number]
     def column
-      args = {}
-      SourceMap.new(self, @client, 'column', args)
+      n = SourceMap.new(self, @client, 'column')
+      @client.invoke(n)
     end
 
     # The filename from the module source.
     # @return [string]
     def filename
-      args = {}
-      SourceMap.new(self, @client, 'filename', args)
+      n = SourceMap.new(self, @client, 'filename')
+      @client.invoke(n)
     end
 
     # The line number within the filename.
     # @return [number]
     def line
-      args = {}
-      SourceMap.new(self, @client, 'line', args)
+      n = SourceMap.new(self, @client, 'line')
+      @client.invoke(n)
     end
 
     # The module dependency this was declared in.
     # @return [string]
     def module_
-      args = {}
-      SourceMap.new(self, @client, 'module', args)
+      n = SourceMap.new(self, @client, 'module')
+      @client.invoke(n)
     end
   end
 
@@ -3970,8 +3943,8 @@ module Dagger
     # It doesn't run the default command if no exec has been set.
     # @return [TerminalID]
     def sync
-      args = {}
-      Terminal.new(self, @client, 'sync', args)
+      n = Terminal.new(self, @client, 'sync')
+      @client.invoke(n)
     end
   end
 
@@ -3986,57 +3959,51 @@ module Dagger
     # If kind is ENUM, the enum-specific type definition. If kind is not ENUM, this will be null.
     # @return [EnumTypeDef]
     def as_enum
-      args = {}
-      TypeDef.new(self, @client, 'asEnum', args)
+      TypeDef.new(self, @client, 'asEnum')
     end
 
     # If kind is INPUT, the input-specific type definition. If kind is not INPUT, this will be null.
     # @return [InputTypeDef]
     def as_input
-      args = {}
-      TypeDef.new(self, @client, 'asInput', args)
+      TypeDef.new(self, @client, 'asInput')
     end
 
     # If kind is INTERFACE, the interface-specific type definition. If kind is not INTERFACE, this will be null.
     # @return [InterfaceTypeDef]
     def as_interface
-      args = {}
-      TypeDef.new(self, @client, 'asInterface', args)
+      TypeDef.new(self, @client, 'asInterface')
     end
 
     # If kind is LIST, the list-specific type definition. If kind is not LIST, this will be null.
     # @return [ListTypeDef]
     def as_list
-      args = {}
-      TypeDef.new(self, @client, 'asList', args)
+      TypeDef.new(self, @client, 'asList')
     end
 
     # If kind is OBJECT, the object-specific type definition. If kind is not OBJECT, this will be null.
     # @return [ObjectTypeDef]
     def as_object
-      args = {}
-      TypeDef.new(self, @client, 'asObject', args)
+      TypeDef.new(self, @client, 'asObject')
     end
 
     # If kind is SCALAR, the scalar-specific type definition. If kind is not SCALAR, this will be null.
     # @return [ScalarTypeDef]
     def as_scalar
-      args = {}
-      TypeDef.new(self, @client, 'asScalar', args)
+      TypeDef.new(self, @client, 'asScalar')
     end
 
     # The kind of type this is (e.g. primitive, list, object).
     # @return [TypeDefKind]
     def kind
-      args = {}
-      TypeDef.new(self, @client, 'kind', args)
+      n = TypeDef.new(self, @client, 'kind')
+      @client.invoke(n)
     end
 
     # Whether this type can be set to null. Defaults to false.
     # @return [boolean]
     def optional
-      args = {}
-      TypeDef.new(self, @client, 'optional', args)
+      n = TypeDef.new(self, @client, 'optional')
+      @client.invoke(n)
     end
 
     # Adds a function for constructing a new instance of an Object TypeDef, failing if the type is not an object.
