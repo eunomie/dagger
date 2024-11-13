@@ -60,7 +60,7 @@
   end
 
   def connect
-    @connect ||= GraphQLClient.new
+    @connect ||= Client.new(nil, GraphQLClient.new, '')
   end
   module_function :connect
 {{- end }}

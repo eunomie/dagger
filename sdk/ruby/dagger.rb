@@ -10,7 +10,7 @@ class HelloDagger
 
   def run(args)
     args.each do |arg|
-      puts @dag.invoke send(arg)
+      puts send(arg)
     end
   end
 end

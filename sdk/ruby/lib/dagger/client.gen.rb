@@ -146,7 +146,7 @@ module Dagger
   end
 
   def connect
-    @connect ||= GraphQLClient.new
+    @connect ||= Client.new(nil, @client, '')
   end
   module_function :connect
 
@@ -172,7 +172,7 @@ module Dagger
     # Be sure to set any exposed ports before this conversion.
     # @return [Service]
     def as_service
-      Container.new(self, @client, 'asService')
+      Service.new(self, @client, 'asService')
     end
 
     # Returns a File representing the container serialized to a tarball.
@@ -191,7 +191,7 @@ module Dagger
       args['platformVariants'] = platform_variants unless platform_variants.nil?
       args['forcedCompression'] = forced_compression unless forced_compression.nil?
       args['mediaTypes'] = media_types unless media_types.nil?
-      Container.new(self, @client, 'asTarball', args)
+      File.new(self, @client, 'asTarball', args)
     end
 
     # Initializes this container from a Dockerfile build.
@@ -236,7 +236,7 @@ module Dagger
         'path' => path
       }
       args['expand'] = expand unless expand.nil?
-      Container.new(self, @client, 'directory', args)
+      Directory.new(self, @client, 'directory', args)
     end
 
     # Retrieves entrypoint to be prepended to the arguments of all commands.
@@ -350,7 +350,7 @@ module Dagger
         'path' => path
       }
       args['expand'] = expand unless expand.nil?
-      Container.new(self, @client, 'file', args)
+      File.new(self, @client, 'file', args)
     end
 
     # Initializes this container from a pulled base image.
@@ -452,7 +452,7 @@ module Dagger
     # Retrieves this container's root filesystem. Mounts are not included.
     # @return [Directory]
     def rootfs
-      Container.new(self, @client, 'rootfs')
+      Directory.new(self, @client, 'rootfs')
     end
 
     # The error stream of the last executed command.
@@ -1180,7 +1180,7 @@ module Dagger
     # The directory containing the module's source code loaded into the engine (plus any generated code that may have been created).
     # @return [Directory]
     def source
-      CurrentModule.new(self, @client, 'source')
+      Directory.new(self, @client, 'source')
     end
 
     # Load a directory from the module's scratch working directory, including any changes that may have been made to it during module function execution.
@@ -1195,7 +1195,7 @@ module Dagger
       }
       args['exclude'] = exclude unless exclude.nil?
       args['include'] = include unless include.nil?
-      CurrentModule.new(self, @client, 'workdir', args)
+      Directory.new(self, @client, 'workdir', args)
     end
 
     # Load a file from the module's scratch working directory, including any changes that may have been made to it during module function execution.Load a file from the module's scratch working directory, including any changes that may have been made to it during module function execution.
@@ -1206,7 +1206,7 @@ module Dagger
       args = {
         'path' => path
       }
-      CurrentModule.new(self, @client, 'workdirFile', args)
+      File.new(self, @client, 'workdirFile', args)
     end
   end
 
@@ -1221,7 +1221,7 @@ module Dagger
     # The local (on-disk) cache for the Dagger engine
     # @return [DaggerEngineCache]
     def local_cache
-      DaggerEngine.new(self, @client, 'localCache')
+      DaggerEngineCache.new(self, @client, 'localCache')
     end
   end
 
@@ -1236,7 +1236,7 @@ module Dagger
     # The current set of entries in the cache
     # @return [DaggerEngineCacheEntrySet]
     def entry_set
-      DaggerEngineCache.new(self, @client, 'entrySet')
+      DaggerEngineCacheEntrySet.new(self, @client, 'entrySet')
     end
 
     # The maximum bytes to keep in the cache without pruning, after which automatic pruning may kick in.
@@ -1369,7 +1369,7 @@ module Dagger
       args = {}
       args['sourceRootPath'] = source_root_path unless source_root_path.nil?
       args['engineVersion'] = engine_version unless engine_version.nil?
-      Directory.new(self, @client, 'asModule', args)
+      Module_.new(self, @client, 'asModule', args)
     end
 
     # Gets the difference between this directory and an another directory.
@@ -1417,7 +1417,7 @@ module Dagger
       args['target'] = target unless target.nil?
       args['buildArgs'] = build_args unless build_args.nil?
       args['secrets'] = secrets unless secrets.nil?
-      Directory.new(self, @client, 'dockerBuild', args)
+      Container.new(self, @client, 'dockerBuild', args)
     end
 
     # Returns a list of files and directories at the given path.
@@ -1452,7 +1452,7 @@ module Dagger
       args = {
         'path' => path
       }
-      Directory.new(self, @client, 'file', args)
+      File.new(self, @client, 'file', args)
     end
 
     # Returns a list of files and directories that matche the given pattern.
@@ -1646,7 +1646,7 @@ module Dagger
     # The location of this enum declaration.
     # @return [SourceMap]
     def source_map
-      EnumTypeDef.new(self, @client, 'sourceMap')
+      SourceMap.new(self, @client, 'sourceMap')
     end
 
     # If this EnumTypeDef is associated with a Module, the name of the module. Unset otherwise.
@@ -1689,7 +1689,7 @@ module Dagger
     # The location of this enum value declaration.
     # @return [SourceMap]
     def source_map
-      EnumValueTypeDef.new(self, @client, 'sourceMap')
+      SourceMap.new(self, @client, 'sourceMap')
     end
   end
 
@@ -1743,13 +1743,13 @@ module Dagger
     # The location of this field declaration.
     # @return [SourceMap]
     def source_map
-      FieldTypeDef.new(self, @client, 'sourceMap')
+      SourceMap.new(self, @client, 'sourceMap')
     end
 
     # The type of the field.
     # @return [TypeDef]
     def type_def
-      FieldTypeDef.new(self, @client, 'typeDef')
+      TypeDef.new(self, @client, 'typeDef')
     end
   end
 
@@ -1876,13 +1876,13 @@ module Dagger
     # The type returned by the function.
     # @return [TypeDef]
     def return_type
-      Function.new(self, @client, 'returnType')
+      TypeDef.new(self, @client, 'returnType')
     end
 
     # The location of this function declaration.
     # @return [SourceMap]
     def source_map
-      Function.new(self, @client, 'sourceMap')
+      SourceMap.new(self, @client, 'sourceMap')
     end
 
     # Returns the function with the provided argument
@@ -1983,13 +1983,13 @@ module Dagger
     # The location of this arg declaration.
     # @return [SourceMap]
     def source_map
-      FunctionArg.new(self, @client, 'sourceMap')
+      SourceMap.new(self, @client, 'sourceMap')
     end
 
     # The type of the argument.
     # @return [TypeDef]
     def type_def
-      FunctionArg.new(self, @client, 'typeDef')
+      TypeDef.new(self, @client, 'typeDef')
     end
   end
 
@@ -2076,7 +2076,7 @@ module Dagger
     # The directory containing the generated code.
     # @return [Directory]
     def code
-      GeneratedCode.new(self, @client, 'code')
+      Directory.new(self, @client, 'code')
     end
 
     # List of paths to mark generated in version control (i.e. .gitattributes).
@@ -2143,7 +2143,7 @@ module Dagger
     # The directory containing everything needed to load load and use the module.
     # @return [Directory]
     def context_directory
-      GitModuleSource.new(self, @client, 'contextDirectory')
+      Directory.new(self, @client, 'contextDirectory')
     end
 
     # The URL to access the web view of the repository (e.g., GitHub, GitLab, Bitbucket)
@@ -2203,7 +2203,7 @@ module Dagger
     def tree(discard_git_dir: nil)
       args = {}
       args['discardGitDir'] = discard_git_dir unless discard_git_dir.nil?
-      GitRef.new(self, @client, 'tree', args)
+      Directory.new(self, @client, 'tree', args)
     end
   end
 
@@ -2223,7 +2223,7 @@ module Dagger
       args = {
         'name' => name
       }
-      GitRepository.new(self, @client, 'branch', args)
+      GitRef.new(self, @client, 'branch', args)
     end
 
     # Returns details of a commit.
@@ -2234,13 +2234,13 @@ module Dagger
       args = {
         'id' => id
       }
-      GitRepository.new(self, @client, 'commit', args)
+      GitRef.new(self, @client, 'commit', args)
     end
 
     # Returns details for HEAD.
     # @return [GitRef]
     def head
-      GitRepository.new(self, @client, 'head')
+      GitRef.new(self, @client, 'head')
     end
 
     # Returns details of a ref.
@@ -2251,7 +2251,7 @@ module Dagger
       args = {
         'name' => name
       }
-      GitRepository.new(self, @client, 'ref', args)
+      GitRef.new(self, @client, 'ref', args)
     end
 
     # Returns details of a tag.
@@ -2262,7 +2262,7 @@ module Dagger
       args = {
         'name' => name
       }
-      GitRepository.new(self, @client, 'tag', args)
+      GitRef.new(self, @client, 'tag', args)
     end
 
     # tags that match any of the given glob patterns.
@@ -2322,7 +2322,7 @@ module Dagger
       }
       args['exclude'] = exclude unless exclude.nil?
       args['include'] = include unless include.nil?
-      Host.new(self, @client, 'directory', args)
+      Directory.new(self, @client, 'directory', args)
     end
 
     # Accesses a file on the host.
@@ -2333,7 +2333,7 @@ module Dagger
       args = {
         'path' => path
       }
-      Host.new(self, @client, 'file', args)
+      File.new(self, @client, 'file', args)
     end
 
     # Creates a service that forwards traffic to a specified address via the host.
@@ -2348,7 +2348,7 @@ module Dagger
       args = {}
       args['host'] = host unless host.nil?
       args['ports'] = ports unless ports.nil?
-      Host.new(self, @client, 'service', args)
+      Service.new(self, @client, 'service', args)
     end
 
     # Sets a secret given a user-defined name and the file path on the host, and returns the secret.
@@ -2364,7 +2364,7 @@ module Dagger
         'name' => name,
         'path' => path
       }
-      Host.new(self, @client, 'setSecretFile', args)
+      Secret.new(self, @client, 'setSecretFile', args)
     end
 
     # Creates a tunnel that forwards traffic from the host to a service.
@@ -2387,7 +2387,7 @@ module Dagger
       }
       args['ports'] = ports unless ports.nil?
       args['native'] = native unless native.nil?
-      Host.new(self, @client, 'tunnel', args)
+      Service.new(self, @client, 'tunnel', args)
     end
 
     # Accesses a Unix socket on the host.
@@ -2398,7 +2398,7 @@ module Dagger
       args = {
         'path' => path
       }
-      Host.new(self, @client, 'unixSocket', args)
+      Socket.new(self, @client, 'unixSocket', args)
     end
   end
 
@@ -2460,7 +2460,7 @@ module Dagger
     # The location of this interface declaration.
     # @return [SourceMap]
     def source_map
-      InterfaceTypeDef.new(self, @client, 'sourceMap')
+      SourceMap.new(self, @client, 'sourceMap')
     end
 
     # If this InterfaceTypeDef is associated with a Module, the name of the module. Unset otherwise.
@@ -2505,7 +2505,7 @@ module Dagger
     # The type of the elements in the list.
     # @return [TypeDef]
     def element_type_def
-      ListTypeDef.new(self, @client, 'elementTypeDef')
+      TypeDef.new(self, @client, 'elementTypeDef')
     end
   end
 
@@ -2520,7 +2520,7 @@ module Dagger
     # The directory containing everything needed to load load and use the module.
     # @return [Directory]
     def context_directory
-      LocalModuleSource.new(self, @client, 'contextDirectory')
+      Directory.new(self, @client, 'contextDirectory')
     end
 
     # The relative path to the module root from the host directory
@@ -2577,13 +2577,13 @@ module Dagger
     # The generated files and directories made on top of the module source's context directory.
     # @return [Directory]
     def generated_context_diff
-      Module_.new(self, @client, 'generatedContextDiff')
+      Directory.new(self, @client, 'generatedContextDiff')
     end
 
     # The module source's context plus any configuration and source files created by codegen.
     # @return [Directory]
     def generated_context_directory
-      Module_.new(self, @client, 'generatedContextDirectory')
+      Directory.new(self, @client, 'generatedContextDirectory')
     end
 
     # Retrieves the module with the objects loaded via its SDK.
@@ -2616,7 +2616,7 @@ module Dagger
     # The container that runs the module's entrypoint. It will fail to execute if the module doesn't compile.
     # @return [Container]
     def runtime
-      Module_.new(self, @client, 'runtime')
+      Container.new(self, @client, 'runtime')
     end
 
     # The SDK used by this module. Either a name of a builtin SDK or a module source ref string pointing to the SDK's implementation.
@@ -2638,7 +2638,7 @@ module Dagger
     # The source for the module.
     # @return [ModuleSource]
     def source
-      Module_.new(self, @client, 'source')
+      ModuleSource.new(self, @client, 'source')
     end
 
     # Retrieves the module with the given description
@@ -2718,7 +2718,7 @@ module Dagger
     # The source for the dependency module.
     # @return [ModuleSource]
     def source
-      ModuleDependency.new(self, @client, 'source')
+      ModuleSource.new(self, @client, 'source')
     end
   end
 
@@ -2733,13 +2733,13 @@ module Dagger
     # If the source is a of kind git, the git source representation of it.
     # @return [GitModuleSource]
     def as_git_source
-      ModuleSource.new(self, @client, 'asGitSource')
+      GitModuleSource.new(self, @client, 'asGitSource')
     end
 
     # If the source is of kind local, the local source representation of it.
     # @return [LocalModuleSource]
     def as_local_source
-      ModuleSource.new(self, @client, 'asLocalSource')
+      LocalModuleSource.new(self, @client, 'asLocalSource')
     end
 
     # Load the source as a module. If this is a local source, the parent directory must have been provided during module source creation
@@ -2748,7 +2748,7 @@ module Dagger
     def as_module(engine_version: nil)
       args = {}
       args['engineVersion'] = engine_version unless engine_version.nil?
-      ModuleSource.new(self, @client, 'asModule', args)
+      Module_.new(self, @client, 'asModule', args)
     end
 
     # A human readable ref string representation of this module source.
@@ -2768,7 +2768,7 @@ module Dagger
     # The directory containing everything needed to load load and use the module.
     # @return [Directory]
     def context_directory
-      ModuleSource.new(self, @client, 'contextDirectory')
+      Directory.new(self, @client, 'contextDirectory')
     end
 
     # The dependencies of the module source. Includes dependencies from the configuration and any extras from withDependencies calls.
@@ -2793,7 +2793,7 @@ module Dagger
       args = {
         'path' => path
       }
-      ModuleSource.new(self, @client, 'directory', args)
+      Directory.new(self, @client, 'directory', args)
     end
 
     # The kind of source (e.g. local, git, etc.)
@@ -2847,7 +2847,7 @@ module Dagger
       }
       args['viewName'] = view_name unless view_name.nil?
       args['ignore'] = ignore unless ignore.nil?
-      ModuleSource.new(self, @client, 'resolveDirectoryFromCaller', args)
+      Directory.new(self, @client, 'resolveDirectoryFromCaller', args)
     end
 
     # Load the source from its path on the caller's filesystem, including only needed+configured files and directories. Only valid for local sources.
@@ -2878,7 +2878,7 @@ module Dagger
       args = {
         'name' => name
       }
-      ModuleSource.new(self, @client, 'view', args)
+      ModuleSourceView.new(self, @client, 'view', args)
     end
 
     # The named views defined for this module source, which are sets of directory filters that can be applied to directory arguments provided to functions.
@@ -3005,7 +3005,7 @@ module Dagger
     # The function used to construct new instances of this object, if any
     # @return [Function]
     def constructor
-      ObjectTypeDef.new(self, @client, 'constructor')
+      Function.new(self, @client, 'constructor')
     end
 
     # The doc string for the object, if any.
@@ -3039,7 +3039,7 @@ module Dagger
     # The location of this object declaration.
     # @return [SourceMap]
     def source_map
-      ObjectTypeDef.new(self, @client, 'sourceMap')
+      SourceMap.new(self, @client, 'sourceMap')
     end
 
     # If this ObjectTypeDef is associated with a Module, the name of the module. Unset otherwise.
@@ -3108,7 +3108,7 @@ module Dagger
         'mediaType' => media_type,
         'uncompressed' => uncompressed
       }
-      Client.new(self, @client, 'blob', args)
+      Directory.new(self, @client, 'blob', args)
     end
 
     # Retrieves a container builtin to the engine.
@@ -3119,7 +3119,7 @@ module Dagger
       args = {
         'digest' => digest
       }
-      Client.new(self, @client, 'builtinContainer', args)
+      Container.new(self, @client, 'builtinContainer', args)
     end
 
     # Constructs a cache volume for a given cache key.
@@ -3130,7 +3130,7 @@ module Dagger
       args = {
         'key' => key
       }
-      Client.new(self, @client, 'cacheVolume', args)
+      CacheVolume.new(self, @client, 'cacheVolume', args)
     end
 
     # Creates a scratch container.
@@ -3141,7 +3141,7 @@ module Dagger
     def container(platform: nil)
       args = {}
       args['platform'] = platform unless platform.nil?
-      Client.new(self, @client, 'container', args)
+      Container.new(self, @client, 'container', args)
     end
 
     # The FunctionCall context that the SDK caller is currently executing in.
@@ -3149,13 +3149,13 @@ module Dagger
     # If the caller is not currently executing in a function, this will return an error.
     # @return [FunctionCall]
     def current_function_call
-      Client.new(self, @client, 'currentFunctionCall')
+      FunctionCall.new(self, @client, 'currentFunctionCall')
     end
 
     # The module currently being served in the session, if any.
     # @return [CurrentModule]
     def current_module
-      Client.new(self, @client, 'currentModule')
+      CurrentModule.new(self, @client, 'currentModule')
     end
 
     # The TypeDef representations of the objects currently being served in the session.
@@ -3168,7 +3168,7 @@ module Dagger
     # The Dagger engine container configuration and state
     # @return [DaggerEngine]
     def dagger_engine
-      Client.new(self, @client, 'daggerEngine')
+      DaggerEngine.new(self, @client, 'daggerEngine')
     end
 
     # The default platform of the engine.
@@ -3181,7 +3181,7 @@ module Dagger
     # Creates an empty directory.
     # @return [Directory]
     def directory
-      Client.new(self, @client, 'directory')
+      Directory.new(self, @client, 'directory')
     end
 
     # Creates a function.
@@ -3195,7 +3195,7 @@ module Dagger
         'name' => name,
         'returnType' => return_type
       }
-      Client.new(self, @client, 'function', args)
+      Function.new(self, @client, 'function', args)
     end
 
     # Create a code generation result, given a directory containing the generated code.
@@ -3205,7 +3205,7 @@ module Dagger
       args = {
         'code' => code
       }
-      Client.new(self, @client, 'generatedCode', args)
+      GeneratedCode.new(self, @client, 'generatedCode', args)
     end
 
     # Queries a Git repository.
@@ -3228,13 +3228,13 @@ module Dagger
       args['experimentalServiceHost'] = experimental_service_host unless experimental_service_host.nil?
       args['sshKnownHosts'] = ssh_known_hosts unless ssh_known_hosts.nil?
       args['sshAuthSocket'] = ssh_auth_socket unless ssh_auth_socket.nil?
-      Client.new(self, @client, 'git', args)
+      GitRepository.new(self, @client, 'git', args)
     end
 
     # Queries the host environment.
     # @return [Host]
     def host
-      Client.new(self, @client, 'host')
+      Host.new(self, @client, 'host')
     end
 
     # Returns a file containing an http remote url content.
@@ -3247,7 +3247,7 @@ module Dagger
         'url' => url
       }
       args['experimentalServiceHost'] = experimental_service_host unless experimental_service_host.nil?
-      Client.new(self, @client, 'http', args)
+      File.new(self, @client, 'http', args)
     end
 
     # Load a CacheVolume from its ID.
@@ -3257,7 +3257,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadCacheVolumeFromID', args)
+      CacheVolume.new(self, @client, 'loadCacheVolumeFromID', args)
     end
 
     # Load a Container from its ID.
@@ -3267,7 +3267,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadContainerFromID', args)
+      Container.new(self, @client, 'loadContainerFromID', args)
     end
 
     # Load a CurrentModule from its ID.
@@ -3277,7 +3277,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadCurrentModuleFromID', args)
+      CurrentModule.new(self, @client, 'loadCurrentModuleFromID', args)
     end
 
     # Load a DaggerEngineCacheEntry from its ID.
@@ -3287,7 +3287,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadDaggerEngineCacheEntryFromID', args)
+      DaggerEngineCacheEntry.new(self, @client, 'loadDaggerEngineCacheEntryFromID', args)
     end
 
     # Load a DaggerEngineCacheEntrySet from its ID.
@@ -3297,7 +3297,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadDaggerEngineCacheEntrySetFromID', args)
+      DaggerEngineCacheEntrySet.new(self, @client, 'loadDaggerEngineCacheEntrySetFromID', args)
     end
 
     # Load a DaggerEngineCache from its ID.
@@ -3307,7 +3307,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadDaggerEngineCacheFromID', args)
+      DaggerEngineCache.new(self, @client, 'loadDaggerEngineCacheFromID', args)
     end
 
     # Load a DaggerEngine from its ID.
@@ -3317,7 +3317,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadDaggerEngineFromID', args)
+      DaggerEngine.new(self, @client, 'loadDaggerEngineFromID', args)
     end
 
     # Load a Directory from its ID.
@@ -3327,7 +3327,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadDirectoryFromID', args)
+      Directory.new(self, @client, 'loadDirectoryFromID', args)
     end
 
     # Load a EnumTypeDef from its ID.
@@ -3337,7 +3337,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadEnumTypeDefFromID', args)
+      EnumTypeDef.new(self, @client, 'loadEnumTypeDefFromID', args)
     end
 
     # Load a EnumValueTypeDef from its ID.
@@ -3347,7 +3347,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadEnumValueTypeDefFromID', args)
+      EnumValueTypeDef.new(self, @client, 'loadEnumValueTypeDefFromID', args)
     end
 
     # Load a EnvVariable from its ID.
@@ -3357,7 +3357,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadEnvVariableFromID', args)
+      EnvVariable.new(self, @client, 'loadEnvVariableFromID', args)
     end
 
     # Load a FieldTypeDef from its ID.
@@ -3367,7 +3367,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadFieldTypeDefFromID', args)
+      FieldTypeDef.new(self, @client, 'loadFieldTypeDefFromID', args)
     end
 
     # Load a File from its ID.
@@ -3377,7 +3377,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadFileFromID', args)
+      File.new(self, @client, 'loadFileFromID', args)
     end
 
     # Load a FunctionArg from its ID.
@@ -3387,7 +3387,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadFunctionArgFromID', args)
+      FunctionArg.new(self, @client, 'loadFunctionArgFromID', args)
     end
 
     # Load a FunctionCallArgValue from its ID.
@@ -3397,7 +3397,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadFunctionCallArgValueFromID', args)
+      FunctionCallArgValue.new(self, @client, 'loadFunctionCallArgValueFromID', args)
     end
 
     # Load a FunctionCall from its ID.
@@ -3407,7 +3407,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadFunctionCallFromID', args)
+      FunctionCall.new(self, @client, 'loadFunctionCallFromID', args)
     end
 
     # Load a Function from its ID.
@@ -3417,7 +3417,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadFunctionFromID', args)
+      Function.new(self, @client, 'loadFunctionFromID', args)
     end
 
     # Load a GeneratedCode from its ID.
@@ -3427,7 +3427,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadGeneratedCodeFromID', args)
+      GeneratedCode.new(self, @client, 'loadGeneratedCodeFromID', args)
     end
 
     # Load a GitModuleSource from its ID.
@@ -3437,7 +3437,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadGitModuleSourceFromID', args)
+      GitModuleSource.new(self, @client, 'loadGitModuleSourceFromID', args)
     end
 
     # Load a GitRef from its ID.
@@ -3447,7 +3447,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadGitRefFromID', args)
+      GitRef.new(self, @client, 'loadGitRefFromID', args)
     end
 
     # Load a GitRepository from its ID.
@@ -3457,7 +3457,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadGitRepositoryFromID', args)
+      GitRepository.new(self, @client, 'loadGitRepositoryFromID', args)
     end
 
     # Load a Host from its ID.
@@ -3467,7 +3467,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadHostFromID', args)
+      Host.new(self, @client, 'loadHostFromID', args)
     end
 
     # Load a InputTypeDef from its ID.
@@ -3477,7 +3477,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadInputTypeDefFromID', args)
+      InputTypeDef.new(self, @client, 'loadInputTypeDefFromID', args)
     end
 
     # Load a InterfaceTypeDef from its ID.
@@ -3487,7 +3487,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadInterfaceTypeDefFromID', args)
+      InterfaceTypeDef.new(self, @client, 'loadInterfaceTypeDefFromID', args)
     end
 
     # Load a Label from its ID.
@@ -3497,7 +3497,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadLabelFromID', args)
+      Label.new(self, @client, 'loadLabelFromID', args)
     end
 
     # Load a ListTypeDef from its ID.
@@ -3507,7 +3507,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadListTypeDefFromID', args)
+      ListTypeDef.new(self, @client, 'loadListTypeDefFromID', args)
     end
 
     # Load a LocalModuleSource from its ID.
@@ -3517,7 +3517,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadLocalModuleSourceFromID', args)
+      LocalModuleSource.new(self, @client, 'loadLocalModuleSourceFromID', args)
     end
 
     # Load a ModuleDependency from its ID.
@@ -3527,7 +3527,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadModuleDependencyFromID', args)
+      ModuleDependency.new(self, @client, 'loadModuleDependencyFromID', args)
     end
 
     # Load a Module from its ID.
@@ -3537,7 +3537,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadModuleFromID', args)
+      Module_.new(self, @client, 'loadModuleFromID', args)
     end
 
     # Load a ModuleSource from its ID.
@@ -3547,7 +3547,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadModuleSourceFromID', args)
+      ModuleSource.new(self, @client, 'loadModuleSourceFromID', args)
     end
 
     # Load a ModuleSourceView from its ID.
@@ -3557,7 +3557,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadModuleSourceViewFromID', args)
+      ModuleSourceView.new(self, @client, 'loadModuleSourceViewFromID', args)
     end
 
     # Load a ObjectTypeDef from its ID.
@@ -3567,7 +3567,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadObjectTypeDefFromID', args)
+      ObjectTypeDef.new(self, @client, 'loadObjectTypeDefFromID', args)
     end
 
     # Load a Port from its ID.
@@ -3577,7 +3577,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadPortFromID', args)
+      Port.new(self, @client, 'loadPortFromID', args)
     end
 
     # Load a ScalarTypeDef from its ID.
@@ -3587,7 +3587,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadScalarTypeDefFromID', args)
+      ScalarTypeDef.new(self, @client, 'loadScalarTypeDefFromID', args)
     end
 
     # Load a Secret from its ID.
@@ -3597,7 +3597,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadSecretFromID', args)
+      Secret.new(self, @client, 'loadSecretFromID', args)
     end
 
     # Load a Service from its ID.
@@ -3607,7 +3607,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadServiceFromID', args)
+      Service.new(self, @client, 'loadServiceFromID', args)
     end
 
     # Load a Socket from its ID.
@@ -3617,7 +3617,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadSocketFromID', args)
+      Socket.new(self, @client, 'loadSocketFromID', args)
     end
 
     # Load a SourceMap from its ID.
@@ -3627,7 +3627,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadSourceMapFromID', args)
+      SourceMap.new(self, @client, 'loadSourceMapFromID', args)
     end
 
     # Load a Terminal from its ID.
@@ -3637,7 +3637,7 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadTerminalFromID', args)
+      Terminal.new(self, @client, 'loadTerminalFromID', args)
     end
 
     # Load a TypeDef from its ID.
@@ -3647,13 +3647,13 @@ module Dagger
       args = {
         'id' => id
       }
-      Client.new(self, @client, 'loadTypeDefFromID', args)
+      TypeDef.new(self, @client, 'loadTypeDefFromID', args)
     end
 
     # Create a new module.
     # @return [Module_]
     def module_
-      Client.new(self, @client, 'module')
+      Module_.new(self, @client, 'module')
     end
 
     # Create a new module dependency configuration from a module source and name
@@ -3666,7 +3666,7 @@ module Dagger
         'source' => source
       }
       args['name'] = name unless name.nil?
-      Client.new(self, @client, 'moduleDependency', args)
+      ModuleDependency.new(self, @client, 'moduleDependency', args)
     end
 
     # Create a new module source instance from a source ref string.
@@ -3683,7 +3683,7 @@ module Dagger
       args['refPin'] = ref_pin unless ref_pin.nil?
       args['stable'] = stable unless stable.nil?
       args['relHostPath'] = rel_host_path unless rel_host_path.nil?
-      Client.new(self, @client, 'moduleSource', args)
+      ModuleSource.new(self, @client, 'moduleSource', args)
     end
 
     # Reference a secret by name.
@@ -3694,7 +3694,7 @@ module Dagger
         'name' => name
       }
       args['accessor'] = accessor unless accessor.nil?
-      Client.new(self, @client, 'secret', args)
+      Secret.new(self, @client, 'secret', args)
     end
 
     # Sets a secret given a user defined name to its plaintext and returns the secret.
@@ -3710,7 +3710,7 @@ module Dagger
         'name' => name,
         'plaintext' => plaintext
       }
-      Client.new(self, @client, 'setSecret', args)
+      Secret.new(self, @client, 'setSecret', args)
     end
 
     # Creates source map metadata.
@@ -3727,13 +3727,13 @@ module Dagger
         'line' => line,
         'column' => column
       }
-      Client.new(self, @client, 'sourceMap', args)
+      SourceMap.new(self, @client, 'sourceMap', args)
     end
 
     # Create a new TypeDef.
     # @return [TypeDef]
     def type_def
-      Client.new(self, @client, 'typeDef')
+      TypeDef.new(self, @client, 'typeDef')
     end
 
     # Get the current Dagger Engine version.
@@ -3959,37 +3959,37 @@ module Dagger
     # If kind is ENUM, the enum-specific type definition. If kind is not ENUM, this will be null.
     # @return [EnumTypeDef]
     def as_enum
-      TypeDef.new(self, @client, 'asEnum')
+      EnumTypeDef.new(self, @client, 'asEnum')
     end
 
     # If kind is INPUT, the input-specific type definition. If kind is not INPUT, this will be null.
     # @return [InputTypeDef]
     def as_input
-      TypeDef.new(self, @client, 'asInput')
+      InputTypeDef.new(self, @client, 'asInput')
     end
 
     # If kind is INTERFACE, the interface-specific type definition. If kind is not INTERFACE, this will be null.
     # @return [InterfaceTypeDef]
     def as_interface
-      TypeDef.new(self, @client, 'asInterface')
+      InterfaceTypeDef.new(self, @client, 'asInterface')
     end
 
     # If kind is LIST, the list-specific type definition. If kind is not LIST, this will be null.
     # @return [ListTypeDef]
     def as_list
-      TypeDef.new(self, @client, 'asList')
+      ListTypeDef.new(self, @client, 'asList')
     end
 
     # If kind is OBJECT, the object-specific type definition. If kind is not OBJECT, this will be null.
     # @return [ObjectTypeDef]
     def as_object
-      TypeDef.new(self, @client, 'asObject')
+      ObjectTypeDef.new(self, @client, 'asObject')
     end
 
     # If kind is SCALAR, the scalar-specific type definition. If kind is not SCALAR, this will be null.
     # @return [ScalarTypeDef]
     def as_scalar
-      TypeDef.new(self, @client, 'asScalar')
+      ScalarTypeDef.new(self, @client, 'asScalar')
     end
 
     # The kind of type this is (e.g. primitive, list, object).

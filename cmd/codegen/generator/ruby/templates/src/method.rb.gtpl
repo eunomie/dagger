@@ -3,6 +3,10 @@
 	{{- $parentName := .ParentObject.Name }}
 	{{- $required := GetRequiredArgs .Args }}
 	{{- $optionals := GetOptionalArgs .Args }}
+	{{- $outputType := .TypeRef | FormatOutputType }}
+	{{- if Solve .}}
+		{{- $outputType = $parentName | QueryToClient | FormatName }}
+	{{- end }}
 
 	{{- if and ($optionals) (eq $parentName "Query") }}
 		{{- $parentName = "Client" }}
@@ -27,7 +31,7 @@
       assert_not_nil(:{{.Name | FormatArg}}, {{.Name | FormatArg}})
 	{{- end }}
 	{{- if and (eq (len $required) 0) (eq (len $optionals) 0) }}
-      n = {{$parentName | QueryToClient | FormatName}}.new(self, @client, '{{.Name}}')
+      n = {{$outputType}}.new(self, @client, '{{.Name}}')
 	{{- else }}
 		{{- if eq (len $required) 0 }}
       args = {}
@@ -41,7 +45,7 @@
 		{{- range $index, $value := $optionals }}
       args['{{ .Name }}'] = {{ .Name | FormatArg }} unless {{ .Name | FormatArg }}.nil?
 		{{- end }}
-      n = {{$parentName | QueryToClient | FormatName}}.new(self, @client, '{{.Name}}', args)
+      n = {{$outputType}}.new(self, @client, '{{.Name}}', args)
 	{{- end }}
 	{{- if Solve . }}
       @client.invoke(n)
