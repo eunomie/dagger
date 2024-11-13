@@ -10,7 +10,7 @@ class HelloDagger
 
   def run(args)
     args.each do |arg|
-      puts send(arg)
+      puts send(arg.gsub('-', '_'))
     end
   end
 end
