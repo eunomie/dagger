@@ -1,0 +1,4 @@
+task :codegen, [:schema_file] do |t, args|
+    args.with_defaults(:schema_file => "/schema.json")
+    puts File.read(args.schema_file)
+end

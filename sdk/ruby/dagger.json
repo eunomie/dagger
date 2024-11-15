@@ -1,0 +1,6 @@
+{
+  "name": "ruby-sdk",
+  "engineVersion": "v0.14.0",
+  "sdk": "go",
+  "source": "runtime"
+}
