@@ -121,9 +121,15 @@ module Dagger
 
     def query(definition)
       uri = URI(@host)
+      host = uri.host
+      path = uri.path
+      if host.nil? || host.empty? || path.nil? || path.empty?
+        warn('dagger host not found')
+        exit(false)
+      end
       params = { 'query' => definition, 'variables' => {} }
-      http = Net::HTTP.new(uri.host, uri.port)
-      res = http.post(uri.path, params.to_json, @headers)
+      http = Net::HTTP.new(host, uri.port)
+      res = http.post(path, params.to_json, @headers)
       JSON.parse(res.body)
     end
 
@@ -146,9 +152,14 @@ module Dagger
   end
 
   def connect
-    @connect ||= Client.new(nil, @client, '')
+    @connect ||= Client.new(nil, gqlclient, '')
   end
   module_function :connect
+
+  def gqlclient
+    @gqlclient ||= GraphQLClient.new
+  end
+  module_function :gqlclient
 
   # A directory whose contents persist across runs.
   class CacheVolume < Node
@@ -1210,145 +1221,6 @@ module Dagger
     end
   end
 
-  # The Dagger engine configuration and state
-  class DaggerEngine < Node
-    # Return the Node ID for the GraphQL entity
-    # @return [String]
-    def id
-      @client.invoke(Node.new(self, @client, 'id'))
-    end
-
-    # The local (on-disk) cache for the Dagger engine
-    # @return [DaggerEngineCache]
-    def local_cache
-      DaggerEngineCache.new(self, @client, 'localCache')
-    end
-  end
-
-  # A cache storage for the Dagger engine
-  class DaggerEngineCache < Node
-    # Return the Node ID for the GraphQL entity
-    # @return [String]
-    def id
-      @client.invoke(Node.new(self, @client, 'id'))
-    end
-
-    # The current set of entries in the cache
-    # @return [DaggerEngineCacheEntrySet]
-    def entry_set
-      DaggerEngineCacheEntrySet.new(self, @client, 'entrySet')
-    end
-
-    # The maximum bytes to keep in the cache without pruning, after which automatic pruning may kick in.
-    # @return [number]
-    # @deprecated Use minFreeSpace instead.
-    def keep_bytes
-      n = DaggerEngineCache.new(self, @client, 'keepBytes')
-      @client.invoke(n)
-    end
-
-    # The maximum bytes to keep in the cache without pruning.
-    # @return [number]
-    def max_used_space
-      n = DaggerEngineCache.new(self, @client, 'maxUsedSpace')
-      @client.invoke(n)
-    end
-
-    # The target amount of free disk space the garbage collector will attempt to leave.
-    # @return [number]
-    def min_free_space
-      n = DaggerEngineCache.new(self, @client, 'minFreeSpace')
-      @client.invoke(n)
-    end
-
-    # Prune the cache of releaseable entries
-    # @return [Void]
-    def prune
-      n = DaggerEngineCache.new(self, @client, 'prune')
-      @client.invoke(n)
-    end
-
-    # @return [number]
-    def reserved_space
-      n = DaggerEngineCache.new(self, @client, 'reservedSpace')
-      @client.invoke(n)
-    end
-  end
-
-  # An individual cache entry in a cache entry set
-  class DaggerEngineCacheEntry < Node
-    # Return the Node ID for the GraphQL entity
-    # @return [String]
-    def id
-      @client.invoke(Node.new(self, @client, 'id'))
-    end
-
-    # Whether the cache entry is actively being used.
-    # @return [boolean]
-    def actively_used
-      n = DaggerEngineCacheEntry.new(self, @client, 'activelyUsed')
-      @client.invoke(n)
-    end
-
-    # The time the cache entry was created, in Unix nanoseconds.
-    # @return [number]
-    def created_time_unix_nano
-      n = DaggerEngineCacheEntry.new(self, @client, 'createdTimeUnixNano')
-      @client.invoke(n)
-    end
-
-    # The description of the cache entry.
-    # @return [string]
-    def description
-      n = DaggerEngineCacheEntry.new(self, @client, 'description')
-      @client.invoke(n)
-    end
-
-    # The disk space used by the cache entry.
-    # @return [number]
-    def disk_space_bytes
-      n = DaggerEngineCacheEntry.new(self, @client, 'diskSpaceBytes')
-      @client.invoke(n)
-    end
-
-    # The most recent time the cache entry was used, in Unix nanoseconds.
-    # @return [number]
-    def most_recent_use_time_unix_nano
-      n = DaggerEngineCacheEntry.new(self, @client, 'mostRecentUseTimeUnixNano')
-      @client.invoke(n)
-    end
-  end
-
-  # A set of cache entries returned by a query to a cache
-  class DaggerEngineCacheEntrySet < Node
-    # Return the Node ID for the GraphQL entity
-    # @return [String]
-    def id
-      @client.invoke(Node.new(self, @client, 'id'))
-    end
-
-    # The total disk space used by the cache entries in this set.
-    # @return [number]
-    def disk_space_bytes
-      n = DaggerEngineCacheEntrySet.new(self, @client, 'diskSpaceBytes')
-      @client.invoke(n)
-    end
-
-    # The list of individual cache entries in the set
-    # @return [Array<DaggerEngineCacheEntry>]
-    def entries
-      n = DaggerEngineCacheEntrySet.new(self, @client, 'entries')
-      @client.invoke(n)
-    end
-
-    # The number of cache entries in this set.
-    # @return [number]
-    def entry_count
-      n = DaggerEngineCacheEntrySet.new(self, @client, 'entryCount')
-      @client.invoke(n)
-    end
-  end
-
   # A directory.
   class Directory < Node
     # Return the Node ID for the GraphQL entity
@@ -1618,6 +1490,145 @@ module Dagger
 
     def with(fun)
       fun.call(self)
+    end
+  end
+
+  # The Dagger engine configuration and state
+  class Engine < Node
+    # Return the Node ID for the GraphQL entity
+    # @return [String]
+    def id
+      @client.invoke(Node.new(self, @client, 'id'))
+    end
+
+    # The local (on-disk) cache for the Dagger engine
+    # @return [EngineCache]
+    def local_cache
+      EngineCache.new(self, @client, 'localCache')
+    end
+  end
+
+  # A cache storage for the Dagger engine
+  class EngineCache < Node
+    # Return the Node ID for the GraphQL entity
+    # @return [String]
+    def id
+      @client.invoke(Node.new(self, @client, 'id'))
+    end
+
+    # The current set of entries in the cache
+    # @return [EngineCacheEntrySet]
+    def entry_set
+      EngineCacheEntrySet.new(self, @client, 'entrySet')
+    end
+
+    # The maximum bytes to keep in the cache without pruning, after which automatic pruning may kick in.
+    # @return [number]
+    # @deprecated Use minFreeSpace instead.
+    def keep_bytes
+      n = EngineCache.new(self, @client, 'keepBytes')
+      @client.invoke(n)
+    end
+
+    # The maximum bytes to keep in the cache without pruning.
+    # @return [number]
+    def max_used_space
+      n = EngineCache.new(self, @client, 'maxUsedSpace')
+      @client.invoke(n)
+    end
+
+    # The target amount of free disk space the garbage collector will attempt to leave.
+    # @return [number]
+    def min_free_space
+      n = EngineCache.new(self, @client, 'minFreeSpace')
+      @client.invoke(n)
+    end
+
+    # Prune the cache of releaseable entries
+    # @return [Void]
+    def prune
+      n = EngineCache.new(self, @client, 'prune')
+      @client.invoke(n)
+    end
+
+    # @return [number]
+    def reserved_space
+      n = EngineCache.new(self, @client, 'reservedSpace')
+      @client.invoke(n)
+    end
+  end
+
+  # An individual cache entry in a cache entry set
+  class EngineCacheEntry < Node
+    # Return the Node ID for the GraphQL entity
+    # @return [String]
+    def id
+      @client.invoke(Node.new(self, @client, 'id'))
+    end
+
+    # Whether the cache entry is actively being used.
+    # @return [boolean]
+    def actively_used
+      n = EngineCacheEntry.new(self, @client, 'activelyUsed')
+      @client.invoke(n)
+    end
+
+    # The time the cache entry was created, in Unix nanoseconds.
+    # @return [number]
+    def created_time_unix_nano
+      n = EngineCacheEntry.new(self, @client, 'createdTimeUnixNano')
+      @client.invoke(n)
+    end
+
+    # The description of the cache entry.
+    # @return [string]
+    def description
+      n = EngineCacheEntry.new(self, @client, 'description')
+      @client.invoke(n)
+    end
+
+    # The disk space used by the cache entry.
+    # @return [number]
+    def disk_space_bytes
+      n = EngineCacheEntry.new(self, @client, 'diskSpaceBytes')
+      @client.invoke(n)
+    end
+
+    # The most recent time the cache entry was used, in Unix nanoseconds.
+    # @return [number]
+    def most_recent_use_time_unix_nano
+      n = EngineCacheEntry.new(self, @client, 'mostRecentUseTimeUnixNano')
+      @client.invoke(n)
+    end
+  end
+
+  # A set of cache entries returned by a query to a cache
+  class EngineCacheEntrySet < Node
+    # Return the Node ID for the GraphQL entity
+    # @return [String]
+    def id
+      @client.invoke(Node.new(self, @client, 'id'))
+    end
+
+    # The total disk space used by the cache entries in this set.
+    # @return [number]
+    def disk_space_bytes
+      n = EngineCacheEntrySet.new(self, @client, 'diskSpaceBytes')
+      @client.invoke(n)
+    end
+
+    # The list of individual cache entries in the set
+    # @return [Array<EngineCacheEntry>]
+    def entries
+      n = EngineCacheEntrySet.new(self, @client, 'entries')
+      @client.invoke(n)
+    end
+
+    # The number of cache entries in this set.
+    # @return [number]
+    def entry_count
+      n = EngineCacheEntrySet.new(self, @client, 'entryCount')
+      @client.invoke(n)
     end
   end
 
@@ -3165,12 +3176,6 @@ module Dagger
       @client.invoke(n)
     end
 
-    # The Dagger engine container configuration and state
-    # @return [DaggerEngine]
-    def dagger_engine
-      DaggerEngine.new(self, @client, 'daggerEngine')
-    end
-
     # The default platform of the engine.
     # @return [Platform]
     def default_platform
@@ -3182,6 +3187,12 @@ module Dagger
     # @return [Directory]
     def directory
       Directory.new(self, @client, 'directory')
+    end
+
+    # The Dagger engine container configuration and state
+    # @return [Engine]
+    def engine
+      Engine.new(self, @client, 'engine')
     end
 
     # Creates a function.
@@ -3280,46 +3291,6 @@ module Dagger
       CurrentModule.new(self, @client, 'loadCurrentModuleFromID', args)
     end
 
-    # Load a DaggerEngineCacheEntry from its ID.
-    # @return [DaggerEngineCacheEntry]
-    def load_dagger_engine_cache_entry_from_id(id:)
-      assert_not_nil(:id, id)
-      args = {
-        'id' => id
-      }
-      DaggerEngineCacheEntry.new(self, @client, 'loadDaggerEngineCacheEntryFromID', args)
-    end
-
-    # Load a DaggerEngineCacheEntrySet from its ID.
-    # @return [DaggerEngineCacheEntrySet]
-    def load_dagger_engine_cache_entry_set_from_id(id:)
-      assert_not_nil(:id, id)
-      args = {
-        'id' => id
-      }
-      DaggerEngineCacheEntrySet.new(self, @client, 'loadDaggerEngineCacheEntrySetFromID', args)
-    end
-
-    # Load a DaggerEngineCache from its ID.
-    # @return [DaggerEngineCache]
-    def load_dagger_engine_cache_from_id(id:)
-      assert_not_nil(:id, id)
-      args = {
-        'id' => id
-      }
-      DaggerEngineCache.new(self, @client, 'loadDaggerEngineCacheFromID', args)
-    end
-
-    # Load a DaggerEngine from its ID.
-    # @return [DaggerEngine]
-    def load_dagger_engine_from_id(id:)
-      assert_not_nil(:id, id)
-      args = {
-        'id' => id
-      }
-      DaggerEngine.new(self, @client, 'loadDaggerEngineFromID', args)
-    end
-
     # Load a Directory from its ID.
     # @return [Directory]
     def load_directory_from_id(id:)
@@ -3328,6 +3299,46 @@ module Dagger
         'id' => id
       }
       Directory.new(self, @client, 'loadDirectoryFromID', args)
+    end
+
+    # Load a EngineCacheEntry from its ID.
+    # @return [EngineCacheEntry]
+    def load_engine_cache_entry_from_id(id:)
+      assert_not_nil(:id, id)
+      args = {
+        'id' => id
+      }
+      EngineCacheEntry.new(self, @client, 'loadEngineCacheEntryFromID', args)
+    end
+
+    # Load a EngineCacheEntrySet from its ID.
+    # @return [EngineCacheEntrySet]
+    def load_engine_cache_entry_set_from_id(id:)
+      assert_not_nil(:id, id)
+      args = {
+        'id' => id
+      }
+      EngineCacheEntrySet.new(self, @client, 'loadEngineCacheEntrySetFromID', args)
+    end
+
+    # Load a EngineCache from its ID.
+    # @return [EngineCache]
+    def load_engine_cache_from_id(id:)
+      assert_not_nil(:id, id)
+      args = {
+        'id' => id
+      }
+      EngineCache.new(self, @client, 'loadEngineCacheFromID', args)
+    end
+
+    # Load a Engine from its ID.
+    # @return [Engine]
+    def load_engine_from_id(id:)
+      assert_not_nil(:id, id)
+      args = {
+        'id' => id
+      }
+      Engine.new(self, @client, 'loadEngineFromID', args)
     end
 
     # Load a EnumTypeDef from its ID.
