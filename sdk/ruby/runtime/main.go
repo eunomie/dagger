@@ -8,10 +8,11 @@ import (
 )
 
 const (
-	RubyImage     = "ruby:3.3.6-alpine:3.20"
-	RubyDigest    = "sha256:caeab43b356463e63f87af54a03de1ae4687b36da708e6d37025c557ade450f8"
-	ModSourcePath = "/lib"
-	GenPath       = "sdk"
+	RubyImage        = "ruby:3.3.6-alpine3.20"
+	RubyDigest       = "sha256:caeab43b356463e63f87af54a03de1ae4687b36da708e6d37025c557ade450f8"
+	ModSourceDirPath = "/src"
+	GenPath          = "lib/dagger"
+	codegenBinPath   = "/codegen"
 )
 
 type RubySdk struct {
@@ -23,7 +24,6 @@ func New(
 	// Directory with the ruby SDK source code.
 	// +optional
 	// +defaultPath="/sdk/ruby"
-	// +ignore=["**", "!generated/", "!lib/", "!dagger.gemspec", "!Gemfile"]
 	sdkSourceDir *dagger.Directory,
 ) (*RubySdk, error) {
 	if sdkSourceDir == nil {
@@ -44,7 +44,15 @@ func (m *RubySdk) Codegen(
 	if err != nil {
 		return nil, err
 	}
-	return dag.GeneratedCode(ctr.Directory(ModSourcePath)).
+	codegen := dag.
+		Directory().
+		WithDirectory(
+			"/",
+			ctr.Directory(ModSourceDirPath))
+	return dag.GeneratedCode(
+		//ctr.Directory(ModSourcePath),
+		codegen,
+	).
 		WithVCSGeneratedPaths([]string{
 			GenPath + "/**",
 			"entrypoint.rb",
@@ -71,46 +79,95 @@ func (m *RubySdk) CodegenBase(
 	}
 
 	base := dag.Container().
-		From(fmt.Sprintf("%s@%s", RubyImage, RubyDigest))
+		From(fmt.Sprintf("%s@%s", RubyImage, RubyDigest)).
+		WithExec([]string{"apk", "add", "git", "openssh", "curl"})
+
+	sdk := m.
+		addSDK().
+		WithDirectory(".", m.generateClient(base, introspectionJSON, name, subPath))
 
 	// Mounts Ruby SDK code and installs it
 	// Runs codegen using the schema json provided by the dagger engine
-	ctr := base.
-		WithDirectory("/sdk", m.SourceDir).
-		WithWorkdir("/sdk")
+	base = base.
+		WithMountedDirectory("/opt/module", dag.CurrentModule().Source().Directory(".")).
+		WithDirectory(ModSourceDirPath,
+			dag.Directory().WithDirectory("/", modSource.ContextDirectory(), dagger.DirectoryWithDirectoryOpts{
+				Include: m.moduleConfigFiles(subPath),
+			})).
+		WithDirectory(filepath.Join(ModSourceDirPath, subPath, GenPath), sdk).
+		WithWorkdir(filepath.Join(ModSourceDirPath, subPath))
+	base = base.WithDirectory(".", base.Directory("/opt/module/template"))
 
-	sdkDir := ctr.
+	base = base.WithExec([]string{"bundle", "install"})
+
+	base = base.
+		WithDirectory(ModSourceDirPath,
+			dag.Directory().WithDirectory("/", modSource.ContextDirectory(), dagger.DirectoryWithDirectoryOpts{
+				Exclude: append(m.moduleConfigFiles(subPath), filepath.Join(subPath, "sdk")),
+			}))
+	//WithDirectory("/sdk", m.SourceDir).
+	//WithWorkdir("/sdk")
+
+	/*
+		srcPath := filepath.Join(ModSourceDirPath, subPath)
+		sdkPath := filepath.Join(srcPath, GenPath)
+		runtime := dag.CurrentModule().Source()
+
+		ctxDir := modSource.ContextDirectory().
+			WithoutDirectory(filepath.Join(subPath, "vendor")).
+			WithoutDirectory(filepath.Join(subPath, GenPath))
+
+		base = base.
+			WithMountedDirectory("/opt/template", runtime.Directory("template")).
+			WithMountedFile("/init-template.sh", runtime.File("scripts/init-template.sh")).
+			WithMountedDirectory(ModSourceDirPath, ctxDir).
+			WithDirectory(sdkPath, sdk).
+			WithWorkdir(srcPath).
+			WithExec([]string{"/init-template.sh", name}).
+			WithExec([]string{"bundle", "install"}).
+			WithEntrypoint([]string{"bundle", "exec", "ruby", filepath.Join(srcPath, "main.rb")})
+	*/
+	return base, nil
+}
+
+func (m *RubySdk) moduleConfigFiles(path string) []string {
+	modConfigFiles := []string{
+		"Gemfile",
+		"Gemfile.lock",
+	}
+
+	for i, file := range modConfigFiles {
+		modConfigFiles[i] = filepath.Join(path, file)
+	}
+
+	return modConfigFiles
+}
+
+func (m *RubySdk) addSDK() *dagger.Directory {
+	return m.SourceDir.
+		WithoutDirectory("codegen").
+		WithoutDirectory("runtime")
+}
+
+func (m *RubySdk) generateClient(
+	ctr *dagger.Container,
+	introspectionJSON *dagger.File,
+	name, subPath string,
+) *dagger.Directory {
+	return ctr.
+		WithMountedFile(codegenBinPath, m.SourceDir.File("/codegen")).
 		WithMountedFile("/schema.json", introspectionJSON).
 		WithExec([]string{
-			"scripts/codegen.rb",
-			"dagger:codegen",
-			"--schema-file",
-			"/schema.json",
+			codegenBinPath,
+			"--lang", "ruby",
+			"--output", ModSourceDirPath,
+			"--module-name", name,
+			"--module-context-path", subPath,
+			"--introspection-json-path", "/schema.json",
+		}, dagger.ContainerWithExecOpts{
+			ExperimentalPrivilegedNesting: true,
 		}).
-		WithoutDirectory("vendor").
-		WithoutDirectory("scripts").
-		WithoutFile("Gemfile.lock").
-		Directory(".")
-
-	srcPath := filepath.Join(ModSourcePath, subPath)
-	sdkPath := filepath.Join(srcPath, GenPath)
-	runtime := dag.CurrentModule().Source()
-
-	ctxDir := modSource.ContextDirectory().
-		WithoutDirectory(filepath.Join(subPath, "vendor")).
-		WithoutDirectory(filepath.Join(subPath, GenPath))
-
-	ctr = ctr.
-		WithMountedDirectory("/opt/template", runtime.Directory("template")).
-		WithMountedFile("/init-template.sh", runtime.File("scripts/init-template.sh")).
-		WithMountedDirectory(ModSourcePath, ctxDir).
-		WithDirectory(sdkPath, sdkDir).
-		WithWorkdir(srcPath).
-		WithExec([]string{"/init-template.sh", name}).
-		WithExec([]string{"bundle", "install"}).
-		WithEntrypoint([]string{filepath.Join(srcPath, "entrypoint.rb")})
-
-	return ctr, nil
+		Directory(ModSourceDirPath)
 }
 
 func (m *RubySdk) ModuleRuntime(

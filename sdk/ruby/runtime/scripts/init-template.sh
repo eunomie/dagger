@@ -1,3 +1,5 @@
 #!/bin/sh
 
-echo "init-template!"
+set -eux
+
+cp -r /opt/template/* .

@@ -127,7 +127,7 @@ func parseSDKName(sdkName string) (SDK, string, error) {
 	}
 
 	// inbuilt sdk go/python/typescript currently does not support selecting a specific version
-	if slices.Contains([]SDK{SDKGo, SDKPython, SDKTypescript}, SDK(sdkNameParsed)) && hasVersion {
+	if slices.Contains([]SDK{SDKGo, SDKPython, SDKTypescript, SDKRuby}, SDK(sdkNameParsed)) && hasVersion {
 		return "", "", fmt.Errorf("the %s sdk does not currently support selecting a specific version", sdkNameParsed)
 	}
 
@@ -179,7 +179,8 @@ func (s *moduleSchema) builtinSDK(ctx context.Context, root *core.Query, sdkName
 	case SDKElixir:
 		return s.sdkForModule(ctx, root, "github.com/dagger/dagger/sdk/elixir"+sdkSuffix, dagql.Instance[*core.ModuleSource]{})
 	case SDKRuby:
-		return s.sdkForModule(ctx, root, "github.com/dagger/dagger/sdk/ruby"+sdkSuffix, dagql.Instance[*core.ModuleSource]{})
+		//return s.sdkForModule(ctx, root, "github.com/dagger/dagger/sdk/ruby"+sdkSuffix, dagql.Instance[*core.ModuleSource]{})
+		return s.loadBuiltinSDK(ctx, root, sdkName, digest.Digest(os.Getenv(distconsts.RubySDKManifestDigestEnvName)))
 	}
 
 	return nil, getInvalidBuiltinSDKError(sdkName)
