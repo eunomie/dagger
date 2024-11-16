@@ -9,6 +9,8 @@ class HelloDagger
 
   def run(args)
     name = args.shift
-    puts send(name.gsub('-', '_'), *args)
+    puts self.send(name.gsub('-', '_'), *args)
   end
 end
+
+HelloDagger.new.run ARGV

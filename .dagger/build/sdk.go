@@ -130,16 +130,9 @@ func (build *Builder) typescriptSDKContent(ctx context.Context) (*sdkContent, er
 func (build *Builder) rubySDKContent(ctx context.Context) (*sdkContent, error) {
 	rootfs := dag.Directory().WithDirectory("/", build.source.Directory("sdk/ruby"), dagger.DirectoryWithDirectoryOpts{
 		Include: []string{
-			"**/*.rb",
 			"runtime",
-			"dagger.gemspec",
 			"Gemfile",
-			"Rakefile",
-			"rubocop.yml",
-			"dagger.json",
-		},
-		Exclude: []string{
-			"Gemfile.lock",
+			"lib",
 		},
 	})
 	sdkCtrTarball := dag.Container().

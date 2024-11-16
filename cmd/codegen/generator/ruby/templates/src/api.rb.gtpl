@@ -17,18 +17,8 @@ require 'net/http'
 require 'base64'
 require 'json'
 
-def basic_auth(username, password)
-  Base64.encode64("#{username}:#{password}").rstrip
-end
-
 # Dagger module
 module Dagger
-{{""}}
-  {{- template "node" }}
-{{""}}
-  {{- template "client" }}
-  {{- /* template "types" . */ -}}
-{{""}}
-  {{- template "objects" . }}
+  {{- template "objects" .}}
 end
 {{ end }}

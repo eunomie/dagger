@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+
+	"github.com/iancoleman/strcase"
 	"path/filepath"
 	"ruby-sdk/internal/dagger"
 )
@@ -13,17 +15,32 @@ const (
 	ModSourceDirPath = "/src"
 	GenPath          = "lib/dagger"
 	codegenBinPath   = "/codegen"
+	schemaPath       = "/schema.json"
 )
 
 type RubySdk struct {
-	SourceDir     *dagger.Directory
+	SDKSourceDir  *dagger.Directory
 	RequiredPaths []string
+	moduleConfig  moduleConfig
+}
+
+type moduleConfig struct {
+	name    string
+	subPath string
+}
+
+func (c *moduleConfig) modulePath() string {
+	return filepath.Join(ModSourceDirPath, c.subPath)
+}
+
+func (c *moduleConfig) sdkPath() string {
+	return filepath.Join(c.modulePath(), GenPath)
 }
 
 func New(
-	// Directory with the ruby SDK source code.
-	// +optional
-	// +defaultPath="/sdk/ruby"
+// Directory with the ruby SDK source code.
+// +optional
+// +ignore=["**", "!**/*.rb", "!Gemfile"]
 	sdkSourceDir *dagger.Directory,
 ) (*RubySdk, error) {
 	if sdkSourceDir == nil {
@@ -31,8 +48,27 @@ func New(
 	}
 	return &RubySdk{
 		RequiredPaths: []string{},
-		SourceDir:     sdkSourceDir,
+		SDKSourceDir:  sdkSourceDir,
 	}, nil
+}
+
+func (m *RubySdk) setModuleConfig(ctx context.Context, modSource *dagger.ModuleSource) error {
+	name, err := modSource.ModuleOriginalName(ctx)
+	if err != nil {
+		return fmt.Errorf("could not load module name: %w", err)
+	}
+
+	subPath, err := modSource.SourceSubpath(ctx)
+	if err != nil {
+		return fmt.Errorf("could not load source subpath: %w", err)
+	}
+
+	m.moduleConfig = moduleConfig{
+		name:    name,
+		subPath: subPath,
+	}
+
+	return nil
 }
 
 func (m *RubySdk) Codegen(
@@ -40,6 +76,9 @@ func (m *RubySdk) Codegen(
 	modSource *dagger.ModuleSource,
 	introspectionJSON *dagger.File,
 ) (*dagger.GeneratedCode, error) {
+	if err := m.setModuleConfig(ctx, modSource); err != nil {
+		return nil, err
+	}
 	ctr, err := m.CodegenBase(ctx, modSource, introspectionJSON)
 	if err != nil {
 		return nil, err
@@ -49,17 +88,15 @@ func (m *RubySdk) Codegen(
 		WithDirectory(
 			"/",
 			ctr.Directory(ModSourceDirPath))
+
 	return dag.GeneratedCode(
-		//ctr.Directory(ModSourcePath),
 		codegen,
 	).
 		WithVCSGeneratedPaths([]string{
 			GenPath + "/**",
-			"entrypoint.rb",
 		}).
 		WithVCSIgnoredPaths([]string{
 			GenPath,
-			"vendor",
 		}), nil
 }
 
@@ -68,72 +105,63 @@ func (m *RubySdk) CodegenBase(
 	modSource *dagger.ModuleSource,
 	introspectionJSON *dagger.File,
 ) (*dagger.Container, error) {
-	name, err := modSource.ModuleOriginalName(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("could not load module name: %w", err)
-	}
+	base := m.base()
 
-	subPath, err := modSource.SourceSubpath(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("could not load source subpath: %w", err)
-	}
+	// Get a directory with the SDK sources and the generated client.
+	sdk := m.SDKSourceDir.
+		WithoutDirectory("codegen").
+		WithoutDirectory("runtime").
+		WithDirectory(".", m.generateClient(base, introspectionJSON))
 
-	base := dag.Container().
-		From(fmt.Sprintf("%s@%s", RubyImage, RubyDigest)).
-		WithExec([]string{"apk", "add", "git", "openssh", "curl"})
-
-	sdk := m.
-		addSDK().
-		WithDirectory(".", m.generateClient(base, introspectionJSON, name, subPath))
-
-	// Mounts Ruby SDK code and installs it
-	// Runs codegen using the schema json provided by the dagger engine
 	base = base.
 		WithMountedDirectory("/opt/module", dag.CurrentModule().Source().Directory(".")).
-		WithDirectory(ModSourceDirPath,
-			dag.Directory().WithDirectory("/", modSource.ContextDirectory(), dagger.DirectoryWithDirectoryOpts{
-				Include: m.moduleConfigFiles(subPath),
-			})).
-		WithDirectory(filepath.Join(ModSourceDirPath, subPath, GenPath), sdk).
-		WithWorkdir(filepath.Join(ModSourceDirPath, subPath))
-	base = base.WithDirectory(".", base.Directory("/opt/module/template"))
-
-	base = base.WithExec([]string{"bundle", "install"})
-
+		WithDirectory(ModSourceDirPath, modSource.ContextDirectory()).
+		//WithDirectory(ModSourceDirPath,
+		//	dag.Directory().WithDirectory("/", modSource.ContextDirectory(), dagger.DirectoryWithDirectoryOpts{
+		//		Include: m.moduleConfigFiles(m.moduleConfig.subPath),
+		//	})).
+		WithDirectory(m.moduleConfig.modulePath(), m.SDKSourceDir, dagger.ContainerWithDirectoryOpts{
+			Include: []string{
+				"Gemfile",
+				"lib",
+			},
+			Exclude: []string{
+				"lib/dagger/client.gen.rb",
+			},
+		}).
+		WithDirectory(filepath.Join(m.moduleConfig.modulePath(), GenPath), sdk, dagger.ContainerWithDirectoryOpts{
+			Include: []string{
+				"client.gen.rb",
+			},
+		}).
+		WithWorkdir(m.moduleConfig.modulePath())
+	// add template files
 	base = base.
-		WithDirectory(ModSourceDirPath,
-			dag.Directory().WithDirectory("/", modSource.ContextDirectory(), dagger.DirectoryWithDirectoryOpts{
-				Exclude: append(m.moduleConfigFiles(subPath), filepath.Join(subPath, "sdk")),
-			}))
-	//WithDirectory("/sdk", m.SourceDir).
-	//WithWorkdir("/sdk")
+		WithDirectory(".", base.Directory("/opt/module/template"), dagger.ContainerWithDirectoryOpts{
+			Include: []string{
+				"dagger.rb",
+				"dagger.gemspec",
+				"main.rb",
+			},
+		}).
+		WithExec([]string{"sed", "-i", "-e", fmt.Sprintf("s/HelloDagger/%s/g", strcase.ToCamel(m.moduleConfig.name)), "dagger.rb"}).
+		WithExec([]string{"sed", "-i", "-e", fmt.Sprintf("s/HelloDagger/%s/g", strcase.ToCamel(m.moduleConfig.name)), "dagger.gemspec"}).
+		WithExec([]string{"sed", "-i", "-e", fmt.Sprintf("s/HelloDagger/%s/g", strcase.ToCamel(m.moduleConfig.name)), "main.rb"}).
+		WithExec([]string{"bundle", "install"})
 
-	/*
-		srcPath := filepath.Join(ModSourceDirPath, subPath)
-		sdkPath := filepath.Join(srcPath, GenPath)
-		runtime := dag.CurrentModule().Source()
-
-		ctxDir := modSource.ContextDirectory().
-			WithoutDirectory(filepath.Join(subPath, "vendor")).
-			WithoutDirectory(filepath.Join(subPath, GenPath))
-
-		base = base.
-			WithMountedDirectory("/opt/template", runtime.Directory("template")).
-			WithMountedFile("/init-template.sh", runtime.File("scripts/init-template.sh")).
-			WithMountedDirectory(ModSourceDirPath, ctxDir).
-			WithDirectory(sdkPath, sdk).
-			WithWorkdir(srcPath).
-			WithExec([]string{"/init-template.sh", name}).
-			WithExec([]string{"bundle", "install"}).
-			WithEntrypoint([]string{"bundle", "exec", "ruby", filepath.Join(srcPath, "main.rb")})
-	*/
 	return base, nil
+}
+
+func (m *RubySdk) base() *dagger.Container {
+	return dag.
+		Container().
+		From(fmt.Sprintf("%s@%s", RubyImage, RubyDigest)).
+		WithExec([]string{"apk", "add", "git", "openssh", "curl"})
 }
 
 func (m *RubySdk) moduleConfigFiles(path string) []string {
 	modConfigFiles := []string{
 		"Gemfile",
-		"Gemfile.lock",
 	}
 
 	for i, file := range modConfigFiles {
@@ -144,7 +172,7 @@ func (m *RubySdk) moduleConfigFiles(path string) []string {
 }
 
 func (m *RubySdk) addSDK() *dagger.Directory {
-	return m.SourceDir.
+	return m.SDKSourceDir.
 		WithoutDirectory("codegen").
 		WithoutDirectory("runtime")
 }
@@ -152,22 +180,24 @@ func (m *RubySdk) addSDK() *dagger.Directory {
 func (m *RubySdk) generateClient(
 	ctr *dagger.Container,
 	introspectionJSON *dagger.File,
-	name, subPath string,
 ) *dagger.Directory {
 	return ctr.
-		WithMountedFile(codegenBinPath, m.SourceDir.File("/codegen")).
-		WithMountedFile("/schema.json", introspectionJSON).
+		// Add dagger codegen binary.
+		WithMountedFile(codegenBinPath, m.SDKSourceDir.File("/codegen")).
+		// Mount the introspection file.
+		WithMountedFile(schemaPath, introspectionJSON).
+		// Generate the ruby client from the introspection file.
 		WithExec([]string{
 			codegenBinPath,
 			"--lang", "ruby",
 			"--output", ModSourceDirPath,
-			"--module-name", name,
-			"--module-context-path", subPath,
-			"--introspection-json-path", "/schema.json",
+			"--module-name", m.moduleConfig.name,
+			"--module-context-path", m.moduleConfig.modulePath(),
+			"--introspection-json-path", schemaPath,
 		}, dagger.ContainerWithExecOpts{
 			ExperimentalPrivilegedNesting: true,
 		}).
-		Directory(ModSourceDirPath)
+		Directory(m.moduleConfig.sdkPath())
 }
 
 func (m *RubySdk) ModuleRuntime(
@@ -175,5 +205,8 @@ func (m *RubySdk) ModuleRuntime(
 	modSource *dagger.ModuleSource,
 	introspectionJSON *dagger.File,
 ) (*dagger.Container, error) {
+	if err := m.setModuleConfig(ctx, modSource); err != nil {
+		return nil, err
+	}
 	return m.CodegenBase(ctx, modSource, introspectionJSON)
 }
