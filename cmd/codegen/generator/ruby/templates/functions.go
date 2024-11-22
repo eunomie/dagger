@@ -33,7 +33,48 @@ func TypescriptTemplateFuncs(
 		"Solve":               solve,
 		"IsSelfChainable":     commonFunc.IsSelfChainable,
 		"ValidTypes":          validTypes,
+		"IsCustomScalar":      isCustomScalar,
+		"IsEnum":              isEnum,
+		"SortEnumFields":      sortEnumFields,
+		"FormatEnum":          formatEnum,
+		"PascalCase":          pascalCase,
+		"SortInputFields":     sortInputFields,
 	}
+}
+
+// pascalCase change a type name into pascalCase
+func pascalCase(name string) string {
+	return strcase.ToCamel(name)
+}
+
+// formatEnum formats a GraphQL enum into a TS equivalent
+func formatEnum(s string) string {
+	s = strings.ToLower(s)
+	return strcase.ToCamel(s)
+}
+
+// isCustomScalar checks if the type is actually custom.
+func isCustomScalar(t *introspection.Type) bool {
+	switch introspection.Scalar(t.Name) {
+	case introspection.ScalarString, introspection.ScalarInt, introspection.ScalarFloat, introspection.ScalarBoolean:
+		return false
+	default:
+		return t.Kind == introspection.TypeKindScalar
+	}
+}
+
+// isEnum checks if the type is actually custom.
+func isEnum(t *introspection.Type) bool {
+	return t.Kind == introspection.TypeKindEnum &&
+		// We ignore the internal GraphQL enums
+		!strings.HasPrefix(t.Name, "_")
+}
+
+func sortEnumFields(s []introspection.EnumValue) []introspection.EnumValue {
+	sort.SliceStable(s, func(i, j int) bool {
+		return s[i].Name < s[j].Name
+	})
+	return s
 }
 
 func validTypes(types introspection.Types) introspection.Types {

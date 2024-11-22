@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# typed: true
+require 'sorbet-runtime'
+
 def basic_auth(username, password)
   Base64.encode64("#{username}:#{password}").rstrip
 end
@@ -8,6 +11,9 @@ end
 module Dagger
   # Client to interact with the dagger GraphQL API
   class GraphQLClient
+    extend T::Sig
+
+    sig {void}
     def initialize
       unless ENV.include?('DAGGER_SESSION_PORT')
         warn('DAGGER_SESSION_PORT is not set')
@@ -30,10 +36,9 @@ module Dagger
         'Authorization' => "Basic #{basic_auth(session_token, '')}",
         'content-type' => 'application/json'
       }
-
-      @root = Node.new(nil, @client, '')
     end
 
+    sig {params(definition: String).returns(T.untyped)}
     def query(definition)
       uri = URI(@host)
       host = uri.host
@@ -48,18 +53,7 @@ module Dagger
       JSON.parse(res.body)
     end
 
-    def container
-      Container.new(@root.dup, self, 'container')
-    end
-
-    def host
-      Host.new(@root.dup, self, 'host')
-    end
-
-    def cache_volume(key:)
-      CacheVolume.new(@root.dup, self, 'cacheVolume', { 'key' => key })
-    end
-
+    sig {params(node: Node).returns(T.untyped)}
     def invoke(node)
       res = query(node.to_s)
       node.value(res)

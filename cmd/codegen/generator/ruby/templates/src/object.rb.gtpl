@@ -16,6 +16,8 @@
 			{{- end }}
 			{{- /* Write object name. */ -}}
 {{ "  " }}class {{ .Name | QueryToClient | FormatName }} < Node
+    extend T::Sig
+{{ "" }}
       {{- $first := true -}}
       {{- /* Add custom method to main Client */ -}}
       {{- if .Name | QueryToClient | FormatName | eq "Client" }}
@@ -33,6 +35,7 @@
 				{{- if eq $field.Name "id" }}
     # Return the Node ID for the GraphQL entity
     # @return [String]
+    sig {returns(String)}
     def id
       @client.invoke(Node.new(self, @client, 'id'))
     end
