@@ -42,7 +42,9 @@ public class DaggerCodegenMojo extends AbstractMojo {
   protected String introspectionJson;
 
   /** Specify output directory where the Java files are generated. */
-  @Parameter(defaultValue = "${project.build.directory}/generated-sources/dagger")
+  @Parameter(
+      property = "dagger.gen.output",
+      defaultValue = "${project.build.directory}/generated-sources/dagger")
   private File outputDirectory;
 
   @Override
