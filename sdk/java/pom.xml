@@ -224,6 +224,11 @@
                     <version>${fmt-maven-plugin.version}</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${build-helper-maven-plugin.version}</version>
+                </plugin>
+                <plugin>
                     <groupId>io.dagger</groupId>
                     <artifactId>dagger-codegen-maven-plugin</artifactId>
                     <version>${project.version}</version>
@@ -291,7 +296,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <daggerengine.version>0.18.2</daggerengine.version>
         <daggerengine.schema></daggerengine.schema>
-
         <assertj-core.version>3.27.3</assertj-core.version>
         <auto-service.version>1.1.1</auto-service.version>
         <commons-compress.version>1.27.1</commons-compress.version>
@@ -317,6 +321,7 @@
         <maven-shade-plugin.version>3.6.0</maven-shade-plugin.version>
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
         <versions-maven-plugin.version>2.18.0</versions-maven-plugin.version>
+        <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
         <mockito-core.version>5.17.0</mockito-core.version>
         <slf4j-api.version>2.0.17</slf4j-api.version>
         <slf4j-simple.version>2.0.17</slf4j-simple.version>

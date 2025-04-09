@@ -4,10 +4,6 @@ import io.dagger.codegen.introspection.CodegenVisitor;
 import io.dagger.codegen.introspection.Schema;
 import io.dagger.codegen.introspection.SchemaVisitor;
 import io.dagger.codegen.introspection.Type;
-import java.io.*;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -16,6 +12,14 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.util.List;
 
 @Mojo(
     name = "codegen",
@@ -61,6 +65,7 @@ public class DaggerCodegenMojo extends AbstractMojo {
     }
 
     Path dest = outputDir.toPath();
+    getLog().info(String.format("Generating Dagger code for version %s into %s", version, dest));
     try (InputStream in = getInstrospectionJson()) {
       Schema schema = Schema.initialize(in, version);
       SchemaVisitor codegen = new CodegenVisitor(schema, dest, Charset.forName(outputEncoding));

@@ -145,7 +145,9 @@ func (m *JavaSdk) buildJavaDependencies(
 		// Mount the introspection JSON file used to generate the SDK
 		WithMountedFile("/schema.json", introspectionJSON).
 		// Copy the SDK source directory, so all the files needed to build the dependencies
-		WithDirectory(GenPath, m.SDKSourceDir).
+		// The generated files available contains non module related files, so better to remove them first
+		// to ensure code generation is clean
+		WithDirectory(GenPath, m.SDKSourceDir, dagger.ContainerWithDirectoryOpts{Exclude: []string{"dagger-java-sdk/src/gen"}}).
 		WithWorkdir(GenPath).
 		// Set the version of the dependencies we are building to the version of the introspection file
 		WithExec([]string{
@@ -154,7 +156,7 @@ func (m *JavaSdk) buildJavaDependencies(
 			"-DgenerateBackupPoms=false",
 			fmt.Sprintf("-DnewVersion=%s", version),
 		}).
-		// Build and install the java modules one by one
+		// Build and install the java modules
 		// - dagger-codegen-maven-plugin: this plugin will be used to generate the SDK code, from the introspection file,
 		//   this means including the ability to call other projects (not part of the main dagger SDK)
 		//   - this plugin is only used to build the SDK, the user module doesn't need it
@@ -165,7 +167,7 @@ func (m *JavaSdk) buildJavaDependencies(
 		//   - the user module code only depends on this, it includes all the required types
 		WithExec([]string{
 			"mvn",
-			"--projects", "dagger-codegen-maven-plugin,dagger-java-annotation-processor,dagger-java-sdk", "--also-make",
+			"--projects", "dagger-java-annotation-processor,dagger-java-sdk", "--also-make",
 			"clean", "install",
 			// avoid tests
 			"-DskipTests",
@@ -273,7 +275,7 @@ func (m *JavaSdk) generateCode(
 		// those are all the types generated from the introspection
 		WithDirectory(
 			filepath.Join(m.moduleConfig.modulePath(), "target", "generated-sources", "dagger-module"),
-			javaDeps.Directory(filepath.Join(GenPath, "dagger-java-sdk", "target", "generated-sources", "dagger"))).
+			javaDeps.Directory(filepath.Join(GenPath, "dagger-java-sdk", "src", "gen", "java"))).
 		Directory(ModSourceDirPath), nil
 }
 
