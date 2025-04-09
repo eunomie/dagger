@@ -260,22 +260,22 @@ func (m *JavaSdk) generateCode(
 		WithDirectory(
 			m.moduleConfig.modulePath(),
 			ctr.Directory(m.moduleConfig.modulePath())).
-		// copy the generated entrypoint under target/generated-sources/annotations
+		// copy all the generated code under target/generated-sources
 		WithDirectory(
-			filepath.Join(m.moduleConfig.modulePath(), "target", "generated-sources", "entrypoint"),
-			entrypoint.Directory(filepath.Join(m.moduleConfig.modulePath(), "target", "generated-sources", "annotations"))).
-		// copy the sdk source code under target/generated-sources/dagger-io
-		// this is not really generated-sources, this is the sdk. But we don't want it as the user source code
-		// and we don't want to install it on the user machine. That way the java classes are made available
-		// to a build system or an IDE without to interfere with the user source code
-		WithDirectory(
-			filepath.Join(m.moduleConfig.modulePath(), "target", "generated-sources", "dagger-io"),
-			javaDeps.Directory(filepath.Join(GenPath, "dagger-java-sdk", "src", "main", "java"))).
-		// copy the generated SDK files to target/generated-sources/dagger-module
-		// those are all the types generated from the introspection
-		WithDirectory(
-			filepath.Join(m.moduleConfig.modulePath(), "target", "generated-sources", "dagger-module"),
-			javaDeps.Directory(filepath.Join(GenPath, "dagger-java-sdk", "src", "gen", "java"))).
+			filepath.Join(m.moduleConfig.modulePath(), "target", "generated-sources"),
+			dag.Directory().
+				// copy the sdk source code under target/generated-sources/dagger-io
+				// this is not really generated-sources, this is the sdk. But we don't want it as the user source code
+				// and we don't want to install it on the user machine. That way the java classes are made available
+				// to a build system or an IDE without to interfere with the user source code
+				WithDirectory("dagger-io", javaDeps.Directory(filepath.Join(GenPath, "dagger-java-sdk", "src", "main", "java"))).
+				// copy the generated SDK files to the same target/generated-sources/dagger-io
+				// those are all the types generated from the introspection
+				// both generated and non generated are under the same directory, this makes more sense while looking
+				// at the files as they share the same namesapces
+				WithDirectory("dagger-io", javaDeps.Directory(filepath.Join(GenPath, "dagger-java-sdk", "src", "gen", "java"))).
+				// copy the generated entrypoint under target/generated-sources/entrypoint
+				WithDirectory("entrypoint", entrypoint.Directory(filepath.Join(m.moduleConfig.modulePath(), "target", "generated-sources", "annotations")))).
 		Directory(ModSourceDirPath), nil
 }
 

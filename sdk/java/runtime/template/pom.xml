@@ -130,7 +130,6 @@
                         <configuration>
                             <sources>
                                 <source>${project.build.directory}/generated-sources/dagger-io</source>
-                                <source>${project.build.directory}/generated-sources/dagger-module</source>
                                 <source>${project.build.directory}/generated-sources/entrypoint</source>
                             </sources>
                         </configuration>
