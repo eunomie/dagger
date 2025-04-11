@@ -63,15 +63,26 @@ func (m *JavaSdk) Codegen(
 	if err := m.setModuleConfig(ctx, modSource); err != nil {
 		return nil, err
 	}
-	mvnCtr, err := m.codegenBase(ctx, modSource, introspectionJSON)
+
+	// Get a container with the user module sources and all dependencies, including the SDK packages built and installed
+	moduleCtr, err := m.javaModuleCtr(ctx, modSource, introspectionJSON)
 	if err != nil {
 		return nil, err
 	}
 
-	generatedCode, err := m.generateCode(ctx, mvnCtr, introspectionJSON)
-	if err != nil {
-		return nil, err
-	}
+	generatedCode := dag.
+		Directory().
+		// copy all user files
+		WithDirectory(
+			m.moduleConfig.modulePath(),
+			moduleCtr.Directory(m.moduleConfig.modulePath())).
+		// copy all the generated code under target/generated-sources
+		WithDirectory(
+			filepath.Join(m.moduleConfig.modulePath(), "target", "generated-sources"),
+			dag.Directory().
+				// copy the generated entrypoint under target/generated-sources/entrypoint
+				WithDirectory("annotations", moduleCtr.Directory(filepath.Join(m.moduleConfig.modulePath(), "target", "generated-sources", "annotations")))).
+		Directory(ModSourceDirPath)
 
 	return dag.
 		GeneratedCode(dag.Directory().WithDirectory("/", generatedCode)).
@@ -83,98 +94,79 @@ func (m *JavaSdk) Codegen(
 		}), nil
 }
 
-// codegenBase takes the user module code, add the generated SDK dependencies
-// if the user module code is empty, creates a default module content based on the template from the SDK
-// The generated container will *not* contain the SDK source code, but only the packages built from the SDK
-func (m *JavaSdk) codegenBase(
+func (m *JavaSdk) javaModuleCtr(
 	ctx context.Context,
 	modSource *dagger.ModuleSource,
 	introspectionJSON *dagger.File,
 ) (*dagger.Container, error) {
-	ctr, err := m.buildJavaDependencies(ctx, introspectionJSON)
-	if err != nil {
-		return nil, err
-	}
-	ctr = ctr.
-		// Copy the user module directory under /src
-		WithDirectory(ModSourceDirPath, modSource.ContextDirectory()).
-		// Set the working directory to the one containing the sources to build, not just the module root
-		WithWorkdir(m.moduleConfig.modulePath())
-	// Add a default template if there's no existing user code
-	ctr, err = m.addTemplate(ctx, ctr)
-	if err != nil {
-		return nil, err
-	}
-	// Ensure the version in the pom.xml is the same as the introspection file
-	// This is updating the pom.xml whatever it's coming from the template or the user module
+	// Get the dagger version
 	version, err := m.getDaggerVersionForModule(ctx, introspectionJSON)
 	if err != nil {
 		return nil, err
 	}
-	ctr = ctr.
-		// set the version of the Dagger dependencies to the version of the introspection file
-		WithExec([]string{
-			"mvn",
-			"versions:set-property",
-			"-DgenerateBackupPoms=false",
-			"-Dproperty=dagger.module.deps",
-			fmt.Sprintf("-DnewVersion=%s", version),
-		})
-	return ctr, nil
-}
 
-// buildJavaDependencies builds and install the needed dependencies
-// used to build, package and run the user module.
-// Everything will be done under ModSourceDirPath/dagger-io (m.moduleConfig.genPath()).
-func (m *JavaSdk) buildJavaDependencies(
-	ctx context.Context,
-	introspectionJSON *dagger.File,
-) (*dagger.Container, error) {
-	// We need maven to build the dependencies
+	// We need a maven container
 	ctr, err := m.mvnContainer(ctx)
 	if err != nil {
 		return nil, err
 	}
-	version, err := m.getDaggerVersionForModule(ctx, introspectionJSON)
+
+	// Create a container to generate the SDK files based on the introspection file
+	// order of operations is set to improve cachine
+	deps := ctr.
+		// Copy the SDK source directory to build the java dependencies
+		WithDirectory(GenPath, m.SDKSourceDir).
+		WithWorkdir(GenPath).
+		// Set the version of the dependencies we are building to the version of the introspection file
+		With(m.mvnExec("versions:set", "-DgenerateBackupPoms=false", fmt.Sprintf("-DnewVersion=%s", version))).
+		// Build first the codegen plugin. This is the one that should only depend on the SDK source code/version but not on
+		// introspection code
+		With(m.mvnExec("install", "-pl", "dagger-codegen-maven-plugin")).
+		// Mount the introspection file. This file might depend on the dependencies so it's good to not mount it before
+		// that point we really need it
+		WithMountedFile("/schema.json", introspectionJSON).
+		// Build dagger-java-sdk (all the types required to create module source code)
+		// and dagger-java-annotation-processor (to generate the entrypoint)
+		// The generated files available contains non module related files, so better to remove them first
+		// to ensure code generation is clean
+		WithoutDirectory(filepath.Join(GenPath, "dagger-java-sdk", "src", "gen")).
+		With(m.mvnExec(
+			"--projects", "dagger-java-annotation-processor,dagger-java-sdk", "--also-make",
+			"install",
+			"-DskipTests",
+			"-Ddaggerengine.schema=/schema.json",
+		))
+
+	// Create a container to deal with the user's module source code
+	mod := ctr.
+		// Copy the generated jars from above
+		WithMountedDirectory("/root/.m2", deps.Directory("/root/.m2")).
+		// Mount the user's module directory
+		WithMountedDirectory(ModSourceDirPath, modSource.ContextDirectory()).
+		// Set the working directory to the one containing the sources to build, not just the module root
+		WithWorkdir(m.moduleConfig.modulePath())
+
+	// Add a default template if there's no existing user code
+	mod, err = m.addTemplate(ctx, mod)
 	if err != nil {
 		return nil, err
 	}
-	return ctr.
-		// Cache maven dependencies
-		WithMountedCache("/root/.m2", dag.CacheVolume("sdk-java-maven-m2")).
-		// Mount the introspection JSON file used to generate the SDK
-		WithMountedFile("/schema.json", introspectionJSON).
-		// Copy the SDK source directory, so all the files needed to build the dependencies
-		// The generated files available contains non module related files, so better to remove them first
-		// to ensure code generation is clean
-		WithDirectory(GenPath, m.SDKSourceDir, dagger.ContainerWithDirectoryOpts{Exclude: []string{"dagger-java-sdk/src/gen"}}).
-		WithWorkdir(GenPath).
-		// Set the version of the dependencies we are building to the version of the introspection file
-		WithExec([]string{
-			"mvn",
-			"versions:set",
+
+	mod = mod.
+		// Set the version of the Dagger dependencies to the version of the introspection file
+		// This version is the one used to generate the dependencies above
+		With(m.mvnExec(
+			"versions:set-property",
 			"-DgenerateBackupPoms=false",
+			"-Dproperty=dagger.module.deps",
 			fmt.Sprintf("-DnewVersion=%s", version),
-		}).
-		// Build and install the java modules
-		// - dagger-codegen-maven-plugin: this plugin will be used to generate the SDK code, from the introspection file,
-		//   this means including the ability to call other projects (not part of the main dagger SDK)
-		//   - this plugin is only used to build the SDK, the user module doesn't need it
-		// - dagger-java-annotation-processor: this will read dagger specific annotations (@Module, @Object, @Function)
-		//   and generate the entrypoint to register the module and invoke the functions
-		//   - this processor will be used by the user module to generate the entrypoint, so it's referenced in the user module pom.xml
-		// - dagger-java-sdk: the actual SDK, where the generated code will be written
-		//   - the user module code only depends on this, it includes all the required types
-		WithExec([]string{
-			"mvn",
-			"--projects", "dagger-java-annotation-processor,dagger-java-sdk", "--also-make",
-			"clean", "install",
-			// avoid tests
-			"-DskipTests",
-			// specify the introspection json file
-			"-Ddaggerengine.schema=/schema.json",
-			// "-e", // this is just for debug purpose, uncomment if needed
-		}), nil
+		))
+
+	mod = mod.
+		// Compile. This will be used to get the dependencies and to package
+		With(m.mvnExec("compile"))
+
+	return mod, nil
 }
 
 // addTemplate creates all the necessary files to start a new Java module
@@ -232,53 +224,6 @@ func (m *JavaSdk) addTemplate(
 	return ctr, nil
 }
 
-// generateCode builds and returns the generated source code and java classes
-func (m *JavaSdk) generateCode(
-	ctx context.Context,
-	ctr *dagger.Container,
-	introspectionJSON *dagger.File,
-) (*dagger.Directory, error) {
-	// generate the java sdk dependencies
-	javaDeps, err := m.buildJavaDependencies(ctx, introspectionJSON)
-	if err != nil {
-		return nil, err
-	}
-	// generate the entrypoint class based on the user module
-	entrypoint := ctr.
-		// set the module name as an environment variable so we ensure constructor is only on main object
-		WithEnvVariable("_DAGGER_JAVA_SDK_MODULE_NAME", m.moduleConfig.name).
-		// generate the entrypoint
-		WithExec([]string{
-			"mvn",
-			"clean",
-			"compile",
-			// "-e", // this is just for debug purpose, uncomment if needed
-		})
-	return dag.
-		Directory().
-		// copy all user files
-		WithDirectory(
-			m.moduleConfig.modulePath(),
-			ctr.Directory(m.moduleConfig.modulePath())).
-		// copy all the generated code under target/generated-sources
-		WithDirectory(
-			filepath.Join(m.moduleConfig.modulePath(), "target", "generated-sources"),
-			dag.Directory().
-				// copy the sdk source code under target/generated-sources/dagger-io
-				// this is not really generated-sources, this is the sdk. But we don't want it as the user source code
-				// and we don't want to install it on the user machine. That way the java classes are made available
-				// to a build system or an IDE without to interfere with the user source code
-				WithDirectory("dagger-io", javaDeps.Directory(filepath.Join(GenPath, "dagger-java-sdk", "src", "main", "java"))).
-				// copy the generated SDK files to the same target/generated-sources/dagger-io
-				// those are all the types generated from the introspection
-				// both generated and non generated are under the same directory, this makes more sense while looking
-				// at the files as they share the same namesapces
-				WithDirectory("dagger-io", javaDeps.Directory(filepath.Join(GenPath, "dagger-java-sdk", "src", "gen", "java"))).
-				// copy the generated entrypoint under target/generated-sources/entrypoint
-				WithDirectory("entrypoint", entrypoint.Directory(filepath.Join(m.moduleConfig.modulePath(), "target", "generated-sources", "annotations")))).
-		Directory(ModSourceDirPath), nil
-}
-
 func (m *JavaSdk) ModuleRuntime(
 	ctx context.Context,
 	modSource *dagger.ModuleSource,
@@ -288,17 +233,19 @@ func (m *JavaSdk) ModuleRuntime(
 		return nil, err
 	}
 
-	// Get a container with the user module sources and the SDK packages built and installed
-	mvnCtr, err := m.codegenBase(ctx, modSource, introspectionJSON)
-	if err != nil {
-		return nil, err
-	}
-	// Build the executable jar
-	jar, err := m.buildJar(ctx, mvnCtr)
+	// Get a container with the user module sources and all dependencies, including the SDK packages built and installed
+	moduleCtr, err := m.javaModuleCtr(ctx, modSource, introspectionJSON)
 	if err != nil {
 		return nil, err
 	}
 
+	// Build the executable jar
+	jar, err := m.buildJar(ctx, moduleCtr)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create the runnable container
 	javaCtr, err := m.jreContainer(ctx)
 	if err != nil {
 		return nil, err
@@ -321,13 +268,17 @@ func (m *JavaSdk) buildJar(
 			// set the module name as an environment variable so we ensure constructor is only on main object
 			WithEnvVariable("_DAGGER_JAVA_SDK_MODULE_NAME", m.moduleConfig.name).
 			// build the final jar
-			WithExec([]string{
-				"mvn",
-				"clean",
-				"package",
-				"-DskipTests",
-				// "-e", // this is just for debug purpose, uncomment if needed
-			}))
+			With(m.mvnExec("clean", "package", "-DskipTests")))
+}
+
+func (m *JavaSdk) mvnExec(args ...string) dagger.WithContainerFunc {
+	return func(ctr *dagger.Container) *dagger.Container {
+		cmd := []string{"mvn"}
+		cmd = append(cmd, args...)
+		// cmd = append(cmd, "-e") // this is just for debug purpose, uncommit it needed
+		return ctr.
+			WithExec(cmd)
+	}
 }
 
 // finalJar will return the jar corresponding to the user module built
@@ -340,13 +291,13 @@ func (m *JavaSdk) finalJar(
 	ctr *dagger.Container,
 ) (*dagger.File, error) {
 	artifactID, err := ctr.
-		WithExec([]string{"mvn", "org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate", "-Dexpression=project.artifactId", "-q", "-DforceStdout"}).
+		WithExec([]string{"mvn", "org.apache.maven.plugins:maven-help-plugin:evaluate", "-Dexpression=project.artifactId", "-q", "-DforceStdout"}).
 		Stdout(ctx)
 	if err != nil {
 		return nil, err
 	}
 	version, err := ctr.
-		WithExec([]string{"mvn", "org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate", "-Dexpression=project.version", "-q", "-DforceStdout"}).
+		WithExec([]string{"mvn", "org.apache.maven.plugins:maven-help-plugin:evaluate", "-Dexpression=project.version", "-q", "-DforceStdout"}).
 		Stdout(ctx)
 	if err != nil {
 		return nil, err
