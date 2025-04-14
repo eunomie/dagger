@@ -11,9 +11,11 @@ import (
 )
 
 const (
-	javaSDKPath = "sdk/java"
-	mavenImage  = "maven:3.9.9-eclipse-temurin-21-alpine"
-	mavenDigest = "sha256:4cbb8bf76c46b97e028998f2486ed014759a8e932480431039bdb93dffe6813e"
+	javaSDKPath             = "sdk/java"
+	javaSDKGenCodePath      = javaSDKPath + "/dagger-java-sdk/target/generated-sources/dagger"
+	javaGeneratedSchemaPath = "target/generated-schema/schema.json"
+	mavenImage              = "maven:3.9.9-eclipse-temurin-21-alpine"
+	mavenDigest             = "sha256:4cbb8bf76c46b97e028998f2486ed014759a8e932480431039bdb93dffe6813e"
 )
 
 type JavaSDK struct {
@@ -42,9 +44,53 @@ func (t JavaSDK) Test(ctx context.Context) error {
 	return err
 }
 
-// Regenerate the Java SDK API
+// Regenerate the Java SDK API based on the version defined in the pom.xml (version updated by the bump command)
 func (t JavaSDK) Generate(ctx context.Context) (*dagger.Directory, error) {
-	return dag.Directory(), nil
+	return t.generate(ctx, false)
+}
+
+// Regenerate the Java SDK API based on the current version of the engine
+func (t JavaSDK) GenerateCurrent(ctx context.Context) (*dagger.Directory, error) {
+	return t.generate(ctx, true)
+}
+
+func (t JavaSDK) generate(ctx context.Context, current bool) (*dagger.Directory, error) {
+	installer, err := t.Dagger.installer(ctx, "sdk")
+	if err != nil {
+		return nil, err
+	}
+
+	base := t.Maven(ctx).With(installer)
+
+	return dag.Directory().
+			WithDirectory(
+				javaSDKGenCodePath,
+				base.
+					// force reconstruction of all generated files
+					WithoutDirectory("/"+javaSDKGenCodePath).
+					// ensure codegen plugin is available
+					WithExec([]string{"mvn", "clean", "install", "-pl", "dagger-codegen-maven-plugin"}).
+					With(func(ctr *dagger.Container) *dagger.Container {
+						if current {
+							return ctr.
+								// do not generate a schema file, this will use the current source version
+								// generate the Java SDK code
+								WithExec([]string{
+									"mvn", "compile",
+									"-pl", "dagger-java-sdk", "--also-make"})
+						} else {
+							return ctr.
+								// generate the schema file, ensure we are using the engine version and not the source version
+								WithExec([]string{"mvn", "-N", "dagger-codegen:generateSchema"}).
+								// generate the Java SDK code
+								WithExec([]string{
+									"mvn", "compile",
+									"-pl", "dagger-java-sdk", "--also-make",
+									"-Ddaggerengine.schema=" + javaGeneratedSchemaPath})
+						}
+					}).
+					Directory("/"+javaSDKGenCodePath)),
+		nil
 }
 
 // Test the publishing process
