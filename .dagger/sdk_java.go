@@ -76,16 +76,17 @@ func (t JavaSDK) generate(ctx context.Context, current bool) (*dagger.Directory,
 								// do not generate a schema file, this will use the current source version
 								// generate the Java SDK code
 								WithExec([]string{
-									"mvn", "package",
-									"-pl", "dagger-java-sdk", "--also-make"})
+									"mvn", "-N",
+									"dagger-codegen:codegen"})
 						} else {
 							return ctr.
+								Terminal().
 								// generate the schema file, ensure we are using the engine version and not the source version
 								WithExec([]string{"mvn", "-N", "dagger-codegen:generateSchema"}).
 								// generate the Java SDK code
 								WithExec([]string{
-									"mvn", "package",
-									"-pl", "dagger-java-sdk", "--also-make",
+									"mvn", "-N",
+									"dagger-codegen:codegen",
 									"-Ddaggerengine.schema=" + javaGeneratedSchemaPath})
 						}
 					}).
