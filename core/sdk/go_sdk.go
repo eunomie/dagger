@@ -500,11 +500,11 @@ func (sdk *goSDK) baseWithCodegen(
 	// cause failures if we also mount this in Runtime.
 	// Issue we run into is that when we try to run sdk checks
 	// using .dagger, it fails trying to find the socket
-	setSSHAuthSelectors, unsetSSHAuthSelectors, err := sdk.getUnixSocketSelector(ctx)
-	if err != nil {
-		return ctr, err
-	}
-	selectors = append(selectors, setSSHAuthSelectors...)
+	//setSSHAuthSelectors, unsetSSHAuthSelectors, err := sdk.getUnixSocketSelector(ctx)
+	//if err != nil {
+	//	return ctr, err
+	//}
+	//selectors = append(selectors, setSSHAuthSelectors...)
 
 	// now that we are done with gitconfig and injecting env
 	// variables, we can run the codegen command.
@@ -525,7 +525,7 @@ func (sdk *goSDK) baseWithCodegen(
 		},
 	)
 
-	selectors = append(selectors, unsetSSHAuthSelectors...)
+	//selectors = append(selectors, unsetSSHAuthSelectors...)
 
 	if err := sdk.dag.Select(ctx, ctr, &ctr, selectors...); err != nil {
 		return ctr, fmt.Errorf("failed to mount introspection json file into go module sdk container codegen: %w", err)
