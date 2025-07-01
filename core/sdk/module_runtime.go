@@ -39,6 +39,45 @@ func (sdk *runtimeModule) TypeDefs(
 	return sdk.callModuleFn(ctx, "moduleTypeDefs", source, schemaJSONFile)
 }
 
+func (sdk *runtimeModule) HasModuleTypeDefsObject() bool {
+	_, ok := sdk.mod.funcs["moduleTypeDefsObject"]
+	return ok
+}
+
+func (sdk *runtimeModule) TypeDefsObject(
+	ctx context.Context,
+	deps *core.ModDeps,
+	source dagql.Instance[*core.ModuleSource],
+) (inst dagql.Instance[*core.Module], rerr error) {
+	if !sdk.HasModuleTypeDefsObject() {
+		return inst, fmt.Errorf("failed to get typedefs object: module %s does not implement moduleTypeDefsObject", sdk.mod.mod.Self.Name())
+	}
+
+	ctx, span := core.Tracer(ctx).Start(ctx, "module SDK: load typedefs object")
+	defer telemetry.End(span, func() error { return rerr })
+
+	schemaJSONFile, err := deps.SchemaIntrospectionJSONFile(ctx, []string{"Host"})
+	if err != nil {
+		return inst, fmt.Errorf("failed to get schema introspection json during %s module sdk runtime: %w", sdk.mod.mod.Self.Name(), err)
+	}
+
+	rerr = sdk.mod.dag.Select(ctx, sdk.mod.sdk, &inst,
+		dagql.Selector{
+			Field: "moduleTypeDefsObject",
+			Args: []dagql.NamedInput{
+				{
+					Name:  "modSource",
+					Value: dagql.NewID[*core.ModuleSource](source.ID()),
+				},
+				{
+					Name:  "introspectionJson",
+					Value: dagql.NewID[*core.File](schemaJSONFile.ID()),
+				},
+			},
+		})
+	return
+}
+
 func (sdk *runtimeModule) Runtime(
 	ctx context.Context,
 	deps *core.ModDeps,
