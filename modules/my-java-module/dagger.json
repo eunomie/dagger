@@ -1,0 +1,14 @@
+{
+  "name": "my-java-module",
+  "engineVersion": "v0.18.13-010101000000-dev-53d5ba633ab6",
+  "sdk": {
+    "source": "../../sdk/java"
+  },
+  "dependencies": [
+    {
+      "name": "glow",
+      "source": "github.com/eunomie/daggerverse/glow",
+      "pin": "d205fcdf19ca5df01d26ae9a31cc32c2b3641465"
+    }
+  ]
+}
