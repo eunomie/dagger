@@ -317,19 +317,89 @@ func (m *JavaSdk) ModuleTypeDefsObject(
 	modSource *dagger.ModuleSource,
 	introspectionJSON *dagger.File,
 ) (*dagger.Module, error) {
-	return dag.Module().
-			WithDescription("MyJavaModule example").
-			WithObject(
-				dag.TypeDef().WithObject("MyJavaModule").
-					WithFunction(
-						dag.Function("containerEcho", dag.TypeDef().WithObject("Container")).
-							WithArg("stringArg", dag.TypeDef().WithKind(dagger.TypeDefKindStringKind))).
-					WithFunction(
-						dag.Function("print", dag.TypeDef().WithKind(dagger.TypeDefKindBooleanKind)).
-							WithArg("stringArg", dag.TypeDef().WithKind(dagger.TypeDefKindStringKind))).
-					WithFunction(
-						dag.Function("base", dag.TypeDef().WithObject("Container")))),
-		nil
+	return dag.Module().FromJSON(`{
+  "description": "",
+  "enums": [],
+  "interfaces": [],
+  "name": "",
+  "objects": [
+    {
+      "kind": "OBJECT_KIND",
+      "optional": false,
+      "values": {
+        "Constructor": null,
+        "Description": "PrintModule desc",
+        "Fields": [],
+        "Functions": [
+          {
+            "Args": [
+              {
+                "DefaultPath": "",
+                "DefaultValue": "",
+                "Description": "",
+                "Ignore": null,
+                "Name": "stringArg",
+                "OriginalName": "stringArg",
+                "SourceMap": null,
+                "TypeDef": {
+                  "kind": "STRING_KIND",
+                  "optional": false
+                }
+              }
+            ],
+            "Description": "",
+            "Name": "containerEcho",
+            "OriginalName": "ContainerEcho",
+            "ParentOriginalName": "PrintModule",
+            "ReturnType": {
+              "kind": "OBJECT_KIND",
+              "optional": false,
+              "values": {
+                "Constructor": null,
+                "Description": "",
+                "Fields": [],
+                "Functions": [],
+                "Name": "Container",
+                "OriginalName": "Container",
+                "SourceMap": null,
+                "SourceModuleName": ""
+              }
+            },
+            "SourceMap": {
+              "Column": 1,
+              "Filename": "main.go",
+              "Line": 10,
+              "Module": ""
+            }
+          }
+        ],
+        "Name": "PrintModule",
+        "OriginalName": "PrintModule",
+        "SourceMap": {
+          "Column": 6,
+          "Filename": "main.go",
+          "Line": 8,
+          "Module": ""
+        },
+        "SourceModuleName": ""
+      }
+    }
+  ],
+  "originalName": ""
+}`), nil
+	//return dag.Module().
+	//		WithDescription("MyJavaModule example").
+	//		WithObject(
+	//			dag.TypeDef().WithObject("MyJavaModule").
+	//				WithFunction(
+	//					dag.Function("containerEcho", dag.TypeDef().WithObject("Container")).
+	//						WithArg("stringArg", dag.TypeDef().WithKind(dagger.TypeDefKindStringKind))).
+	//				WithFunction(
+	//					dag.Function("print", dag.TypeDef().WithKind(dagger.TypeDefKindBooleanKind)).
+	//						WithArg("stringArg", dag.TypeDef().WithKind(dagger.TypeDefKindStringKind))).
+	//				WithFunction(
+	//					dag.Function("base", dag.TypeDef().WithObject("Container")))),
+	//	nil
 }
 
 func (m *JavaSdk) ModuleTypeDefs(

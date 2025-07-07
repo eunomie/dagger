@@ -101,6 +101,11 @@ func (s *moduleSchema) Install() {
 			Args(
 				dagql.Arg("includeDependencies").Doc("Expose the dependencies of this module to the client"),
 			),
+		dagql.Func("fromJSON", s.moduleFromJSON).
+			Doc("Load a module from a JSON string").
+			Args(
+				dagql.Arg("json").Doc("The JSON string to load"),
+			),
 	}.Install(s.dag)
 
 	dagql.Fields[*core.CurrentModule]{
@@ -741,4 +746,10 @@ func (s *moduleSchema) loadSourceMap(ctx context.Context, sourceMap dagql.Option
 		return nil, fmt.Errorf("failed to decode source map: %w", err)
 	}
 	return sourceMapI.Self, nil
+}
+
+func (s *moduleSchema) moduleFromJSON(ctx context.Context, mod *core.Module, args struct {
+	Json string
+}) (*core.Module, error) {
+	return core.ModuleFromJSONString(args.Json)
 }
