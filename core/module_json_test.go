@@ -9,15 +9,135 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestModuleJSON_fromJson(t *testing.T) {
+	m, err := ModuleFromJSONString(`{
+  "name": "",
+  "originalName": "",
+  "description": "MyJavaModule example",
+  "objects": [
+    {
+      "kind": "OBJECT_KIND",
+      "optional": false,
+      "values": {
+        "Name": "MyJavaModule",
+        "Description": "",
+        "SourceMap": null,
+        "Fields": [],
+        "Functions": [
+          {
+            "Name": "containerEcho",
+            "Description": "",
+            "Args": [
+              {
+                "Name": "stringArg",
+                "Description": "",
+                "SourceMap": null,
+                "TypeDef": {
+                  "kind": "STRING_KIND",
+                  "optional": false
+                },
+                "DefaultValue": null,
+                "DefaultPath": "",
+                "Ignore": [],
+                "OriginalName": "stringArg"
+              }
+            ],
+            "ReturnType": {
+              "kind": "OBJECT_KIND",
+              "optional": false,
+              "values": {
+                "Name": "Container",
+                "Description": "",
+                "SourceMap": null,
+                "Fields": [],
+                "Functions": [],
+                "Constructor": null,
+                "SourceModuleName": "",
+                "OriginalName": "Container"
+              }
+            },
+            "SourceMap": null,
+            "ParentOriginalName": "MyJavaModule",
+            "OriginalName": "containerEcho"
+          },
+          {
+            "Name": "print",
+            "Description": "",
+            "Args": [
+              {
+                "Name": "stringArg",
+                "Description": "",
+                "SourceMap": null,
+                "TypeDef": {
+                  "kind": "STRING_KIND",
+                  "optional": false
+                },
+                "DefaultValue": null,
+                "DefaultPath": "",
+                "Ignore": [],
+                "OriginalName": "stringArg"
+              }
+            ],
+            "ReturnType": {
+              "kind": "BOOLEAN_KIND",
+              "optional": false
+            },
+            "SourceMap": null,
+            "ParentOriginalName": "MyJavaModule",
+            "OriginalName": "print"
+          },
+          {
+            "Name": "base",
+            "Description": "",
+            "Args": [],
+            "ReturnType": {
+              "kind": "OBJECT_KIND",
+              "optional": false,
+              "values": {
+                "Name": "Container",
+                "Description": "",
+                "SourceMap": null,
+                "Fields": [],
+                "Functions": [],
+                "Constructor": null,
+                "SourceModuleName": "",
+                "OriginalName": "Container"
+              }
+            },
+            "SourceMap": null,
+            "ParentOriginalName": "MyJavaModule",
+            "OriginalName": "base"
+          }
+        ],
+        "Constructor": null,
+        "SourceModuleName": "",
+        "OriginalName": "MyJavaModule"
+      }
+    }
+  ],
+  "interfaces": [],
+  "enums": []
+}`)
+	require.NoError(t, err)
+	assert.Equal(t, "MyJavaModule", m.NameField)
+	assert.Equal(t, "", m.OriginalName)
+	assert.Equal(t, "MyJavaModule example", m.Description)
+	assert.Len(t, m.ObjectDefs, 1)
+	assert.Len(t, m.InterfaceDefs, 0)
+	assert.Len(t, m.EnumDefs, 0)
+	assert.Equal(t, "MyJavaModule", m.ObjectDefs[0].AsObject.Value.Name)
+	assert.Len(t, m.ObjectDefs[0].AsObject.Value.Functions, 3)
+}
+
 func TestModuleJSON_BasicModule(t *testing.T) {
 	// Test basic module with just name and description
 	module := &Module{
-		NameField:    "TestModule",
-		OriginalName: "TestModule",
-		Description:  "A test module for JSON serialization",
-		ObjectDefs:   []*TypeDef{},
+		NameField:     "TestModule",
+		OriginalName:  "TestModule",
+		Description:   "A test module for JSON serialization",
+		ObjectDefs:    []*TypeDef{},
 		InterfaceDefs: []*TypeDef{},
-		EnumDefs:     []*TypeDef{},
+		EnumDefs:      []*TypeDef{},
 	}
 
 	// Test marshaling
@@ -56,10 +176,10 @@ func TestModuleJSON_ModuleWithObjectDefs(t *testing.T) {
 	userObjectDef := NewObjectTypeDef("User", "A user object")
 	userObjectDef.Fields = []*FieldTypeDef{
 		{
-			Name:        "name",
+			Name:         "name",
 			OriginalName: "name",
-			Description: "User's name",
-			TypeDef:     stringType,
+			Description:  "User's name",
+			TypeDef:      stringType,
 		},
 	}
 
@@ -240,16 +360,16 @@ func TestModuleJSON_ComplexModule(t *testing.T) {
 	userObjectDef := NewObjectTypeDef("User", "A user object")
 	userObjectDef.Fields = []*FieldTypeDef{
 		{
-			Name:        "name",
+			Name:         "name",
 			OriginalName: "name",
-			Description: "User's name",
-			TypeDef:     stringType,
+			Description:  "User's name",
+			TypeDef:      stringType,
 		},
 		{
-			Name:        "status",
+			Name:         "status",
 			OriginalName: "status",
-			Description: "User's status",
-			TypeDef:     enumTypeDef,
+			Description:  "User's status",
+			TypeDef:      enumTypeDef,
 		},
 	}
 	userTypeDef := &TypeDef{

@@ -106,6 +106,8 @@ func (s *moduleSchema) Install() {
 			Args(
 				dagql.Arg("json").Doc("The JSON string to load"),
 			),
+		dagql.Func("toJSON", s.moduleToJSON).
+			Doc("Return a JSON string representation of the module"),
 	}.Install(s.dag)
 
 	dagql.Fields[*core.CurrentModule]{
@@ -752,4 +754,8 @@ func (s *moduleSchema) moduleFromJSON(ctx context.Context, mod *core.Module, arg
 	Json string
 }) (*core.Module, error) {
 	return core.ModuleFromJSONString(args.Json)
+}
+
+func (s *moduleSchema) moduleToJSON(ctx context.Context, mod *core.Module, args struct{}) (string, error) {
+	return mod.ToJSONString()
 }
