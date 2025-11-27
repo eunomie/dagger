@@ -48,7 +48,7 @@ type GoSdkDev {
   """
   Regenerate the Go SDK API
   """
-  pub generate(): Changeset! {
+  pub generate(): Changeset! @generator {
     devContainer().
       withExec(["go", "generate", "-v", "./..."]).
       withExec(["go", "mod", "tidy"]).

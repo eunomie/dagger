@@ -168,6 +168,7 @@ func (t PythonSdkDev) TestSuite(
 }
 
 // Regenerate the core Python client library
+// +generator
 func (t PythonSdkDev) Generate(_ context.Context) (*dagger.Changeset, error) {
 	devContainer := t.DevContainer
 
