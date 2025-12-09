@@ -122,9 +122,7 @@
       "source": "toolchains/security",
       "arguments": [
         {
-          "function": [
-            "scanSource"
-          ],
+          "function": ["scanSource"],
           "name": "source",
           "argument": "",
           "ignore": [
@@ -140,9 +138,7 @@
       ],
       "customizations": [
         {
-          "function": [
-            "scanSource"
-          ],
+          "function": ["scanSource"],
           "name": "",
           "argument": "source",
           "ignore": [
@@ -166,37 +162,6 @@
       "source": "toolchains/test-split"
     }
   ],
-  "include": [
-    "sdk/typescript/runtime/**/*",
-    "go.mod",
-    "go.sum",
-    "util/parallel"
-  ],
-  "dependencies": [
-    {
-      "name": "changelog",
-      "source": "toolchains/changelog"
-    },
-    {
-      "name": "docs",
-      "source": "toolchains/docs-dev"
-    },
-    {
-      "name": "helm",
-      "source": "toolchains/helm-dev"
-    },
-    {
-      "name": "sdks",
-      "source": "toolchains/all-sdks"
-    },
-    {
-      "name": "engine-dev",
-      "source": "toolchains/engine-dev"
-    },
-    {
-      "name": "cli",
-      "source": "toolchains/cli-dev"
-    }
-  ],
+  "include": ["go.mod", "go.sum", "util/patchpreview/patch.go"],
   "source": ".dagger"
 }
