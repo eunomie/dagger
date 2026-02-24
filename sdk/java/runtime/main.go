@@ -160,7 +160,7 @@ func (m *JavaSdk) buildJavaDependencies(
 
 	// Mount host Maven settings if available
 	settingsFile := modSource.HostConfigFile("maven-settings")
-	if _, err := settingsFile.Sync(ctx); err == nil {
+	if fileID, err := settingsFile.ID(ctx); err == nil && fileID != "" {
 		ctr = ctr.WithMountedFile("/root/.m2/settings.xml", settingsFile)
 	}
 
