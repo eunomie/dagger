@@ -82,7 +82,7 @@ func (m *JavaSdk) Codegen(
 		return nil, err
 	}
 
-	generatedCode, err := m.generateCode(ctx, mvnCtr, introspectionJSON)
+	generatedCode, err := m.generateCode(ctx, modSource, mvnCtr, introspectionJSON)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (m *JavaSdk) codegenBase(
 	modSource *dagger.ModuleSource,
 	introspectionJSON *dagger.File,
 ) (*dagger.Container, error) {
-	ctr, err := m.buildJavaDependencies(ctx, introspectionJSON)
+	ctr, err := m.buildJavaDependencies(ctx, modSource, introspectionJSON)
 	if err != nil {
 		return nil, err
 	}
@@ -142,6 +142,7 @@ func (m *JavaSdk) codegenBase(
 // Everything will be done under ModSourceDirPath/dagger-io (m.moduleConfig.genPath()).
 func (m *JavaSdk) buildJavaDependencies(
 	ctx context.Context,
+	modSource *dagger.ModuleSource,
 	introspectionJSON *dagger.File,
 ) (*dagger.Container, error) {
 	// We need maven to build the dependencies
@@ -153,9 +154,17 @@ func (m *JavaSdk) buildJavaDependencies(
 	if err != nil {
 		return nil, err
 	}
-	return ctr.
+	ctr = ctr.
 		// Cache maven dependencies
-		WithMountedCache("/root/.m2/repository", dag.CacheVolume("sdk-java-maven-m2"), dagger.ContainerWithMountedCacheOpts{Sharing: dagger.CacheSharingModeLocked}).
+		WithMountedCache("/root/.m2/repository", dag.CacheVolume("sdk-java-maven-m2"), dagger.ContainerWithMountedCacheOpts{Sharing: dagger.CacheSharingModeLocked})
+
+	// Mount host Maven settings if available
+	settingsFile := modSource.HostConfigFile("maven-settings")
+	if _, err := settingsFile.Sync(ctx); err == nil {
+		ctr = ctr.WithMountedFile("/root/.m2/settings.xml", settingsFile)
+	}
+
+	return ctr.
 		// Mount the introspection JSON file used to generate the SDK
 		WithMountedFile("/schema.json", introspectionJSON).
 		// Copy the SDK source directory, so all the files needed to build the dependencies
@@ -246,11 +255,12 @@ func (m *JavaSdk) addTemplate(
 // generateCode builds and returns the generated source code and java classes
 func (m *JavaSdk) generateCode(
 	ctx context.Context,
+	modSource *dagger.ModuleSource,
 	ctr *dagger.Container,
 	introspectionJSON *dagger.File,
 ) (*dagger.Directory, error) {
 	// generate the java sdk dependencies
-	javaDeps, err := m.buildJavaDependencies(ctx, introspectionJSON)
+	javaDeps, err := m.buildJavaDependencies(ctx, modSource, introspectionJSON)
 	if err != nil {
 		return nil, err
 	}
