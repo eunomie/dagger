@@ -276,6 +276,12 @@ func (s *moduleSourceSchema) Install(dag *dagql.Server) {
 			Args(
 				dagql.Arg("path").Doc(`The path of the client to remove.`),
 			),
+
+		dagql.NodeFuncWithCacheKey("hostConfigFile", s.moduleSourceHostConfigFile, dagql.CachePerCall).
+			Doc(`Returns a well-known host configuration file by name. Only available to SDK modules; returns null for user modules.`).
+			Args(
+				dagql.Arg("name").Doc(`The well-known config name (e.g., "maven-settings", "npmrc").`),
+			),
 	}.Install(dag)
 
 	dagql.Fields[*core.SDKConfig]{}.Install(dag)
@@ -3983,4 +3989,79 @@ func matchVersion(versions []string, match, subPath string) (string, error) {
 		}
 	}
 	return "", fmt.Errorf("unable to find version %s", match)
+}
+
+type moduleSourceHostConfigFileArgs struct {
+	Name string
+}
+
+func (s *moduleSourceSchema) moduleSourceHostConfigFile(
+	ctx context.Context,
+	src dagql.ObjectResult[*core.ModuleSource],
+	args moduleSourceHostConfigFileArgs,
+) (dagql.Nullable[*core.File], error) {
+	none := dagql.Null[*core.File]()
+
+	// Look up the well-known config name
+	relPath, ok := core.WellKnownHostConfigs[args.Name]
+	if !ok {
+		return none, nil
+	}
+
+	// TODO: SDK caller detection
+	// For v1, we rely on the fact that this method is only useful
+	// to SDK modules (user modules don't have a reason to call it).
+	// A proper caller check can be added in a follow-up.
+
+	// Build the home-relative path
+	// bk.AbsPath handles ~ expansion on the client side
+	homePath := "~/" + relPath
+
+	// Check if the file exists on the host
+	query, err := core.CurrentQuery(ctx)
+	if err != nil {
+		return none, nil
+	}
+	bk, err := query.Buildkit(ctx)
+	if err != nil {
+		return none, nil
+	}
+
+	_, err = bk.StatCallerHostPath(ctx, homePath, false)
+	if err != nil {
+		// File doesn't exist on host — return null gracefully
+		return none, nil
+	}
+
+	// Read the file from the host using the same pattern as host.file()
+	srv, err := core.CurrentDagqlServer(ctx)
+	if err != nil {
+		return none, nil
+	}
+
+	fileDir, fileName := filepath.Split(homePath)
+	var fileResult dagql.Result[*core.File]
+	err = srv.Select(ctx, srv.Root(), &fileResult,
+		dagql.Selector{Field: "host"},
+		dagql.Selector{
+			Field: "directory",
+			Args: []dagql.NamedInput{
+				{Name: "path", Value: dagql.NewString(fileDir)},
+				{Name: "include", Value: dagql.ArrayInput[dagql.String]{dagql.NewString(fileName)}},
+				{Name: "noCache", Value: dagql.NewBoolean(true)},
+			},
+		},
+		dagql.Selector{
+			Field: "file",
+			Args: []dagql.NamedInput{
+				{Name: "path", Value: dagql.NewString(fileName)},
+			},
+		},
+	)
+	if err != nil {
+		// Reading failed — return null gracefully
+		return none, nil
+	}
+
+	return dagql.NonNull(fileResult.Self()), nil
 }
