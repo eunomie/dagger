@@ -10525,6 +10525,16 @@ func (r *ModuleSource) GeneratedContextDirectory() *Directory {
 	}
 }
 
+// Returns a well-known host configuration file by name. Only available to SDK modules; returns null for user modules.
+func (r *ModuleSource) HostConfigFile(name string) *File {
+	q := r.query.Select("hostConfigFile")
+	q = q.Arg("name", name)
+
+	return &File{
+		query: q,
+	}
+}
+
 // The URL to access the web view of the repository (e.g., GitHub, GitLab, Bitbucket).
 func (r *ModuleSource) HTMLRepoURL(ctx context.Context) (string, error) {
 	if r.htmlRepoURL != nil {

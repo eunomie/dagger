@@ -10709,6 +10709,15 @@ export class ModuleSource extends BaseClient {
   }
 
   /**
+   * Returns a well-known host configuration file by name. Only available to SDK modules; returns null for user modules.
+   * @param name The well-known config name (e.g., "maven-settings", "npmrc").
+   */
+  hostConfigFile = (name: string): File => {
+    const ctx = this._ctx.select("hostConfigFile", { name })
+    return new File(ctx)
+  }
+
+  /**
    * The URL to access the web view of the repository (e.g., GitHub, GitLab, Bitbucket).
    */
   htmlRepoURL = async (): Promise<string> => {
