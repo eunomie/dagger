@@ -10665,6 +10665,21 @@ class ModuleSource(Type):
         _ctx = self._select("generatedContextDirectory", _args)
         return Directory(_ctx)
 
+    def host_config_file(self, name: str) -> File:
+        """Returns a well-known host configuration file by name. Only available
+        to SDK modules; returns null for user modules.
+
+        Parameters
+        ----------
+        name:
+            The well-known config name (e.g., "maven-settings", "npmrc").
+        """
+        _args = [
+            Arg("name", name),
+        ]
+        _ctx = self._select("hostConfigFile", _args)
+        return File(_ctx)
+
     async def html_repo_url(self) -> str:
         """The URL to access the web view of the repository (e.g., GitHub,
         GitLab, Bitbucket).

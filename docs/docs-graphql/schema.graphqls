@@ -4304,6 +4304,14 @@ type ModuleSource {
   generatedContextDirectory: Directory!
 
   """
+  Returns a well-known host configuration file by name. Only available to SDK modules; returns null for user modules.
+  """
+  hostConfigFile(
+    """The well-known config name (e.g., "maven-settings", "npmrc")."""
+    name: String!
+  ): File
+
+  """
   The URL to access the web view of the repository (e.g., GitHub, GitLab, Bitbucket).
   """
   htmlRepoURL: String!

@@ -5109,6 +5109,12 @@
 		},
 		{
 			"t": "M",
+			"n": "Dagger\\ModuleSource::hostConfigFile",
+			"p": "Dagger/ModuleSource.html#method_hostConfigFile",
+			"d": "<p>Returns a well-known host configuration file by name. Only available to SDK modules; returns null for user modules.</p>"
+		},
+		{
+			"t": "M",
 			"n": "Dagger\\ModuleSource::htmlRepoURL",
 			"p": "Dagger/ModuleSource.html#method_htmlRepoURL",
 			"d": "<p>The URL to access the web view of the repository (e.g., GitHub, GitLab, Bitbucket).</p>"

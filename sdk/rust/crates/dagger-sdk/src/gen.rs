@@ -11265,6 +11265,20 @@ impl ModuleSource {
             graphql_client: self.graphql_client.clone(),
         }
     }
+    /// Returns a well-known host configuration file by name. Only available to SDK modules; returns null for user modules.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The well-known config name (e.g., "maven-settings", "npmrc").
+    pub fn host_config_file(&self, name: impl Into<String>) -> File {
+        let mut query = self.selection.select("hostConfigFile");
+        query = query.arg("name", name.into());
+        File {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
     /// The URL to access the web view of the repository (e.g., GitHub, GitLab, Bitbucket).
     pub async fn html_repo_url(&self) -> Result<String, DaggerError> {
         let query = self.selection.select("htmlRepoURL");

@@ -132,6 +132,16 @@ class ModuleSource extends Client\AbstractObject implements Client\IdAble
     }
 
     /**
+     * Returns a well-known host configuration file by name. Only available to SDK modules; returns null for user modules.
+     */
+    public function hostConfigFile(string $name): File
+    {
+        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('hostConfigFile');
+        $innerQueryBuilder->setArgument('name', $name);
+        return new \Dagger\File($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
+    }
+
+    /**
      * The URL to access the web view of the repository (e.g., GitHub, GitLab, Bitbucket).
      */
     public function htmlRepoURL(): string
