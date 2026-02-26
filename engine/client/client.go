@@ -58,6 +58,7 @@ import (
 	"github.com/dagger/dagger/engine/client/secretprovider"
 	"github.com/dagger/dagger/engine/session/git"
 	"github.com/dagger/dagger/engine/session/h2c"
+	"github.com/dagger/dagger/engine/session/hostconfig"
 	"github.com/dagger/dagger/engine/session/pipe"
 	"github.com/dagger/dagger/engine/session/prompt"
 	"github.com/dagger/dagger/engine/session/store"
@@ -524,6 +525,8 @@ func (c *Client) startSession(ctx context.Context) (rerr error) {
 		terminal.NewTerminalAttachable(ctx, c.Params.WithTerminal),
 		// Git attachable
 		git.NewGitAttachable(ctx),
+		// host config files
+		hostconfig.NewHostConfigAttachable(),
 	}
 
 	if c.Params.Stdin != nil && c.Params.Stdout != nil {
@@ -609,6 +612,7 @@ func (c *Client) startE2ESession(ctx context.Context, callerSessionConn *grpc.Cl
 		h2c.NewTunnelListenerProxy(h2c.NewTunnelListenerClient(callerSessionConn)),
 		terminal.NewTerminalProxy(terminal.NewTerminalClient(callerSessionConn)),
 		git.NewGitAttachableProxy(git.NewGitClient(callerSessionConn)),
+		hostconfig.NewHostConfigProxy(hostconfig.NewHostConfigClient(callerSessionConn)),
 		pipe.NewPipeProxy(pipe.NewPipeClient(callerSessionConn)),
 		prompt.NewPromptProxy(prompt.NewPromptClient(callerSessionConn)),
 		store.NewStoreProxy(callerSessionConn),

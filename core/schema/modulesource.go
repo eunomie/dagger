@@ -4011,22 +4011,7 @@ func (s *moduleSourceSchema) moduleSourceHostConfigFile(
 ) (dagql.Nullable[*core.File], error) {
 	none := dagql.Null[*core.File]()
 
-	// Look up the well-known config name
-	relPath, ok := core.WellKnownHostConfigs[args.Name]
-	if !ok {
-		return none, nil
-	}
-
-	// TODO: SDK caller detection
-	// For v1, we rely on the fact that this method is only useful
-	// to SDK modules (user modules don't have a reason to call it).
-	// A proper caller check can be added in a follow-up.
-
-	// Build the home-relative path
-	// bk.AbsPath handles ~ expansion on the client side
-	homePath := "~/" + relPath
-
-	// Check if the file exists on the host
+	// Get file content from client via session attachable
 	query, err := core.CurrentQuery(ctx)
 	if err != nil {
 		return none, nil
@@ -4036,41 +4021,37 @@ func (s *moduleSourceSchema) moduleSourceHostConfigFile(
 		return none, nil
 	}
 
-	_, err = bk.StatCallerHostPath(ctx, homePath, false)
+	content, err := bk.GetHostConfigFile(ctx, args.Name)
 	if err != nil {
-		// File doesn't exist on host — return null gracefully
+		return none, nil
+	}
+	if content == nil {
+		// File doesn't exist on the host
 		return none, nil
 	}
 
-	// Read the file from the host using the same pattern as host.file()
+	// Create a File from the raw bytes
 	srv, err := core.CurrentDagqlServer(ctx)
 	if err != nil {
 		return none, nil
 	}
 
-	fileDir, fileName := filepath.Split(homePath)
-	var fileResult dagql.Result[*core.File]
-	err = srv.Select(ctx, srv.Root(), &fileResult,
-		dagql.Selector{Field: "host"},
-		dagql.Selector{
-			Field: "directory",
-			Args: []dagql.NamedInput{
-				{Name: "path", Value: dagql.NewString(fileDir)},
-				{Name: "include", Value: dagql.ArrayInput[dagql.String]{dagql.NewString(fileName)}},
-				{Name: "noCache", Value: dagql.NewBoolean(true)},
-			},
-		},
-		dagql.Selector{
-			Field: "file",
-			Args: []dagql.NamedInput{
-				{Name: "path", Value: dagql.NewString(fileName)},
-			},
-		},
+	f, err := core.NewFileWithContents(
+		ctx,
+		"config",
+		content,
+		0o644,
+		nil,
+		query.Platform(),
 	)
 	if err != nil {
-		// Reading failed — return null gracefully
 		return none, nil
 	}
 
-	return dagql.NonNull(fileResult.Self()), nil
+	inst, err := dagql.NewObjectResultForCurrentID(ctx, srv, f)
+	if err != nil {
+		return none, nil
+	}
+
+	return dagql.NonNull(inst.Self()), nil
 }

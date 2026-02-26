@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package dagger.hostconfig;
+
+option go_package = "hostconfig";
+
+service HostConfig {
+  rpc GetFile(HostConfigRequest) returns (HostConfigResponse);
+}
+
+message HostConfigRequest {
+  string name = 1;
+}
+
+message HostConfigResponse {
+  oneof result {
+    FileContent file = 1;
+    ErrorInfo error = 2;
+  }
+}
+
+message FileContent {
+  bytes content = 1;
+  string path = 2;
+}
+
+message ErrorInfo {
+  enum ErrorType {
+    UNKNOWN = 0;
+    NOT_FOUND = 1;
+    READ_FAILED = 2;
+  }
+  ErrorType type = 1;
+  string message = 2;
+}

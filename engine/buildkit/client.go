@@ -42,6 +42,7 @@ import (
 	"github.com/dagger/dagger/engine"
 	"github.com/dagger/dagger/engine/session/git"
 	"github.com/dagger/dagger/engine/session/h2c"
+	"github.com/dagger/dagger/engine/session/hostconfig"
 	"github.com/dagger/dagger/engine/session/pipe"
 	"github.com/dagger/dagger/engine/session/prompt"
 	"github.com/dagger/dagger/engine/session/store"
@@ -660,6 +661,36 @@ func (c *Client) GetGitConfig(ctx context.Context) ([]*git.GitConfigEntry, error
 		return nil, fmt.Errorf("git config error: %s", result.Error.Message)
 	default:
 		return nil, fmt.Errorf("unexpected response type")
+	}
+}
+
+func (c *Client) GetHostConfigFile(ctx context.Context, name string) ([]byte, error) {
+	md, err := engine.ClientMetadataFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	caller, err := c.GetClientCaller(md.ClientID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get client caller for %q: %w", md.ClientID, err)
+	}
+
+	response, err := hostconfig.NewHostConfigClient(caller.Conn()).GetFile(ctx, &hostconfig.HostConfigRequest{
+		Name: name,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get host config file %q: %w", name, err)
+	}
+
+	switch result := response.Result.(type) {
+	case *hostconfig.HostConfigResponse_File:
+		return result.File.Content, nil
+	case *hostconfig.HostConfigResponse_Error:
+		if result.Error.Type == hostconfig.NOT_FOUND {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("host config error for %q: %s", name, result.Error.Message)
+	default:
+		return nil, fmt.Errorf("unexpected response type for host config %q", name)
 	}
 }
 
