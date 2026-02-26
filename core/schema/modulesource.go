@@ -4001,7 +4001,9 @@ func matchVersion(versions []string, match, subPath string) (string, error) {
 }
 
 type moduleSourceHostConfigFileArgs struct {
-	Name string
+	Name    string
+	Content string `internal:"true" default:"" name:"content"`
+	FSDagOpInternalArgs
 }
 
 func (s *moduleSourceSchema) moduleSourceHostConfigFile(
@@ -4011,7 +4013,28 @@ func (s *moduleSourceSchema) moduleSourceHostConfigFile(
 ) (dagql.Nullable[*core.File], error) {
 	none := dagql.Null[*core.File]()
 
-	// Get file content from client via session attachable
+	if args.InDagOp() {
+		// Inside BuildKit operation — create the file from embedded content
+		query, err := core.CurrentQuery(ctx)
+		if err != nil {
+			return none, err
+		}
+		srv, err := core.CurrentDagqlServer(ctx)
+		if err != nil {
+			return none, err
+		}
+		f, err := core.NewFileWithContents(ctx, "config", []byte(args.Content), 0o644, nil, query.Platform())
+		if err != nil {
+			return none, err
+		}
+		inst, err := dagql.NewObjectResultForCurrentID(ctx, srv, f)
+		if err != nil {
+			return none, err
+		}
+		return dagql.NonNull(inst.Self()), nil
+	}
+
+	// Not in DagOp — fetch content from client via session attachable
 	query, err := core.CurrentQuery(ctx)
 	if err != nil {
 		return none, nil
@@ -4026,29 +4049,35 @@ func (s *moduleSourceSchema) moduleSourceHostConfigFile(
 		return none, nil
 	}
 	if content == nil {
-		// File doesn't exist on the host
 		return none, nil
 	}
 
-	// Create a File from the raw bytes
+	// Content found — embed it in the args and create a DagOp file
+	args.Content = string(content)
+
+	newID := dagql.CurrentID(ctx).
+		WithArgument(call.NewArgument("content", call.NewLiteralString(args.Content), false))
+	ctxDagOp := dagql.ContextWithID(ctx, newID)
+
 	srv, err := core.CurrentDagqlServer(ctx)
 	if err != nil {
 		return none, nil
 	}
 
-	f, err := core.NewFileWithContents(
-		ctx,
-		"config",
-		content,
-		0o644,
-		nil,
-		query.Platform(),
-	)
+	f, effectID, err := DagOpFile(ctxDagOp, srv, src.Self(), args, nil, WithStaticPath[*core.ModuleSource, moduleSourceHostConfigFileArgs]("config"))
 	if err != nil {
 		return none, nil
 	}
 
-	inst, err := dagql.NewObjectResultForCurrentID(ctx, srv, f)
+	if _, err := f.Evaluate(ctx); err != nil {
+		return none, nil
+	}
+
+	curID := dagql.CurrentID(ctx)
+	if effectID != "" {
+		curID = curID.AppendEffectIDs(effectID)
+	}
+	inst, err := dagql.NewObjectResultForID(f, srv, curID)
 	if err != nil {
 		return none, nil
 	}

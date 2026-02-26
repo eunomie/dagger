@@ -665,13 +665,9 @@ func (c *Client) GetGitConfig(ctx context.Context) ([]*git.GitConfigEntry, error
 }
 
 func (c *Client) GetHostConfigFile(ctx context.Context, name string) ([]byte, error) {
-	md, err := engine.ClientMetadataFromContext(ctx)
+	caller, err := c.GetMainClientCaller()
 	if err != nil {
-		return nil, err
-	}
-	caller, err := c.GetClientCaller(md.ClientID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get client caller for %q: %w", md.ClientID, err)
+		return nil, fmt.Errorf("failed to get main client caller: %w", err)
 	}
 
 	response, err := hostconfig.NewHostConfigClient(caller.Conn()).GetFile(ctx, &hostconfig.HostConfigRequest{
@@ -685,7 +681,7 @@ func (c *Client) GetHostConfigFile(ctx context.Context, name string) ([]byte, er
 	case *hostconfig.HostConfigResponse_File:
 		return result.File.Content, nil
 	case *hostconfig.HostConfigResponse_Error:
-		if result.Error.Type == hostconfig.NOT_FOUND {
+		if result.Error.Type == hostconfig.NOT_FOUND || result.Error.Type == hostconfig.UNKNOWN {
 			return nil, nil
 		}
 		return nil, fmt.Errorf("host config error for %q: %s", name, result.Error.Message)

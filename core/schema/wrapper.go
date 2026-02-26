@@ -323,6 +323,7 @@ func getSelfDigest(ctx context.Context, a any) (digest.Digest, []llb.State, erro
 		*core.GitRef,
 		*core.GitRepository,
 		*core.Host,
+		*core.ModuleSource,
 		*core.Query,
 		*core.Workspace:
 		// fallback to using dagop ID
