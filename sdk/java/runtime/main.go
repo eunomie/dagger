@@ -146,7 +146,7 @@ func (m *JavaSdk) buildJavaDependencies(
 	introspectionJSON *dagger.File,
 ) (*dagger.Container, error) {
 	// We need maven to build the dependencies
-	ctr, err := m.mvnContainer(ctx)
+	ctr, err := m.mvnContainer(ctx, modSource)
 	if err != nil {
 		return nil, err
 	}
@@ -157,12 +157,6 @@ func (m *JavaSdk) buildJavaDependencies(
 	ctr = ctr.
 		// Cache maven dependencies
 		WithMountedCache("/root/.m2/repository", dag.CacheVolume("sdk-java-maven-m2"), dagger.ContainerWithMountedCacheOpts{Sharing: dagger.CacheSharingModeLocked})
-
-	// Mount host Maven settings if available
-	settingsFile := modSource.HostConfigFile("maven-settings")
-	if fileID, err := settingsFile.ID(ctx); err == nil && fileID != "" {
-		ctr = ctr.WithMountedFile("/root/.m2/settings.xml", settingsFile)
-	}
 
 	return ctr.
 		// Mount the introspection JSON file used to generate the SDK
@@ -375,8 +369,17 @@ func (m *JavaSdk) finalJar(
 	return ctr.File(filepath.Join(m.moduleConfig.modulePath(), "target", jarFileName)), nil
 }
 
-func (m *JavaSdk) mvnContainer(ctx context.Context) (*dagger.Container, error) {
-	return disableSVEOnArm64(ctx, m.MavenImage())
+func (m *JavaSdk) mvnContainer(ctx context.Context, modSource *dagger.ModuleSource) (*dagger.Container, error) {
+	ctr, err := disableSVEOnArm64(ctx, m.MavenImage())
+	if err != nil {
+		return nil, err
+	}
+	// Mount host Maven settings if available
+	settingsFile := modSource.HostConfigFile("maven-settings")
+	if fileID, err := settingsFile.ID(ctx); err == nil && fileID != "" {
+		ctr = ctr.WithMountedFile("/root/.m2/settings.xml", settingsFile)
+	}
+	return ctr, nil
 }
 
 func (m *JavaSdk) jreContainer(ctx context.Context) (*dagger.Container, error) {
