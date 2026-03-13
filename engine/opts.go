@@ -119,6 +119,11 @@ type ClientMetadata struct {
 	// SkipWorkspaceModules skips loading workspace modules when true.
 	SkipWorkspaceModules bool `json:"skip_workspace_modules,omitempty"`
 
+	// FocusModule restricts workspace module loading to only blueprints and
+	// the module whose name matches this value. When empty, all workspace
+	// modules are loaded.
+	FocusModule string `json:"focus_module,omitempty"`
+
 	// LockMode controls lockfile behavior for lookup resolution.
 	// Valid values: "strict", "auto", "update".
 	LockMode string `json:"lock_mode,omitempty"`

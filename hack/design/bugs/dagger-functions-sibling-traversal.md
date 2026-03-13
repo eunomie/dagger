@@ -78,3 +78,45 @@ Once we resolve the sibling function, its return type (e.g. `PythonSdk`) is alre
 `mod.Objects` because `loadTypeDefs` populates all loaded modules' types. The existing
 `mod.GetFunctionProvider(nextType.Name())` call finds it, and further traversal steps
 (e.g. `dagger functions python-sdk python-310`) work naturally.
+
+## Bonus: Selective module loading
+
+Currently `ensureModulesLoaded` resolves all workspace modules in parallel on first query.
+An optimization could defer loading non-blueprint, non-targeted modules until needed. This
+is orthogonal to the bug fix and should be designed separately.
+
+## Optimization: Selective module loading
+
+When a function path is provided (e.g. `dagger functions python-sdk` or
+`dagger call python-sdk --help`), the CLI already knows the first function name. Only
+blueprint modules and the targeted module need to be loaded — not the entire workspace.
+
+### Change 1: Thread focus module from CLI to engine
+
+The CLI already extracts the first function name via `functionName()` into
+`Params.Function`. Thread it to the engine:
+
+- `engine/opts.go`: Add `FocusModule string` to `ClientMetadata`
+- `engine/client/client.go`: Set `md.FocusModule = c.Function` when building metadata
+
+### Change 2: Filter in gatherModuleLoadRequests (engine/server/session.go)
+
+When `FocusModule` is set, skip workspace config modules that are neither blueprints nor
+matching the focus name:
+
+```go
+func gatherModuleLoadRequests(pending []pendingModule, extras []engine.ExtraModule, focusModule string) []moduleLoadRequest {
+    for _, mod := range pending {
+        if focusModule != "" && !mod.Blueprint && mod.Name != focusModule {
+            continue
+        }
+        // ...
+    }
+    // extras always load (explicit -m flag)
+}
+```
+
+### Result
+
+For the dagger/dagger workspace (~20 modules), `dagger functions python-sdk` goes from
+loading all modules to loading only 2 (blueprint + python-sdk).

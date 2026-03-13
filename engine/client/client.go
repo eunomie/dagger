@@ -1406,6 +1406,10 @@ func (c *Client) clientMetadata() engine.ClientMetadata {
 		CloudScaleOutEngineID:     remoteEngineID,
 	}
 
+	if c.Function != "" {
+		md.FocusModule = c.Function
+	}
+
 	if c.Module != "" {
 		md.ExtraModules = []engine.ExtraModule{{Ref: c.Module, Blueprint: true}}
 		md.SkipWorkspaceModules = true

@@ -2168,7 +2168,11 @@ func (srv *Server) ensureModulesLoaded(ctx context.Context, client *daggerClient
 		return fmt.Errorf("waiting for client session: %w", err)
 	}
 
-	loads := gatherModuleLoadRequests(client.pendingModules, client.pendingExtraModules)
+	var focusModule string
+	if client.clientMetadata != nil {
+		focusModule = client.clientMetadata.FocusModule
+	}
+	loads := gatherModuleLoadRequests(client.pendingModules, client.pendingExtraModules, focusModule)
 	resolvedMods := make([]*core.Module, len(loads))
 	resolveErrs := make([]error, len(loads))
 
@@ -2217,9 +2221,17 @@ func (srv *Server) ensureModulesLoaded(ctx context.Context, client *daggerClient
 	return nil
 }
 
-func gatherModuleLoadRequests(pending []pendingModule, extras []engine.ExtraModule) []moduleLoadRequest {
+func gatherModuleLoadRequests(pending []pendingModule, extras []engine.ExtraModule, focusModule string) []moduleLoadRequest {
 	loads := make([]moduleLoadRequest, 0, len(pending)+len(extras))
+	seen := make(map[string]bool, len(pending))
 	for _, mod := range pending {
+		if focusModule != "" && !mod.Blueprint && mod.Name != focusModule {
+			continue
+		}
+		if mod.Name != "" && seen[mod.Name] {
+			continue
+		}
+		seen[mod.Name] = true
 		loads = append(loads, moduleLoadRequest{mod: mod})
 	}
 	for _, extra := range extras {
