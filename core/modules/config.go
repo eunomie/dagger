@@ -84,6 +84,13 @@ type ModuleConfig struct {
 	// If true, disable the new default function caching behavior for this module. Functions will
 	// instead default to the old behavior of per-session caching.
 	DisableDefaultFunctionCaching *bool `json:"disableDefaultFunctionCaching,omitempty"`
+
+	// Controls whether the SDK runs codegen at runtime.
+	// When absent or true (default), the SDK generates code during Runtime() — the
+	// traditional "dagger develop" behavior.
+	// When false, codegen is handled externally (e.g. by "dagger generate" via
+	// sdk:compat:develop) and the SDK skips it in Runtime().
+	RuntimeCodegen *bool `json:"runtimeCodegen,omitempty"`
 }
 
 type ModuleConfigUserFields struct {

@@ -1226,6 +1226,8 @@ func (s *moduleSourceSchema) initFromModConfig(configBytes []byte, src *core.Mod
 		src.DisableDefaultFunctionCaching = true
 	}
 
+	src.RuntimeCodegen = modCfg.RuntimeCodegen
+
 	if modCfg.SDK != nil {
 		src.SDK = &core.SDKConfig{
 			Source:       modCfg.SDK.Source,
@@ -2399,6 +2401,8 @@ func (s *moduleSourceSchema) loadModuleSourceConfig(
 	if src.DisableDefaultFunctionCaching {
 		modCfg.DisableDefaultFunctionCaching = ptr(true)
 	}
+
+	modCfg.RuntimeCodegen = src.RuntimeCodegen
 
 	if src.SDK != nil {
 		modCfg.SDK = &modules.SDK{

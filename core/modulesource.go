@@ -149,6 +149,11 @@ type ModuleSource struct {
 	ModuleConfigUserFields        modules.ModuleConfigUserFields
 	DisableDefaultFunctionCaching bool
 
+	// RuntimeCodegen controls whether the SDK runs codegen at runtime.
+	// nil or true = SDK generates code during Runtime() (default).
+	// false = codegen handled externally (e.g. dagger generate), SDK skips it.
+	RuntimeCodegen *bool `field:"true" name:"runtimeCodegen" doc:"Whether the SDK runs codegen at runtime. When false, codegen is handled externally (e.g. by dagger generate)."`
+
 	// The SDK configuration of the module as read from the module's dagger.json or set by withSDK
 	SDK *SDKConfig `field:"true" name:"sdk" doc:"The SDK configuration of the module."`
 	// The implementation of the SDK with codegen and related operations. Reloaded when SDK changes.
