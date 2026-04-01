@@ -54,6 +54,24 @@ func (t *TypescriptSdk) ModuleRuntime(
 		return nil, fmt.Errorf("failed to analyze module config: %w", err)
 	}
 
+	skipCodegen := false
+	if rc, err := modSource.RuntimeCodegen(ctx); err == nil {
+		skipCodegen = !rc
+	}
+
+	if skipCodegen {
+		switch cfg.runtime {
+		case Bun:
+			return NewBunRuntime(cfg, t.SDKSourceDir, introspectionJSON).SetupContainerWithoutCodegen(ctx)
+		case Deno:
+			return NewDenoRuntime(cfg, t.SDKSourceDir, introspectionJSON).SetupContainerWithoutCodegen(ctx)
+		case Node:
+			return NewNodeRuntime(cfg, t.SDKSourceDir, introspectionJSON).SetupContainerWithoutCodegen(ctx)
+		default:
+			return nil, fmt.Errorf("unknown runtime %s", cfg.runtime)
+		}
+	}
+
 	switch cfg.runtime {
 	case Bun:
 		return NewBunRuntime(cfg, t.SDKSourceDir, introspectionJSON).SetupContainer(ctx)

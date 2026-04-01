@@ -95,6 +95,28 @@ func (d *DenoRuntime) SetupContainer(ctx context.Context) (*dagger.Container, er
 // We do not generate a `deno.lock` file because it requires to specify
 // a source file to generate the lock file from. We don't want that
 // because it would invalidate the cache on each code change.
+func (d *DenoRuntime) SetupContainerWithoutCodegen(ctx context.Context) (*dagger.Container, error) {
+	denoRuntimeWithDep, err := d.withDenoJSON(ctx)
+	if err != nil {
+		return nil, err
+	}
+	denoRuntimeWithDep, err = denoRuntimeWithDep.withInstalledDependencies().sync(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	entrypointPath := filepath.Join(d.cfg.modulePath(), SrcDir, EntrypointExecutableFile)
+	ctr := denoRuntimeWithDep.ctr.
+		WithDirectory(".", d.cfg.wrappedSourceCodeDirectory()).
+		WithMountedFile(entrypointPath, entrypointFile()).
+		WithEntrypoint([]string{"deno", "run", "-q", "-A", entrypointPath})
+
+	if d.cfg.debug {
+		ctr = ctr.Terminal()
+	}
+	return ctr, nil
+}
+
 func (d *DenoRuntime) GenerateDir(ctx context.Context) (*dagger.Directory, error) {
 	var denoJSON *dagger.File
 	var sdkLibrary *dagger.Directory

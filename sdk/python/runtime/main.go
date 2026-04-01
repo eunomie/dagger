@@ -179,7 +179,17 @@ func (m *PythonSdk) ModuleRuntime(
 	modSource *dagger.ModuleSource,
 	introspectionJSON *dagger.File,
 ) (*dagger.Container, error) {
-	runtime, err := m.Common(ctx, modSource, introspectionJSON)
+	skip, err := shouldSkipRuntimeCodegen(ctx, modSource)
+	if err != nil {
+		return nil, err
+	}
+
+	var runtime *PythonSdk
+	if skip {
+		runtime, err = m.CommonWithoutCodegen(ctx, modSource)
+	} else {
+		runtime, err = m.Common(ctx, modSource, introspectionJSON)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -189,6 +199,34 @@ func (m *PythonSdk) ModuleRuntime(
 		ctr = ctr.Terminal()
 	}
 	return ctr, nil
+}
+
+// shouldSkipRuntimeCodegen returns true if the module has runtimeCodegen
+// explicitly set to false.
+func shouldSkipRuntimeCodegen(ctx context.Context, modSource *dagger.ModuleSource) (bool, error) {
+	rc, err := modSource.RuntimeCodegen(ctx)
+	if err != nil {
+		// Field may not exist on older engines; default to running codegen.
+		return false, nil //nolint:nilerr
+	}
+	return !rc, nil
+}
+
+// CommonWithoutCodegen sets up the runtime container without running codegen.
+// Used when runtimeCodegen is false (generated files are already committed).
+func (m *PythonSdk) CommonWithoutCodegen(
+	ctx context.Context,
+	modSource *dagger.ModuleSource,
+) (*PythonSdk, error) {
+	_, err := m.Load(ctx, modSource)
+	if err != nil {
+		return nil, err
+	}
+	_, err = m.WithBase()
+	if err != nil {
+		return nil, err
+	}
+	return m.WithSource().WithUpdates(), nil
 }
 
 // Container for executing the Python module runtime

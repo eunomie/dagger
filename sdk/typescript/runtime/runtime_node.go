@@ -113,6 +113,34 @@ func (n *NodeRuntime) SetupContainer(ctx context.Context) (*dagger.Container, er
 	return ctr, nil
 }
 
+func (n *NodeRuntime) SetupContainerWithoutCodegen(ctx context.Context) (*dagger.Container, error) {
+	runtimeWithPkgJSON, err := n.withPackageJSON(ctx)
+	if err != nil {
+		return nil, err
+	}
+	pkgManager := runtimeWithPkgJSON.createPkgManagerCtr()
+	runtimeWithDep, err := pkgManager.
+		withSetupPackageManager().
+		withInstalledDependencies().
+		sync(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	entrypointPath := filepath.Join(n.cfg.modulePath(), SrcDir, EntrypointExecutableFile)
+	ctr := runtimeWithDep.ctr.
+		WithDirectory(".", n.cfg.wrappedSourceCodeDirectory()).
+		WithMountedFile(entrypointPath, entrypointFile()).
+		WithEntrypoint([]string{
+			"tsx", "--no-deprecation", "--tsconfig", n.cfg.tsConfigPath(), entrypointPath,
+		})
+
+	if n.cfg.debug {
+		ctr = ctr.Terminal()
+	}
+	return ctr, nil
+}
+
 func (n *NodeRuntime) GenerateDir(ctx context.Context) (*dagger.Directory, error) {
 	var tsconfigFile *dagger.File
 	var sdkLibrary *dagger.Directory

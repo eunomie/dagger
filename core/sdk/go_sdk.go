@@ -9,6 +9,7 @@ import (
 
 	"github.com/dagger/dagger/core"
 	"github.com/dagger/dagger/dagql"
+	"github.com/dagger/dagger/engine/slog"
 	"github.com/dagger/dagger/dagql/call"
 	"github.com/dagger/dagger/engine"
 	"github.com/dagger/dagger/engine/buildkit"
@@ -382,6 +383,14 @@ func (sdk *goSDK) ModuleTypes(
 	return inst, nil
 }
 
+// shouldSkipRuntimeCodegen returns true if the module has runtimeCodegen
+// explicitly set to false, meaning generated files are committed and the
+// SDK should not re-generate them at runtime.
+func shouldSkipRuntimeCodegen(src dagql.ObjectResult[*core.ModuleSource]) bool {
+	rc := src.Self().RuntimeCodegen
+	return rc != nil && !*rc
+}
+
 func (sdk *goSDK) Runtime(
 	ctx context.Context,
 	deps *core.SchemaBuilder,
@@ -395,7 +404,12 @@ func (sdk *goSDK) Runtime(
 		return nil, fmt.Errorf("failed to get dag for go module sdk runtime: %w", err)
 	}
 
-	ctr, err := sdk.baseWithCodegen(ctx, deps, source)
+	var ctr dagql.ObjectResult[*core.Container]
+	if shouldSkipRuntimeCodegen(source) {
+		ctr, err = sdk.baseWithExistingCode(ctx, source)
+	} else {
+		ctr, err = sdk.baseWithCodegen(ctx, deps, source)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -583,7 +597,8 @@ func (sdk *goSDK) baseWithCodegen(
 	configSelectors := getSDKConfigSelectors(ctx, config)
 	selectors = append(selectors, configSelectors...)
 
-	// fetch gitconfig selectors
+	// fetch gitconfig selectors — may fail in DIR_SOURCE contexts (e.g. toolchain),
+	// skip gracefully since git config is not essential for codegen
 	bk, err := sdk.root.Buildkit(ctx)
 	if err != nil {
 		return ctr, err
@@ -591,19 +606,18 @@ func (sdk *goSDK) baseWithCodegen(
 
 	gitConfigSelectors, err := gitConfigSelectors(ctx, bk)
 	if err != nil {
-		return ctr, err
+		slog.Debug("skipping git config in codegen", "error", err)
+	} else {
+		selectors = append(selectors, gitConfigSelectors...)
 	}
-	selectors = append(selectors, gitConfigSelectors...)
 
-	// TODO(rajatjindal): verify with Erik as to why this
-	// cause failures if we also mount this in Runtime.
-	// Issue we run into is that when we try to run sdk checks
-	// using .dagger, it fails trying to find the socket
+	// SSH auth — may also fail in DIR_SOURCE contexts, skip gracefully
 	setSSHAuthSelectors, unsetSSHAuthSelectors, err := sdk.getUnixSocketSelector(ctx)
 	if err != nil {
-		return ctr, err
+		slog.Debug("skipping SSH auth in codegen", "error", err)
+	} else {
+		selectors = append(selectors, setSSHAuthSelectors...)
 	}
-	selectors = append(selectors, setSSHAuthSelectors...)
 
 	// now that we are done with gitconfig and injecting env
 	// variables, we can run the codegen command.
@@ -628,6 +642,51 @@ func (sdk *goSDK) baseWithCodegen(
 
 	if err := dag.Select(ctx, ctr, &ctr, selectors...); err != nil {
 		return ctr, fmt.Errorf("failed to mount introspection json file into go module sdk container codegen: %w", err)
+	}
+
+	return ctr, nil
+}
+
+// baseWithExistingCode sets up the Go runtime container with the source
+// mounted as-is, without running codegen. Used when runtimeCodegen is false
+// (generated files are already committed).
+func (sdk *goSDK) baseWithExistingCode(
+	ctx context.Context,
+	src dagql.ObjectResult[*core.ModuleSource],
+) (dagql.ObjectResult[*core.Container], error) {
+	var ctr dagql.ObjectResult[*core.Container]
+
+	dag, err := sdk.root.Server.Server(ctx)
+	if err != nil {
+		return ctr, err
+	}
+
+	contextDir := src.Self().ContextDirectory
+	srcSubpath := src.Self().SourceSubpath
+
+	ctr, err = sdk.base(ctx)
+	if err != nil {
+		return ctr, err
+	}
+
+	if err := dag.Select(ctx, ctr, &ctr,
+		dagql.Selector{
+			Field: "withMountedDirectory",
+			Args: []dagql.NamedInput{
+				{Name: "path", Value: dagql.NewString(goSDKUserModContextDirPath)},
+				{Name: "source", Value: dagql.NewID[*core.Directory](contextDir.ID())},
+			},
+		},
+		dagql.Selector{
+			Field: "withWorkdir",
+			Args: []dagql.NamedInput{
+				{Name: "path", Value: dagql.NewString(
+					filepath.Join(goSDKUserModContextDirPath, srcSubpath),
+				)},
+			},
+		},
+	); err != nil {
+		return ctr, err
 	}
 
 	return ctr, nil

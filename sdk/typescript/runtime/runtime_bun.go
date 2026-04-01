@@ -105,6 +105,30 @@ func (b *BunRuntime) SetupContainer(ctx context.Context) (*dagger.Container, err
 	return ctr, nil
 }
 
+// SetupContainerWithoutCodegen sets up the runtime container without running
+// codegen. Used when runtimeCodegen is false (generated files already committed).
+func (b *BunRuntime) SetupContainerWithoutCodegen(ctx context.Context) (*dagger.Container, error) {
+	runtime, err := b.WithPackageJSON(ctx)
+	if err != nil {
+		return nil, err
+	}
+	runtime, err = runtime.withInstalledDependencies().sync(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	entrypointPath := filepath.Join(b.cfg.modulePath(), SrcDir, EntrypointExecutableFile)
+	ctr := runtime.ctr.
+		WithDirectory(".", b.cfg.wrappedSourceCodeDirectory()).
+		WithMountedFile(entrypointPath, entrypointFile()).
+		WithEntrypoint([]string{"bun", "run", entrypointPath})
+
+	if b.cfg.debug {
+		ctr = ctr.Terminal()
+	}
+	return ctr, nil
+}
+
 func (b *BunRuntime) GenerateDir(ctx context.Context) (*dagger.Directory, error) {
 	var tsconfigFile *dagger.File
 	var sdkLibrary *dagger.Directory
