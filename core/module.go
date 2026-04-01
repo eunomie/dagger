@@ -157,6 +157,10 @@ func functionRequiresArgs(fn *Function) bool {
 		if arg.DefaultValue != nil {
 			continue
 		}
+		// Workspace args are auto-injected by the framework
+		if arg.IsWorkspace() {
+			continue
+		}
 		return true
 	}
 	return false

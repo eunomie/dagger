@@ -529,6 +529,45 @@ func createObjectTypeDef(ctx context.Context, srv *dagql.Server, name string, mo
 		},
 	}
 
+	// Build maps of slot-level and arg-level directives from class body forms.
+	// Slot directives: @generate / @check annotations on methods.
+	// Arg directives: @defaultPath, @ignorePatterns on method arguments.
+	slotDirectives := map[string][]*dang.DirectiveApplication{}
+	methodArgDirectives := map[string]processedDirectives{}
+	for _, form := range module.ClassBodyForms {
+		if slot, ok := form.(*dang.SlotDecl); ok {
+			slotName := slot.Name.Name
+			if len(slot.Directives) > 0 {
+				slotDirectives[slotName] = slot.Directives
+			}
+			// Extract arg directives from function body
+			if fn, ok := slot.Value.(*dang.FunDecl); ok {
+				argDirs := processedDirectives{}
+				for _, arg := range fn.Args {
+					argName := arg.Name.Name
+					for _, dir := range arg.Directives {
+						if argDirs[argName] == nil {
+							argDirs[argName] = map[string]map[string]any{}
+						}
+						if argDirs[argName][dir.Name] == nil {
+							argDirs[argName][dir.Name] = map[string]any{}
+						}
+						for _, a := range dir.Args {
+							val, err := evalConstantValue(a.Value)
+							if err != nil {
+								return res, fmt.Errorf("failed to evaluate directive argument %s.%s.%s: %w", argName, dir.Name, a.Key, err)
+							}
+							argDirs[argName][dir.Name][a.Key] = val
+						}
+					}
+				}
+				if len(argDirs) > 0 {
+					methodArgDirectives[slotName] = argDirs
+				}
+			}
+		}
+	}
+
 	for name, scheme := range module.ClassType.Bindings(dang.PublicVisibility) {
 		slotType, isMono := scheme.Type()
 		if !isMono {
@@ -537,7 +576,7 @@ func createObjectTypeDef(ctx context.Context, srv *dagql.Server, name string, mo
 		switch x := slotType.(type) {
 		case *hm.FunctionType:
 			fn := x
-			fnDef, err := createFunction(ctx, srv, name, fn, nil)
+			fnDef, err := createFunction(ctx, srv, name, fn, methodArgDirectives[name])
 			if err != nil {
 				return res, fmt.Errorf("failed to create method %s for %s: %w", name, name, err)
 			}
@@ -551,6 +590,30 @@ func createObjectTypeDef(ctx context.Context, srv *dagql.Server, name string, mo
 					return res, fmt.Errorf("failed to add description to function: %w", err)
 				}
 				fnDef = descFnDef
+			}
+
+			// Apply @generate and @check directives from the slot declaration
+			if dirs, ok := slotDirectives[name]; ok {
+				for _, dir := range dirs {
+					switch dir.Name {
+					case "generate":
+						var genFnDef dagql.ObjectResult[*core.Function]
+						if err := srv.Select(ctx, fnDef, &genFnDef, dagql.Selector{
+							Field: "withGenerator",
+						}); err != nil {
+							return res, fmt.Errorf("failed to set generator on function %s: %w", name, err)
+						}
+						fnDef = genFnDef
+					case "check":
+						var checkFnDef dagql.ObjectResult[*core.Function]
+						if err := srv.Select(ctx, fnDef, &checkFnDef, dagql.Selector{
+							Field: "withCheck",
+						}); err != nil {
+							return res, fmt.Errorf("failed to set check on function %s: %w", name, err)
+						}
+						fnDef = checkFnDef
+					}
+				}
 			}
 
 			sels = append(sels, dagql.Selector{
