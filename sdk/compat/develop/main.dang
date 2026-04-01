@@ -25,12 +25,16 @@ type Develop {
     # Overlay generated code onto the module directory.
     let merged = modDir.withDirectory(".", generated)
 
-    # Clean .gitignore: remove entries for generated files (listed in
-    # .gitattributes) so they can be committed to git.
+    # Post-process the merged directory:
+    # 1. Clean .gitignore: remove entries for generated files (listed in
+    #    .gitattributes) so they can be committed to git.
+    # 2. Set runtimeCodegen: false in dagger.json so SDKs skip codegen
+    #    at runtime (generated files are now committed).
     let cleaned = container
       .from("alpine:3.22")
       .withMountedDirectory("/work", merged)
       .withWorkdir("/work")
+      .withExec(["apk", "add", "--no-cache", "jq"])
       .withExec(["sh", "-c",
         "if [ -f .gitattributes ] && [ -f .gitignore ]; then " +
         "awk '{print $1}' .gitattributes | while read -r pat; do " +
@@ -41,6 +45,9 @@ type Develop {
         "grep -Fxv \"$x\" .gitignore > .gi.tmp || true; " +
         "mv .gi.tmp .gitignore; " +
         "fi; done; fi"
+      ])
+      .withExec(["sh", "-c",
+        "jq '.runtimeCodegen = false' dagger.json > dagger.json.tmp && mv dagger.json.tmp dagger.json"
       ])
       .directory("/work")
 
