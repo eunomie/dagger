@@ -167,6 +167,47 @@ func (GeneratorsSuite) TestGeneratorsAsBlueprint(ctx context.Context, t *testctx
 	}
 }
 
+func (GeneratorsSuite) TestWorkspaceArgGenerators(ctx context.Context, t *testctx.T) {
+	c := connect(ctx, t)
+	modGen, err := generatorsTestEnv(t, c)
+	require.NoError(t, err)
+	modGen = modGen.WithWorkdir("hello-with-workspace-generator")
+
+	t.Run("list", func(ctx context.Context, t *testctx.T) {
+		out, err := modGen.
+			With(daggerExec("generate", "-l")).
+			CombinedOutput(ctx)
+		require.NoError(t, err)
+		require.Contains(t, out, "generate")
+	})
+
+	t.Run("run", func(ctx context.Context, t *testctx.T) {
+		modGen := modGen
+		exists, err := modGen.Exists(ctx, "generated.txt")
+		require.NoError(t, err)
+		require.False(t, exists)
+
+		modGen = modGen.
+			With(daggerExec("generate", "-y", "--progress=plain"))
+		out, err := modGen.
+			CombinedOutput(ctx)
+		require.NoError(t, err)
+		require.NotContains(t, out, "no changes to apply")
+
+		exists, err = modGen.Exists(ctx, "generated.txt")
+		require.NoError(t, err)
+		require.True(t, exists)
+	})
+
+	t.Run("check list", func(ctx context.Context, t *testctx.T) {
+		out, err := modGen.
+			With(daggerExec("check", "-l")).
+			CombinedOutput(ctx)
+		require.NoError(t, err)
+		require.Contains(t, out, "generated")
+	})
+}
+
 func (GeneratorsSuite) TestGeneratorsAsToolchain(ctx context.Context, t *testctx.T) {
 	c := connect(ctx, t)
 	for _, tc := range []struct {

@@ -1,0 +1,23 @@
+pub description = "Test module for @generate/@check with Workspace args"
+
+type HelloWithWorkspaceGenerator {
+  """
+  Generate a file using workspace context
+  """
+  pub generate(workspace: Workspace!): Changeset! @generate {
+    let ws = workspace.directory(".")
+    let result = ws.withNewFile("generated.txt", "hello from workspace generator")
+    result.changes(ws)
+  }
+
+  """
+  Check that generated files are up to date
+  """
+  pub generated(workspace: Workspace!): Void @check {
+    let changes = generate(workspace)
+    if (!changes.isEmpty) {
+      container.withError("generated files are not up to date").sync
+    }
+    null
+  }
+}
