@@ -39,8 +39,10 @@ var (
 	_                     = ModuleSourceKindEnum.AliasView("LOCAL", "LOCAL_SOURCE", enumView)
 	ModuleSourceKindGit   = ModuleSourceKindEnum.Register("GIT_SOURCE")
 	_                     = ModuleSourceKindEnum.AliasView("GIT", "GIT_SOURCE", enumView)
-	ModuleSourceKindDir   = ModuleSourceKindEnum.Register("DIR_SOURCE")
-	_                     = ModuleSourceKindEnum.AliasView("DIR", "DIR_SOURCE", enumView)
+	ModuleSourceKindDir     = ModuleSourceKindEnum.Register("DIR_SOURCE")
+	_                       = ModuleSourceKindEnum.AliasView("DIR", "DIR_SOURCE", enumView)
+	ModuleSourceKindBuiltin = ModuleSourceKindEnum.Register("BUILTIN_SOURCE")
+	_                       = ModuleSourceKindEnum.AliasView("BUILTIN", "BUILTIN_SOURCE", enumView)
 )
 
 func (proto ModuleSourceKind) Type() *ast.Type {
@@ -101,6 +103,8 @@ func (proto ModuleSourceKind) HumanString() string {
 		return "git"
 	case ModuleSourceKindDir:
 		return "directory"
+	case ModuleSourceKindBuiltin:
+		return "builtin"
 	default:
 		return string(proto)
 	}
@@ -1084,6 +1088,9 @@ type DirModuleSource struct {
 	OriginalContextDir dagql.ObjectResult[*Directory]
 	// the original source root subpath provided to AsModuleSource
 	OriginalSourceRootSubpath string
+	// if this was loaded from a builtin ref (e.g. "sdk:compat:develop"),
+	// preserve it so dagger.json serialization uses the ref instead of a path
+	BuiltinRef string
 }
 
 // ResolveDepToSource given a parent module source, load a dependency of it
@@ -1244,6 +1251,29 @@ func ResolveDepToSource(
 		err := dag.Select(ctx, dag.Root(), &inst, selectors...)
 		if err != nil {
 			return inst, fmt.Errorf("failed to load git dep: %w", err)
+		}
+		return inst, nil
+
+	case ModuleSourceKindBuiltin:
+		// Builtin refs (e.g. "sdk:compat:develop") are resolved by the engine
+		// through the moduleSource query, same as git refs.
+		selectors := []dagql.Selector{{
+			Field: "moduleSource",
+			Args: []dagql.NamedInput{
+				{Name: "refString", Value: dagql.String(depSrcRef)},
+			},
+		}}
+		if depName != "" {
+			selectors = append(selectors, dagql.Selector{
+				Field: "withName",
+				Args: []dagql.NamedInput{
+					{Name: "name", Value: dagql.String(depName)},
+				},
+			})
+		}
+		err := dag.Select(ctx, dag.Root(), &inst, selectors...)
+		if err != nil {
+			return inst, fmt.Errorf("failed to load builtin dep: %w", err)
 		}
 		return inst, nil
 

@@ -329,6 +329,11 @@ func (s *moduleSourceSchema) moduleSource(
 		if err != nil {
 			return inst, err
 		}
+	case core.ModuleSourceKindBuiltin:
+		inst, err = s.builtinModuleSource(ctx, query, parsedRef.Builtin.Ref)
+		if err != nil {
+			return inst, err
+		}
 	default:
 		return inst, fmt.Errorf("unknown module source kind: %s", parsedRef.Kind)
 	}
@@ -811,6 +816,63 @@ func (s *moduleSourceSchema) directoryAsModule(
 	return inst, err
 }
 
+func (s *moduleSourceSchema) builtinModuleSource(
+	ctx context.Context,
+	query dagql.ObjectResult[*core.Query],
+	ref string,
+) (inst dagql.Result[*core.ModuleSource], err error) {
+	dag, err := query.Self().Server.Server(ctx)
+	if err != nil {
+		return inst, fmt.Errorf("failed to get dag server: %w", err)
+	}
+
+	manifestDigest, subpath, err := builtinModuleRef(ref)
+	if err != nil {
+		return inst, err
+	}
+
+	// Load the builtin container from the embedded OCI tarball.
+	var ctr dagql.ObjectResult[*core.Container]
+	if err := dag.Select(ctx, query, &ctr,
+		dagql.Selector{
+			Field: "_builtinContainer",
+			Args: []dagql.NamedInput{
+				{Name: "digest", Value: dagql.String(manifestDigest.String())},
+			},
+		},
+	); err != nil {
+		return inst, fmt.Errorf("failed to load builtin container for %q: %w", ref, err)
+	}
+
+	// Get its rootfs as a directory.
+	var rootfs dagql.ObjectResult[*core.Directory]
+	if err := dag.Select(ctx, ctr, &rootfs,
+		dagql.Selector{Field: "rootfs"},
+	); err != nil {
+		return inst, fmt.Errorf("failed to get rootfs for builtin %q: %w", ref, err)
+	}
+
+	// Create a module source from the rootfs with the subpath as source root.
+	if err := dag.Select(ctx, rootfs, &inst,
+		dagql.Selector{
+			Field: "asModuleSource",
+			Args: []dagql.NamedInput{
+				{Name: "sourceRootPath", Value: dagql.String(subpath)},
+			},
+		},
+	); err != nil {
+		return inst, fmt.Errorf("failed to create module source for builtin %q: %w", ref, err)
+	}
+
+	// Preserve the builtin ref so dagger.json serialization uses it.
+	src := inst.Self()
+	if src.DirSrc != nil {
+		src.DirSrc.BuiltinRef = ref
+	}
+
+	return inst, nil
+}
+
 func (s *moduleSourceSchema) directoryAsModuleSource(
 	ctx context.Context,
 	contextDir dagql.ObjectResult[*core.Directory],
@@ -906,8 +968,10 @@ func (s *moduleSourceSchema) directoryAsModuleSource(
 		return inst, fmt.Errorf("failed to create instance: %w", err)
 	}
 
+	// User defaults (.env) loading may not be available for DIR_SOURCE modules
+	// (e.g. when loaded from a builtin ref in a toolchain context).
 	if err := dirSrc.LoadUserDefaults(ctx); err != nil {
-		return inst, fmt.Errorf("load user defaults: %w", err)
+		slog.Debug("skipping user defaults for dir module source", "error", err)
 	}
 	dirSrc.Digest = dirSrc.CalcDigest(ctx).String()
 	return inst, nil
@@ -2403,6 +2467,15 @@ func (s *moduleSourceSchema) loadModuleSourceConfig(
 				// parent=local, dep=git
 				depCfg.Source = depSrc.Self().AsString()
 				depCfg.Pin = depSrc.Self().Git.Commit
+
+			case core.ModuleSourceKindDir:
+				// parent=local, dep=dir (builtin refs like "sdk:compat:develop")
+				if depSrc.Self().DirSrc != nil && depSrc.Self().DirSrc.BuiltinRef != "" {
+					depCfg.Source = depSrc.Self().DirSrc.BuiltinRef
+				} else {
+					return nil, fmt.Errorf("parent module source kind %s cannot have dependency of kind %s without builtin ref",
+						src.Kind.HumanString(), depSrc.Self().Kind.HumanString())
+				}
 
 			default:
 				return nil, fmt.Errorf("unhandled module source kind: %s", src.Kind.HumanString())

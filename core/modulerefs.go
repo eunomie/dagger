@@ -25,6 +25,8 @@ func FastModuleSourceKindCheck(
 	refPin string,
 ) ModuleSourceKind {
 	switch {
+	case strings.HasPrefix(refString, "sdk:"):
+		return ModuleSourceKindBuiltin
 	case refPin != "":
 		return ModuleSourceKindGit
 	case len(refString) > 0 && (refString[0] == '/' || refString[0] == '.'):
@@ -48,9 +50,14 @@ func FastModuleSourceKindCheck(
 }
 
 type ParsedRefString struct {
-	Kind  ModuleSourceKind
-	Local *ParsedLocalRefString
-	Git   *ParsedGitRefString
+	Kind    ModuleSourceKind
+	Local   *ParsedLocalRefString
+	Git     *ParsedGitRefString
+	Builtin *ParsedBuiltinRefString
+}
+
+type ParsedBuiltinRefString struct {
+	Ref string // e.g. "sdk:compat:develop"
 }
 
 func ParseRefString(
@@ -64,6 +71,11 @@ func ParseRefString(
 
 	kind := FastModuleSourceKindCheck(refString, refPin)
 	switch kind {
+	case ModuleSourceKindBuiltin:
+		return &ParsedRefString{
+			Kind:    kind,
+			Builtin: &ParsedBuiltinRefString{Ref: refString},
+		}, nil
 	case ModuleSourceKindLocal:
 		return &ParsedRefString{
 			Kind: kind,

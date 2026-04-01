@@ -9,6 +9,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestFastModuleSourceKindCheckBuiltin(t *testing.T) {
+	require.Equal(t, ModuleSourceKindBuiltin, FastModuleSourceKindCheck("sdk:compat:develop", ""))
+	require.Equal(t, ModuleSourceKindBuiltin, FastModuleSourceKindCheck("sdk:go:develop", ""))
+	require.NotEqual(t, ModuleSourceKindBuiltin, FastModuleSourceKindCheck("./sdk/local", ""))
+	require.NotEqual(t, ModuleSourceKindBuiltin, FastModuleSourceKindCheck("github.com/foo/sdk", ""))
+}
+
 func TestMatchVersion(t *testing.T) {
 	vers := []string{"v1.0.0", "v1.0.1", "v2.0.0", "path/v1.0.1", "path/v2.0.1"}
 
