@@ -250,6 +250,33 @@ func (build *Builder) goSDKContent(ctx context.Context) (*sdkContent, error) {
 	}, nil
 }
 
+func (build *Builder) compatSDKDevelopContent(ctx context.Context) (*sdkContent, error) {
+	rootfs := dag.Directory().
+		WithDirectory("sdk/compat/develop", build.source.Directory("sdk/compat/develop"))
+
+	sdkCtrTarball := dag.Container().
+		WithRootfs(rootfs).
+		AsTarball(dagger.ContainerAsTarballOpts{
+			ForcedCompression: dagger.ImageLayerCompressionZstd,
+		})
+	sdkDir := unpackTar(sdkCtrTarball)
+
+	var index ocispecs.Index
+	indexContents, err := sdkDir.File("index.json").Contents(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal([]byte(indexContents), &index); err != nil {
+		return nil, err
+	}
+
+	return &sdkContent{
+		index:   index,
+		sdkDir:  sdkDir,
+		envName: distconsts.CompatSDKDevelopManifestDigestEnvName,
+	}, nil
+}
+
 func unpackTar(tarball *dagger.File) *dagger.Directory {
 	return dag.
 		Wolfi().

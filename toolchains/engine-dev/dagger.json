@@ -9,7 +9,8 @@
     "../../sdk/typescript/runtime/**/*",
     "../../go.mod",
     "../../go.sum",
-    "../../util/parallel"
+    "../../util/parallel",
+    "../../sdk/compat/develop"
   ],
   "dependencies": [
     {
