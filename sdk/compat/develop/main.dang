@@ -1,0 +1,60 @@
+pub description = "SDK compatibility layer — generates code for any SDK via the engine's codegen pipeline"
+
+type Develop {
+  """
+  Generate SDK code for a Dagger module.
+  Delegates to the engine's existing SDK codegen pipeline, so it works
+  for any SDK (Go, Python, TypeScript, etc.) without per-SDK logic.
+  """
+  pub generate(workspace: Workspace!): Changeset! @generate {
+    # workspace.directory("/") = workspace boundary (repo root)
+    # workspace.directory(".") = module directory
+    let root = workspace.directory("/")
+    let modDir = workspace.directory(".")
+    let wsPath = workspace.path
+
+    # Create a ModuleSource from the root with the module path as source root.
+    let modSrc = root.asModuleSource(sourceRootPath: wsPath)
+
+    # Run the SDK's Codegen function via the engine pipeline.
+    let genDir = modSrc.generatedContextDirectory
+
+    # Extract only the module's subdirectory from the generated output.
+    let generated = genDir.directory(wsPath)
+
+    # Overlay generated code onto the module directory.
+    let merged = modDir.withDirectory(".", generated)
+
+    # Clean .gitignore: remove entries for generated files (listed in
+    # .gitattributes) so they can be committed to git.
+    let cleaned = container
+      .from("alpine:3.22")
+      .withMountedDirectory("/work", merged)
+      .withWorkdir("/work")
+      .withExec(["sh", "-c",
+        "if [ -f .gitattributes ] && [ -f .gitignore ]; then " +
+        "awk '{print $1}' .gitattributes | while read -r pat; do " +
+        "grep -Fxv \"$pat\" .gitignore > .gi.tmp || true; " +
+        "mv .gi.tmp .gitignore; " +
+        "x=$(echo \"$pat\" | sed 's|/[*][*]$||'); " +
+        "if [ \"$pat\" != \"$x\" ]; then " +
+        "grep -Fxv \"$x\" .gitignore > .gi.tmp || true; " +
+        "mv .gi.tmp .gitignore; " +
+        "fi; done; fi"
+      ])
+      .directory("/work")
+
+    cleaned.changes(modDir)
+  }
+
+  """
+  Check that generated SDK code is up to date
+  """
+  pub generated(workspace: Workspace!): Void @check {
+    let changes = generate(workspace)
+    if (!changes.isEmpty) {
+      container.withError("generated files are not up to date, run 'dagger generate' to fix").sync
+    }
+    null
+  }
+}
