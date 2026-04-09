@@ -400,7 +400,7 @@ class DaggerEntrypointGenerator {
                     sb.append("      if (fnName.equals(\"\")) {\n")
                     firstFn = false
                 } else {
-                    sb.append("\n      if (fnName.equals(\"\")) {\n")
+                    sb.append(" else if (fnName.equals(\"\")) {\n")
                 }
                 generateConstructorInvoke(sb, obj, simpleClassName)
                 sb.append('      }\n')
