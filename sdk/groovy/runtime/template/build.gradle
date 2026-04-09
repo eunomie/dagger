@@ -1,0 +1,44 @@
+plugins {
+    id 'groovy'
+    id 'com.gradleup.shadow' version '9.0.0-beta12'
+}
+
+group = 'io.dagger.modules.daggermodule'
+version = '1.0-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "io.dagger:dagger-java-sdk:${findProperty('daggerDepsVersion') ?: '0.0.1-SNAPSHOT'}"
+    implementation "io.dagger:dagger-groovy-sdk:${findProperty('daggerDepsVersion') ?: '0.0.1-SNAPSHOT'}"
+    implementation 'org.apache.groovy:groovy:4.0.24'
+    runtimeOnly 'org.slf4j:slf4j-simple:2.0.16'
+    runtimeOnly 'org.eclipse:yasson:3.0.4'
+    implementation 'io.netty:netty-handler:4.1.125.Final'
+    runtimeOnly 'net.minidev:json-smart:2.5.2'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir layout.buildDirectory.dir('generated/sources/dagger')
+        }
+    }
+}
+
+shadowJar {
+    archiveClassifier = ''
+    manifest {
+        attributes 'Main-Class': 'io.dagger.gen.entrypoint.Entrypoint'
+    }
+    mergeServiceFiles()
+}
