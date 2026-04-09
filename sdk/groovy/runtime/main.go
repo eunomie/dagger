@@ -280,14 +280,17 @@ func (m *GroovySdk) generateCode(
 	if err != nil {
 		return nil, err
 	}
-	// Compile the user module to trigger code generation
+	generatedDir := filepath.Join(m.moduleConfig.modulePath(), "build", "generated", "sources", "dagger")
+
+	// Compile Groovy sources to trigger the AST transform which generates Entrypoint.java.
+	// We only need compileGroovy here — compileJava is not needed for codegen since we only
+	// return the generated source files, not compiled classes.
 	compiled := ctr.
-		// set the module name as an environment variable so we ensure constructor is only on main object
 		WithEnvVariable("_DAGGER_GROOVY_SDK_MODULE_NAME", m.moduleConfig.name).
-		// compile to generate code
+		WithEnvVariable("_DAGGER_GROOVY_GENERATED_DIR", generatedDir).
 		WithExec(m.gradleCommand(
 			"gradle",
-			"compileGroovy", "compileJava",
+			"compileGroovy",
 			fmt.Sprintf("-PdaggerDepsVersion=%s", version),
 		))
 	return dag.
@@ -346,15 +349,19 @@ func (m *GroovySdk) buildJar(
 		return nil, err
 	}
 
+	generatedDir := filepath.Join(m.moduleConfig.modulePath(), "build", "generated", "sources", "dagger")
+	versionFlag := fmt.Sprintf("-PdaggerDepsVersion=%s", version)
+
+	// Two-pass build:
+	//   Pass 1: compileGroovy triggers the AST transform which generates Entrypoint.java
+	//   Pass 2: --rerun-tasks forces compileGroovy to re-run; this time it sees the
+	//           generated Entrypoint.java in its source set and compiles it via joint
+	//           compilation alongside the user's Groovy classes. Then shadowJar packages all.
 	built := ctr.
-		// set the module name as an environment variable so we ensure constructor is only on main object
 		WithEnvVariable("_DAGGER_GROOVY_SDK_MODULE_NAME", m.moduleConfig.name).
-		// build the shadow JAR
-		WithExec(m.gradleCommand(
-			"gradle",
-			"shadowJar",
-			fmt.Sprintf("-PdaggerDepsVersion=%s", version),
-		))
+		WithEnvVariable("_DAGGER_GROOVY_GENERATED_DIR", generatedDir).
+		WithExec(m.gradleCommand("gradle", "compileGroovy", versionFlag)).
+		WithExec(m.gradleCommand("gradle", "shadowJar", "--rerun-tasks", versionFlag))
 
 	// Find the shadow JAR - it's the only .jar in build/libs/
 	// because we set archiveClassifier = '' in the template

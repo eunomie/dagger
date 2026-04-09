@@ -109,10 +109,10 @@ class DaggerModuleASTTransformation implements ASTTransformation {
         // Generate and write Entrypoint.java
         String entrypointSource = DaggerEntrypointGenerator.generate(moduleDescription, objects, enums)
 
-        String generatedDir = System.getProperty('dagger.groovy.generated.dir',
-            'build/generated/sources/dagger')
-        String outputPath = "${generatedDir}/io/dagger/gen/entrypoint/Entrypoint.java"
-        File outputFile = new File(outputPath)
+        // Use absolute path from env var (set by Go runtime), fall back to relative
+        String generatedDir = System.getenv('_DAGGER_GROOVY_GENERATED_DIR')
+            ?: System.getProperty('dagger.groovy.generated.dir', 'build/generated/sources/dagger')
+        File outputFile = new File(generatedDir, 'io/dagger/gen/entrypoint/Entrypoint.java')
         outputFile.parentFile.mkdirs()
         outputFile.text = entrypointSource
     }
@@ -451,8 +451,13 @@ class DaggerModuleASTTransformation implements ASTTransformation {
             return null
         }
 
+        // Extract simple name for fallback matching (during SEMANTIC_ANALYSIS
+        // the annotation ClassNode may not have its fully qualified name resolved yet)
+        String simpleName = annotationClassName.substring(annotationClassName.lastIndexOf('.') + 1)
+
         for (AnnotationNode ann : annotations) {
-            if (ann.classNode.name == annotationClassName) {
+            String annName = ann.classNode.name
+            if (annName == annotationClassName || annName == simpleName) {
                 return ann
             }
         }

@@ -28,7 +28,10 @@ dependencies {
 
 sourceSets {
     main {
-        java {
+        // The Dagger Groovy AST transform generates Entrypoint.java during compileGroovy.
+        // By putting the generated dir in the Groovy source set, the Groovy compiler handles
+        // it via joint compilation (compiles .java and .groovy together in one pass).
+        groovy {
             srcDir layout.buildDirectory.dir('generated/sources/dagger')
         }
     }
