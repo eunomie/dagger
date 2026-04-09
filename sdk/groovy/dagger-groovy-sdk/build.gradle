@@ -1,0 +1,32 @@
+plugins {
+    id 'groovy'
+    id 'maven-publish'
+}
+
+group = 'io.dagger'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.groovy:groovy:4.0.24'
+    compileOnly "io.dagger:dagger-java-sdk:${findProperty('daggerDepsVersion') ?: '0.0.1-SNAPSHOT'}"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'dagger-groovy-sdk'
+            from components.java
+        }
+    }
+}
