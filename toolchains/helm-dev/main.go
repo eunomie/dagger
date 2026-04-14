@@ -14,14 +14,20 @@ import (
 )
 
 func New(
+	ctx context.Context,
 	// The dagger helm chart directory
 	// +optional
 	// +defaultPath="/helm/dagger"
 	chart *dagger.Directory,
-) *HelmDev {
+) (*HelmDev, error) {
+	entries, err := chart.Entries(ctx)
+	if err != nil {
+		return nil, err
+	}
+	_, _ = dag.Container().From("alpine").WithExec([]string{"echo", "files:", strings.Join(entries, "-")}).CombinedOutput(ctx)
 	return &HelmDev{
 		Chart: chart,
-	}
+	}, nil
 }
 
 type HelmDev struct {
@@ -32,6 +38,7 @@ type HelmDev struct {
 // +check
 func (h *HelmDev) Lint(ctx context.Context) error {
 	_, err := h.chart().
+		WithExec([]string{"ls"}).
 		WithExec([]string{"helm", "lint"}).
 		WithExec([]string{"helm", "lint", "--debug", "--namespace=dagger", "--set=magicache.token=hello-world", "--set=magicache.enabled=true"}).
 		WithExec([]string{"helm", "template", ".", "--debug", "--namespace=dagger", "--set=magicache.token=hello-world", "--set=magicache.enabled=true"}).
