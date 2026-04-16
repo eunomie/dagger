@@ -1,3 +1,4 @@
+import collections
 import contextlib
 import dataclasses
 import json
@@ -97,6 +98,27 @@ def _forward_stderr(source: TextIO, dest: TextIO) -> None:
         dest.writelines(source)
 
 
+class _TailBuffer:
+    """Append-only line buffer that keeps only the most recent lines.
+
+    Used to drain the engine's stderr pipe when the user hasn't configured
+    log_output. Without a drain, the pipe buffer fills (~64 KB on Linux) and
+    the engine blocks writing logs, which deadlocks session shutdown.
+    """
+
+    def __init__(self, maxlines: int = 200) -> None:
+        self._lines: collections.deque[str] = collections.deque(maxlen=maxlines)
+
+    def writelines(self, lines) -> None:
+        self._lines.extend(lines)
+
+    def write(self, s: str) -> None:
+        self._lines.append(s)
+
+    def getvalue(self) -> str:
+        return "".join(self._lines)
+
+
 def run(cfg: Config, path: str) -> subprocess.Popen[str]:
     args = [
         path,
@@ -113,14 +135,18 @@ def run(cfg: Config, path: str) -> subprocess.Popen[str]:
     if cfg.load_workspace_modules:
         args.append("--load-workspace-modules")
 
-    # Determine stderr target. If the stream doesn't have a file descriptor
-    # (e.g. StringIO), use a PIPE and forward via a background thread so that
-    # any TextIO works as documented in Config.log_output.
+    # Determine stderr target. If log_output has a real file descriptor, we
+    # can let the child write to it directly. Otherwise (StringIO, no
+    # log_output at all) we use a PIPE and drain it from a background thread:
+    # without a drain, the ~64 KB pipe buffer fills up and the engine blocks
+    # writing logs, which deadlocks session shutdown.
     log_output = cfg.log_output
-    needs_forwarding = log_output is not None and not _has_fileno(log_output)
-    stderr_target = (
-        subprocess.PIPE if (not log_output or needs_forwarding) else log_output
-    )
+    if log_output is not None and _has_fileno(log_output):
+        stderr_target: int | TextIO = log_output
+        drain_dest: TextIO | None = None
+    else:
+        stderr_target = subprocess.PIPE
+        drain_dest = log_output if log_output is not None else _TailBuffer()
 
     # Retry starting if "text file busy" error is hit. That error can happen
     # due to a flaw in how Linux works: if any fork of this process happens
@@ -146,13 +172,19 @@ def run(cfg: Config, path: str) -> subprocess.Popen[str]:
             logger.warning("file busy, retrying in 0.1 seconds...")
             time.sleep(0.1)
         else:
-            if needs_forwarding and proc.stderr:
+            if drain_dest is not None and proc.stderr:
                 t = threading.Thread(
                     target=_forward_stderr,
-                    args=(proc.stderr, log_output),
+                    args=(proc.stderr, drain_dest),
                     daemon=True,
                 )
                 t.start()
+                # Attach the drain destination and thread so callers can
+                # retrieve recent stderr (e.g. for error messages) without
+                # racing with the forwarding thread over the consumed pipe.
+                if isinstance(drain_dest, _TailBuffer):
+                    proc._dagger_stderr_tail = drain_dest  # type: ignore[attr-defined]
+                proc._dagger_stderr_thread = t  # type: ignore[attr-defined]
                 # Clear proc.stderr so callers don't try to read from it
                 # (it's being consumed by the forwarding thread).
                 proc.stderr = None
@@ -160,6 +192,24 @@ def run(cfg: Config, path: str) -> subprocess.Popen[str]:
 
     msg = "CLI busy"
     raise SessionError(msg)
+
+
+def _read_proc_stderr(proc: subprocess.Popen[str]) -> str | None:
+    """Read whatever stderr we have for a subprocess, if any.
+
+    When stderr was piped, we may read it directly. When it was drained by a
+    forwarding thread into a tail buffer (see `_TailBuffer`), we wait briefly
+    for the thread to finish flushing and read from the buffer.
+    """
+    if proc.stderr and proc.stderr.readable():
+        return proc.stderr.read()
+    tail = getattr(proc, "_dagger_stderr_tail", None)
+    if isinstance(tail, _TailBuffer):
+        thread: threading.Thread | None = getattr(proc, "_dagger_stderr_thread", None)
+        if thread is not None:
+            thread.join(timeout=1.0)
+        return tail.getvalue()
+    return None
 
 
 def get_connect_params(proc: subprocess.Popen[str]) -> ConnectParams:
@@ -170,7 +220,7 @@ def get_connect_params(proc: subprocess.Popen[str]) -> ConnectParams:
     # Check if subprocess exited with an error
     if proc.poll():
         stdout = conn + proc.stdout.read()
-        stderr = proc.stderr.read() if proc.stderr and proc.stderr.readable() else None
+        stderr = _read_proc_stderr(proc)
         msg = make_process_error_msg(proc, stdout, stderr)
         raise SessionError(msg)
 
