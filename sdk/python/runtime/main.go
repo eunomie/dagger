@@ -260,8 +260,15 @@ func (m *PythonSdk) Common(
 	if err != nil {
 		return nil, err
 	}
-	return m.
-		WithSDK(introspectionJSON).
+	// When the module has opted into skip-codegen-at-runtime, skip the
+	// WithSDK codegen phases entirely. The user's committed sdk/** and
+	// src/<pkg>/_dagger_main.py are the sole source of truth at runtime;
+	// Codegen's short-circuit has already verified their presence.
+	builder := m
+	if m.LegacyCodegenAtRuntime {
+		builder = builder.WithSDK(introspectionJSON)
+	}
+	return builder.
 		WithTemplate().
 		WithSource().
 		WithUpdates(), nil
