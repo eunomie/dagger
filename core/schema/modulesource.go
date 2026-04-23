@@ -203,6 +203,12 @@ func (s *moduleSourceSchema) Install(dag *dagql.Server) {
 				dagql.Arg("features").Doc(`The experimental features to disable.`),
 			),
 
+		dagql.Func("experimentalFeatureEnabled", s.moduleSourceExperimentalFeatureEnabled).
+			Doc(`Whether the given experimental feature is enabled on this module source.`).
+			Args(
+				dagql.Arg("feature").Doc(`The experimental feature to check.`),
+			),
+
 		dagql.NodeFunc("generatedContextDirectory", s.moduleSourceGeneratedContextDirectory).
 			Doc(`The generated files and directories made on top of the module source's context directory.`),
 
@@ -2060,6 +2066,19 @@ func (s *moduleSourceSchema) moduleSourceWithUpdateBlueprint(
 		},
 	)
 	return inst, err
+}
+
+func (s *moduleSourceSchema) moduleSourceExperimentalFeatureEnabled(
+	_ context.Context,
+	parentSrc *core.ModuleSource,
+	args struct {
+		Feature core.ModuleSourceExperimentalFeature
+	},
+) (dagql.Boolean, error) {
+	if parentSrc.SDK == nil {
+		return false, nil
+	}
+	return dagql.Boolean(parentSrc.SDK.ExperimentalFeatureEnabled(args.Feature)), nil
 }
 
 func (s *moduleSourceSchema) moduleSourceWithExperimentalFeatures(
