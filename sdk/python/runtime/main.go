@@ -260,16 +260,27 @@ func (m *PythonSdk) Common(
 	if err != nil {
 		return nil, err
 	}
+	// WithTemplate runs BEFORE WithSDK so that at `dagger init` time,
+	// the template files (pyproject.toml, src/<pkg>/__init__.py,
+	// src/<pkg>/main.py) are present in m.ContextDir when WithSDK's
+	// analyzer looks for the module's source. Without this order, the
+	// analyzer sees an empty package dir at init time and produces an
+	// empty _dagger_main.py, which then breaks `dagger functions` /
+	// `dagger call` under the opted-in skip-codegen-at-runtime default:
+	// the runtime trusts the (empty) committed entrypoint and reports
+	// no functions. For non-init modules, WithTemplate is a no-op on
+	// m.ContextDir (it only writes template files when m.IsInit), so
+	// this reordering has no effect on develop/call flows.
+	//
 	// When the module has opted into skip-codegen-at-runtime, skip the
 	// WithSDK codegen phases entirely. The user's committed sdk/** and
 	// src/<pkg>/_dagger_main.py are the sole source of truth at runtime;
 	// Codegen's short-circuit has already verified their presence.
-	builder := m
+	builder := m.WithTemplate()
 	if m.LegacyCodegenAtRuntime {
 		builder = builder.WithSDK(introspectionJSON)
 	}
 	return builder.
-		WithTemplate().
 		WithSource().
 		WithUpdates(), nil
 }

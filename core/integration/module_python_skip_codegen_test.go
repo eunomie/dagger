@@ -149,3 +149,42 @@ class Test:
 	require.Contains(t, after, `case ("Test", "somethingNew"):`,
 		"regenerated entrypoint must dispatch the new function")
 }
+
+// TestPythonSkipCodegenAtRuntimeInitTemplateDispatches verifies that a
+// freshly-initialized Python module (no user-supplied source — just
+// `dagger init --sdk=python`) produces a _dagger_main.py that
+// correctly dispatches the template's Test functions (container_echo,
+// grep_dir). Guards against a regression where WithSDK ran before
+// WithTemplate in Common(), so the analyzer saw an empty package dir
+// and emitted an empty _dagger_main.py — `dagger functions` then
+// reported "No functions found" on a fresh init.
+func (ModuleSuite) TestPythonSkipCodegenAtRuntimeInitTemplateDispatches(
+	ctx context.Context, t *testctx.T,
+) {
+	c := connect(ctx, t)
+
+	// modInit with empty source just runs `dagger init --sdk=python`
+	// and exports the template. We then read the generated entrypoint
+	// and assert the template's function dispatch arms are present.
+	modGen := modInit(t, c, "python", "")
+
+	content, err := modGen.
+		File("src/test/_dagger_main.py").
+		Contents(ctx)
+	require.NoError(t, err)
+
+	// The template's Test class has two functions that must be
+	// reflected in the generated dispatch:
+	require.Contains(t, content, `case ("Test", "containerEcho"):`,
+		"fresh init must include containerEcho dispatch")
+	require.Contains(t, content, `case ("Test", "grepDir"):`,
+		"fresh init must include grepDir dispatch")
+
+	// And the typedefs builder must declare the Test object and its
+	// two functions — empty build_module means dagger functions sees
+	// nothing.
+	require.Contains(t, content, `.with_object(`)
+	require.Contains(t, content, `.with_function(`)
+	require.Contains(t, content, `"containerEcho"`)
+	require.Contains(t, content, `"grepDir"`)
+}
