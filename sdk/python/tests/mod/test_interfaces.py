@@ -11,9 +11,14 @@ from dagger.mod._utils import (
     is_dagger_object_type,
 )
 
-pytestmark = [
-    pytest.mark.anyio,
-]
+pytestmark = pytest.mark.skip(
+    reason=(
+        "Dynamic __dagger_module__ dispatch replaced by codegen'd "
+        "_dagger_main.py static entrypoint (spec 2). AST-path coverage "
+        "lives in test_ast_analyzer.py; entrypoint coverage lives in "
+        "test_entrypoint_gen.py."
+    )
+)
 
 
 @pytest.fixture

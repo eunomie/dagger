@@ -9,11 +9,21 @@ from __future__ import annotations
 
 from typing import Annotated
 
+import pytest
 from typing_extensions import Doc
 
 import dagger
 from dagger import DefaultPath, Deprecated, Ignore, Name
 from dagger.mod import Module
+
+pytestmark = pytest.mark.skip(
+    reason=(
+        "Dynamic __dagger_module__ dispatch replaced by codegen'd "
+        "_dagger_main.py static entrypoint (spec 2). AST-path coverage "
+        "lives in test_ast_analyzer.py; entrypoint coverage lives in "
+        "test_entrypoint_gen.py."
+    )
+)
 
 
 def test_default_path_with_future_annotations():

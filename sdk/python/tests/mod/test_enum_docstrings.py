@@ -5,6 +5,15 @@ import pytest
 import dagger
 from dagger.mod._utils import extract_enum_member_doc
 
+pytestmark = pytest.mark.skip(
+    reason=(
+        "Dynamic __dagger_module__ dispatch replaced by codegen'd "
+        "_dagger_main.py static entrypoint (spec 2). AST-path coverage "
+        "lives in test_ast_analyzer.py; entrypoint coverage lives in "
+        "test_entrypoint_gen.py."
+    )
+)
+
 
 class ExampleEnum(enum.Enum):
     FIRST = "first"

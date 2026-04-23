@@ -679,7 +679,7 @@ class Module:
             fields = inspect.get_annotations(cls)
             for name, t in fields.items():
                 if is_annotated(t) and isinstance(t.__origin__, dataclasses.InitVar):
-                    # Pytohn 3.10 doesn't support `*meta*  syntax
+                    # Python 3.10 doesn't support `*meta` syntax
                     # in Annotated[init_t.type, *meta]
                     t.__origin__ = t.__origin__.type
                     msg = (
@@ -689,7 +689,18 @@ class Module:
                     raise BadUsageError(msg)
 
             wrapped = dataclasses.dataclass(kw_only=True)(cls)
-            return self._process_type(wrapped, deprecated=deprecated)
+            # Static-entrypoint mode: registration side effects are
+            # handled at codegen time (see hack/designs/python-sdk-static-entrypoint.md).
+            # We keep @dataclass behavior for users but skip the
+            # Module registration that's no longer consulted at runtime.
+            wrapped.__dagger_is_object_type__ = True
+            if deprecated is not None:
+                # Forward placeholder for third-party tooling. The AST
+                # analyzer extracts `deprecated=...` from the decorator
+                # call site at codegen time; this attribute is not read
+                # by any runtime path.
+                wrapped.__dagger_deprecated__ = deprecated
+            return wrapped
 
         return wrapper(cls) if cls else wrapper
 
@@ -796,7 +807,8 @@ class Module:
 
         def wrapper(cls: T) -> T:
             new_cls = typing.runtime_checkable(cls)
-            return self._process_type(new_cls, interface=True)
+            new_cls.__dagger_is_interface__ = True
+            return new_cls
 
         return wrapper(cls) if cls else wrapper
 
@@ -836,16 +848,7 @@ class Module:
                 raise BadUsageError(msg)
 
             cls = cast(T, enum.unique(cls))
-            self._enums.setdefault(cls.__name__, cls)
-
-            # Primitive enums get converted based on their primitive type rather
-            # than the custom hook for converting based on member names so we
-            # need to register the hooks for each specific class. Not necessary
-            # to add hooks for non-primitive enums because those are already
-            # handled by the general enum.Enum subclass check.
-            if is_primitive_enum(cls):
-                configure_converter_enum(self._converter, cls)
-
+            cls.__dagger_is_enum__ = True
             return cls
 
         return wrapper(cls) if cls else wrapper

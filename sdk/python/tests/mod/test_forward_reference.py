@@ -1,6 +1,16 @@
+import pytest
 from typing_extensions import Self
 
 from dagger.mod import Module
+
+pytestmark = pytest.mark.skip(
+    reason=(
+        "Dynamic __dagger_module__ dispatch replaced by codegen'd "
+        "_dagger_main.py static entrypoint (spec 2). AST-path coverage "
+        "lives in test_ast_analyzer.py; entrypoint coverage lives in "
+        "test_entrypoint_gen.py."
+    )
+)
 
 mod = Module()
 
