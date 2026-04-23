@@ -282,7 +282,7 @@ type ModuleConfigView struct {
 
 type ModuleCodegenConfig struct {
 	// Whether to automatically generate a .gitignore file for this module.
-	AutomaticGitignore *bool `json:"automaticGitignore,omitempty"`
+	AutomaticGitignore *bool `field:"true" name:"automaticGitignore" doc:"Whether dagger-generated files are auto-appended to .gitignore. When false, the user commits generated files." json:"automaticGitignore,omitempty"`
 
 	// LegacyCodegenAtRuntime controls whether the SDK runs codegen
 	// during runtime operations (dagger call, dagger functions, etc.).
@@ -290,11 +290,22 @@ type ModuleCodegenConfig struct {
 	// files and skips the runtime codegen pass entirely. Codegen still
 	// runs on dagger init and dagger develop.
 	//
-	// Currently honored only by the Go SDK; other SDKs read but ignore
-	// this field.
+	// Currently honored by the Go and Python SDKs; other SDKs read but
+	// ignore this field.
 	//
 	// Default (nil or true): run codegen at runtime (legacy behavior).
-	LegacyCodegenAtRuntime *bool `json:"legacyCodegenAtRuntime,omitempty"`
+	LegacyCodegenAtRuntime *bool `field:"true" name:"legacyCodegenAtRuntime" doc:"Whether the SDK re-runs codegen at runtime. When false, the SDK trusts committed generated files and skips codegen entirely." json:"legacyCodegenAtRuntime,omitempty"`
+}
+
+func (*ModuleCodegenConfig) Type() *ast.Type {
+	return &ast.Type{
+		NamedType: "ModuleCodegenConfig",
+		NonNull:   true,
+	}
+}
+
+func (*ModuleCodegenConfig) TypeDescription() string {
+	return "Codegen configuration from a module source's dagger.json."
 }
 
 func (cfg ModuleCodegenConfig) Clone() *ModuleCodegenConfig {

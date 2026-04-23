@@ -209,6 +209,14 @@ func (s *moduleSourceSchema) Install(dag *dagql.Server) {
 				dagql.Arg("feature").Doc(`The experimental feature to check.`),
 			),
 
+		dagql.Func("codegenConfig", s.moduleSourceCodegenConfig).
+			Doc(`The codegen configuration for the module source (from the "codegen" section of dagger.json).`),
+
+		dagql.Func("legacyCodegenAtRuntime", s.moduleSourceLegacyCodegenAtRuntime).
+			Doc(`Whether the SDK runs codegen at runtime (dagger call, dagger functions). ` +
+				`Default true; the user opts into skip-codegen-at-runtime by setting ` +
+				`codegen.legacyCodegenAtRuntime=false in dagger.json.`),
+
 		dagql.NodeFunc("generatedContextDirectory", s.moduleSourceGeneratedContextDirectory).
 			Doc(`The generated files and directories made on top of the module source's context directory.`),
 
@@ -285,6 +293,7 @@ func (s *moduleSourceSchema) Install(dag *dagql.Server) {
 
 	dagql.Fields[*core.SDKConfig]{}.Install(dag)
 	dagql.Fields[*modules.ModuleConfigClient]{}.Install(dag)
+	dagql.Fields[*modules.ModuleCodegenConfig]{}.Install(dag)
 
 	dagql.Fields[*core.GeneratedCode]{
 		dagql.Func("withVCSGeneratedPaths", s.generatedCodeWithVCSGeneratedPaths).
@@ -2079,6 +2088,40 @@ func (s *moduleSourceSchema) moduleSourceExperimentalFeatureEnabled(
 		return false, nil
 	}
 	return dagql.Boolean(parentSrc.SDK.ExperimentalFeatureEnabled(args.Feature)), nil
+}
+
+func (s *moduleSourceSchema) moduleSourceCodegenConfig(
+	_ context.Context,
+	parentSrc *core.ModuleSource,
+	_ struct{},
+) (*modules.ModuleCodegenConfig, error) {
+	if parentSrc.CodegenConfig == nil {
+		// No codegen config in dagger.json — return a config with
+		// engine defaults filled in.  This keeps the nested path
+		// (codegenConfig.legacyCodegenAtRuntime) semantically
+		// consistent with the flat helper legacyCodegenAtRuntime:
+		// both return true when no config is set.
+		legacy := true
+		autoGitignore := true
+		return &modules.ModuleCodegenConfig{
+			AutomaticGitignore:     &autoGitignore,
+			LegacyCodegenAtRuntime: &legacy,
+		}, nil
+	}
+	return parentSrc.CodegenConfig, nil
+}
+
+func (s *moduleSourceSchema) moduleSourceLegacyCodegenAtRuntime(
+	_ context.Context,
+	parentSrc *core.ModuleSource,
+	_ struct{},
+) (dagql.Boolean, error) {
+	c := parentSrc.CodegenConfig
+	if c == nil || c.LegacyCodegenAtRuntime == nil {
+		// Default behavior: SDK runs codegen at runtime.
+		return true, nil
+	}
+	return dagql.Boolean(*c.LegacyCodegenAtRuntime), nil
 }
 
 func (s *moduleSourceSchema) moduleSourceWithExperimentalFeatures(
