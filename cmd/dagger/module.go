@@ -361,14 +361,15 @@ dagger init --sdk=go
 				return fmt.Errorf("failed to generate code: %w", err)
 			}
 
-			// For new Go modules, opt into skip-codegen-at-runtime by
-			// default. This writes codegen.legacyCodegenAtRuntime=false
-			// and codegen.automaticGitignore=false to the freshly-
-			// exported dagger.json. Other SDKs don't support this mode
-			// yet, so we only apply it for --sdk=go.
-			if sdk == "go" {
+			// For new Go and Python modules, opt into
+			// skip-codegen-at-runtime by default. This writes
+			// codegen.legacyCodegenAtRuntime=false and
+			// codegen.automaticGitignore=false to the freshly-exported
+			// dagger.json. Other SDKs don't support this mode yet.
+			switch sdk {
+			case "go", "python":
 				configPath := filepath.Join(contextDirPath, srcRootSubPath, modules.Filename)
-				if err := setGoSDKSkipRuntimeCodegen(configPath); err != nil {
+				if err := setSDKSkipRuntimeCodegen(configPath); err != nil {
 					return fmt.Errorf("enable skip-codegen-at-runtime: %w", err)
 				}
 			}
@@ -1320,17 +1321,18 @@ func optionalModCmdWrapper(
 	}
 }
 
-// setGoSDKSkipRuntimeCodegen patches the newly-generated dagger.json to
-// opt this module out of runtime codegen. New Go modules created via
-// `dagger init --sdk=go` default to the opt-in path: the generated
-// files live in the repo (automaticGitignore=false) and `dagger call`
-// skips `codegen generate-module` (legacyCodegenAtRuntime=false).
+// setSDKSkipRuntimeCodegen patches the newly-generated dagger.json to
+// opt this module out of runtime codegen. Modules created via
+// `dagger init --sdk=go` or `--sdk=python` default to the opt-in
+// path: the generated files live in the repo
+// (automaticGitignore=false) and runtime calls skip codegen
+// (legacyCodegenAtRuntime=false).
 //
 // Round-trips through modules.ModuleConfigWithUserFields so the output
 // field order stays aligned with the engine's own exporter — this
 // prevents cosmetic diffs between init-time and develop-time
 // dagger.json serialization.
-func setGoSDKSkipRuntimeCodegen(configPath string) error {
+func setSDKSkipRuntimeCodegen(configPath string) error {
 	raw, err := os.ReadFile(configPath)
 	if err != nil {
 		return fmt.Errorf("read %s: %w", configPath, err)

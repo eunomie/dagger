@@ -224,7 +224,7 @@ func TestParseGit(t *testing.T) {
 	}
 }
 
-func TestSetGoSDKSkipRuntimeCodegen(t *testing.T) {
+func TestSetSDKSkipRuntimeCodegen(t *testing.T) {
 	cases := []struct {
 		name           string
 		input          string
@@ -270,8 +270,8 @@ func TestSetGoSDKSkipRuntimeCodegen(t *testing.T) {
 				}
 			}
 
-			if err := setGoSDKSkipRuntimeCodegen(path); err != nil {
-				t.Fatalf("setGoSDKSkipRuntimeCodegen: %v", err)
+			if err := setSDKSkipRuntimeCodegen(path); err != nil {
+				t.Fatalf("setSDKSkipRuntimeCodegen: %v", err)
 			}
 
 			out, err := os.ReadFile(path)
@@ -321,7 +321,7 @@ func TestSetGoSDKSkipRuntimeCodegen(t *testing.T) {
 	}
 }
 
-func TestSetGoSDKSkipRuntimeCodegen_NoGitignoreToRemove(t *testing.T) {
+func TestSetSDKSkipRuntimeCodegen_NoGitignoreToRemove(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "dagger.json")
 	input := `{"name":"m","engineVersion":"latest","sdk":{"source":"go"}}`
@@ -330,8 +330,8 @@ func TestSetGoSDKSkipRuntimeCodegen_NoGitignoreToRemove(t *testing.T) {
 	}
 
 	// No sibling .gitignore exists — the helper must silently succeed.
-	if err := setGoSDKSkipRuntimeCodegen(path); err != nil {
-		t.Fatalf("setGoSDKSkipRuntimeCodegen: %v", err)
+	if err := setSDKSkipRuntimeCodegen(path); err != nil {
+		t.Fatalf("setSDKSkipRuntimeCodegen: %v", err)
 	}
 
 	if _, err := os.Stat(filepath.Join(dir, ".gitignore")); !os.IsNotExist(err) {
@@ -339,8 +339,8 @@ func TestSetGoSDKSkipRuntimeCodegen_NoGitignoreToRemove(t *testing.T) {
 	}
 }
 
-func TestSetGoSDKSkipRuntimeCodegen_MissingFile(t *testing.T) {
-	err := setGoSDKSkipRuntimeCodegen(filepath.Join(t.TempDir(), "does-not-exist.json"))
+func TestSetSDKSkipRuntimeCodegen_MissingFile(t *testing.T) {
+	err := setSDKSkipRuntimeCodegen(filepath.Join(t.TempDir(), "does-not-exist.json"))
 	if err == nil {
 		t.Fatal("expected error for missing file, got nil")
 	}
