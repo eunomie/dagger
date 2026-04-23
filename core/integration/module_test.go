@@ -6442,26 +6442,26 @@ func (m *Test) PrintDefault(ctx context.Context) (string, error) {
 		// }
 		// `,
 		//		},
-		//		{
-		//			sdk: "python",
-		//			source: `import dagger
-		// from dagger import dag, function, object_type
-		//
-		// @object_type
-		// class Test:
-		//     @function
-		//     def container_echo(self, string_arg: str = "Hello Self Calls") -> dagger.Container:
-		//         return dag.container().from_("alpine:latest").with_exec(["echo", string_arg])
-		//
-		//     @function
-		//     async def print(self, string_arg: str) -> str:
-		//         return await dag.test().container_echo(string_arg=string_arg).stdout()
-		//
-		//     @function
-		//     async def print_default(self) -> str:
-		//         return await dag.test().container_echo().stdout()
-		// `,
-		//		},
+		{
+			sdk: "python",
+			source: `import dagger
+from dagger import dag, function, object_type
+
+@object_type
+class Test:
+    @function
+    def container_echo(self, string_arg: str = "Hello Self Calls") -> dagger.Container:
+        return dag.container().from_("alpine:latest").with_exec(["echo", string_arg])
+
+    @function
+    async def print(self, string_arg: str) -> str:
+        return await dag.test().container_echo(string_arg=string_arg).stdout()
+
+    @function
+    async def print_default(self) -> str:
+        return await dag.test().container_echo().stdout()
+`,
+		},
 	}
 
 	for _, tc := range tcs {
@@ -6486,6 +6486,48 @@ func (m *Test) PrintDefault(ctx context.Context) (string, error) {
 			})
 		})
 	}
+}
+
+// TestSelfCallsOffPython verifies that a Python module initialized
+// WITHOUT --with-self-calls does not pay the three-phase
+// analyze+merge+generate cost and its generated gen.py does not
+// contain bindings for the module's own declared types. This pins the
+// default-off behavior so the SELF_CALLS gate cannot silently regress.
+func (ModuleSuite) TestSelfCallsOffPython(ctx context.Context, t *testctx.T) {
+	c := connect(ctx, t)
+
+	source := `import dagger
+from dagger import dag, function, object_type
+
+@object_type
+class Test:
+    @function
+    def hello(self) -> str:
+        return "hi"
+`
+
+	modGen := modInit(t, c, "python", source) // NOTE: no --with-self-calls
+
+	t.Run("module calls still work", func(ctx context.Context, t *testctx.T) {
+		out, err := modGen.
+			With(daggerQuery(`{hello}`)).
+			Stdout(ctx)
+		require.NoError(t, err)
+		require.JSONEq(t, `{"hello":"hi"}`, out)
+	})
+
+	t.Run("gen.py does not contain the module's self type", func(ctx context.Context, t *testctx.T) {
+		// Trigger codegen materialization and read the generated
+		// vendored gen.py. Module-declared types (like `class Test`)
+		// must NOT appear when SELF_CALLS is off.
+		gen, err := modGen.
+			File("sdk/src/dagger/client/gen.py").
+			Contents(ctx)
+		require.NoError(t, err)
+		require.NotContains(t, gen, "class Test(",
+			"gen.py contains the user-declared Test class but "+
+				"--with-self-calls was not passed")
+	})
 }
 
 // TestGoCodegenPhase1Parity compares dagger.gen.go output produced by the
