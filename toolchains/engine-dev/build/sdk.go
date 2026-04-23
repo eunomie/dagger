@@ -101,13 +101,6 @@ func (build *Builder) pythonSDKContent(ctx context.Context) (*sdkContent, error)
 		// extend the introspection schema with the module's declared
 		// types before invoking the Python codegen generator.
 		WithFile("dist/merge-schema", build.CodegenBinary()).
-		// bundle the Python client bindings (gen.py) generated from this
-		// engine's introspection schema. PythonSdk.WithSDK detects this
-		// file and skips the runtime `codegen generate` exec, saving
-		// ~2.8s per cold Python module load.
-		WithFile(".dagger-build/gen.py",
-			build.pythonGenPy(base, codegenShiv),
-		).
 		// bundle a precompiled Go runtime binary for the python-sdk module
 		// so `loadBuiltinSDK(python)` does not pay the ~8s cost of `go build`
 		// on first use. The runtime is a Go binary whose source (and
@@ -139,28 +132,6 @@ func (build *Builder) pythonSDKContent(ctx context.Context) (*sdkContent, error)
 		sdkDir:  sdkDir,
 		envName: distconsts.PythonSDKManifestDigestEnvName,
 	}, nil
-}
-
-// pythonGenPy produces the Python client bindings (gen.py) at engine
-// build time. It uses cmd/introspect to dump the engine's schema JSON
-// in-process (no running engine needed), then invokes the shiv'd
-// codegen executable against that schema — the same binary that
-// PythonSdk.WithSDK runs at module-load time. The resulting gen.py is
-// byte-identical to what the runtime codegen would produce for this
-// engine, which is the correctness invariant PythonSdk relies on to
-// use the bundled file directly.
-func (build *Builder) pythonGenPy(base *dagger.Container, codegenShiv *dagger.File) *dagger.File {
-	schema := dag.Container(dagger.ContainerOpts{Platform: build.platform}).
-		From("alpine:latest").
-		WithMountedFile("/usr/local/bin/introspect", build.binary("./cmd/introspect", false, false)).
-		WithExec([]string{"sh", "-c", "introspect introspect > /schema.json"}).
-		File("/schema.json")
-
-	return base.
-		WithMountedFile("/usr/local/bin/codegen", codegenShiv).
-		WithMountedFile("/schema.json", schema).
-		WithExec([]string{"codegen", "generate", "-i", "/schema.json", "-o", "/gen.py"}).
-		File("/gen.py")
 }
 
 // pythonRuntimeBinary cross-compiles the sdk/python/runtime Go module

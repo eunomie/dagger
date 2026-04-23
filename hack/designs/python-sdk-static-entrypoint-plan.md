@@ -1414,7 +1414,6 @@ if introspectionJSON != nil {
     // User package entrypoint lives at src/<package>/_dagger_main.py
     // inside the user's module subtree.
     entryPath := path.Join(
-        m.SubPath,
         "src",
         m.PackageName,
         "_dagger_main.py",

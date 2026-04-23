@@ -403,23 +403,7 @@ func (m *PythonSdk) WithSDK(introspectionJSON *dagger.File) *PythonSdk {
 	// Allow empty introspection to facilitate debugging the container with a
 	// `dagger call module-runtime terminal` command.
 	if introspectionJSON != nil {
-		var genFile *dagger.File
-
-		if m.SelfCallsEnabled {
-			genFile = m.runSelfCallsCodegen(introspectionJSON)
-		} else {
-			// The builtin engine ships a prebuilt gen.py at .dagger-build/gen.py,
-			// produced from this engine's schema at image build time (see
-			// toolchains/engine-dev/build/sdk.go::pythonGenPy). When present it
-			// is byte-identical to what codegen would emit for introspectionJSON
-			// from the same engine, so we skip the codegen exec entirely and
-			// save ~2.8s per cold Python module load.
-			if m.Discovery.SdkHasFile(".dagger-build/gen.py") {
-				genFile = m.SdkSourceDir.File(".dagger-build/gen.py")
-			} else {
-				genFile = m.runPlainCodegen(introspectionJSON)
-			}
-		}
+		genFile, entryFile := m.runCodegen(introspectionJSON)
 
 		genPath := UserGenPath
 
@@ -428,49 +412,38 @@ func (m *PythonSdk) WithSDK(introspectionJSON *dagger.File) *PythonSdk {
 		if m.VendorPath != "" {
 			genPath = path.Join(m.VendorPath, SDKGenPath)
 		}
-
 		m.AddFile(genPath, genFile)
+
+		// User package entrypoint lives at src/<package>/_dagger_main.py
+		// inside the user's module subtree.
+		entryPath := path.Join(
+			"src",
+			m.PackageName,
+			"_dagger_main.py",
+		)
+		m.AddFile(entryPath, entryFile)
 	}
 
 	return m
 }
 
-// runPlainCodegen runs the Python codegen binary directly on the base
-// introspection schema, producing a gen.py with only upstream types.
-// This is today's behavior — used when SELF_CALLS is off.
-func (m *PythonSdk) runPlainCodegen(introspectionJSON *dagger.File) *dagger.File {
-	ctr := m.Container
-	cmd := []string{"codegen"}
-
-	if m.Discovery.SdkHasFile("dist/codegen") {
-		ctr = ctr.
-			WithMountedCache("/root/.shiv", dag.CacheVolume("shiv")).
-			WithMountedFile("/usr/local/bin/codegen", m.SdkSourceDir.File("dist/codegen"))
-	} else {
-		ctr = ctr.
-			WithWorkdir("/sdk").
-			WithMountedDirectory("", m.SdkSourceDir)
-		cmd = []string{
-			"uv", "run", "--isolated", "--frozen", "--package", "codegen",
-			"python", "-m", "codegen",
-		}
-	}
-
-	return ctr.
-		WithMountedFile(SchemaPath, introspectionJSON).
-		WithExec(append(cmd, "generate", "-i", SchemaPath, "-o", "/gen.py")).
-		File("/gen.py")
-}
-
-// runSelfCallsCodegen runs the three-phase pipeline:
-//  1. python -m dagger.mod._analyzer emit  -> /module-types.json
-//  2. merge-schema                         -> /extended-schema.json
-//  3. codegen generate                     -> /gen.py
+// runCodegen runs the Python codegen pipeline inside the container and
+// returns (a) the generated client bindings at /gen.py and (b) the
+// generated runtime entrypoint at /_dagger_main.py.
 //
-// Invoked when the module source has the SELF_CALLS experimental
-// feature enabled.
-func (m *PythonSdk) runSelfCallsCodegen(introspectionJSON *dagger.File) *dagger.File {
-	userSourceDir := path.Join(m.ContextDirPath, m.SubPath, "src", m.PackageName)
+// Pipeline:
+//
+//	Phase 0:  analyzer emit --metadata-output /module-metadata.json
+//	                        [--schematool-output /module-types.json  (self-calls)]
+//	Phase 1:  merge-schema  (self-calls only)  -> /extended-schema.json
+//	Phase 2:  codegen generate                 -> /gen.py
+//	Phase 3:  analyzer entrypoint              -> /_dagger_main.py
+func (m *PythonSdk) runCodegen(
+	introspectionJSON *dagger.File,
+) (*dagger.File, *dagger.File) {
+	userSourceDir := path.Join(
+		m.ContextDirPath, m.SubPath, "src", m.PackageName,
+	)
 
 	ctr := m.Container.
 		WithMountedFile(SchemaPath, introspectionJSON).
@@ -482,37 +455,45 @@ func (m *PythonSdk) runSelfCallsCodegen(introspectionJSON *dagger.File) *dagger.
 			m.SdkSourceDir.File("dist/merge-schema"),
 		)
 
-	// Phase 1: analyze
-	// Note: no --package flag; dagger is the root package of the uv workspace
-	// (only 'codegen' is a non-root workspace member). Using --package dagger
-	// would fail with "Package `dagger` not found in workspace".
-	ctr = ctr.WithExec([]string{
+	// Phase 0: analyze — one AST walk, metadata always, schematool only
+	// on the self-calls path.
+	phase0 := []string{
 		"uv", "run", "--isolated", "--frozen",
 		"python", "-m", "dagger.mod._analyzer", "emit",
 		"--module-source-dir", userSourceDir,
 		"--main-object", m.MainObjectName,
 		"--module-name", m.ModName,
-		"--introspection-json", SchemaPath,
-		"--schematool-output", "/module-types.json",
-	})
+		"--metadata-output", "/module-metadata.json",
+	}
+	if m.SelfCallsEnabled {
+		phase0 = append(phase0,
+			"--introspection-json", SchemaPath,
+			"--schematool-output", "/module-types.json",
+		)
+	}
+	ctr = ctr.WithExec(phase0)
 
-	// Phase 2: merge
-	// dist/merge-schema is the codegen binary re-exported; call the
-	// merge-schema subcommand explicitly (the binary name alone is not
-	// enough since cobra doesn't auto-dispatch by argv[0]).
-	ctr = ctr.WithExec([]string{
-		"merge-schema", "merge-schema",
-		"--introspection-json-path", SchemaPath,
-		"--module-types-path", "/module-types.json",
-		"--output-path", "/extended-schema.json",
-	})
+	// Phase 1 (conditional): merge
+	schemaForCodegen := SchemaPath
+	if m.SelfCallsEnabled {
+		ctr = ctr.WithExec([]string{
+			"merge-schema", "merge-schema",
+			"--introspection-json-path", SchemaPath,
+			"--module-types-path", "/module-types.json",
+			"--output-path", "/extended-schema.json",
+		})
+		schemaForCodegen = "/extended-schema.json"
+	}
 
-	// Phase 3: generate (reuse shiv-or-uv-run for codegen)
+	// Phase 2: client codegen (reuse the spec-1 shiv-or-uv-run logic).
 	var codegenCmd []string
 	if m.Discovery.SdkHasFile("dist/codegen") {
 		ctr = ctr.
 			WithMountedCache("/root/.shiv", dag.CacheVolume("shiv")).
-			WithMountedFile("/usr/local/bin/codegen", m.SdkSourceDir.File("dist/codegen"))
+			WithMountedFile(
+				"/usr/local/bin/codegen",
+				m.SdkSourceDir.File("dist/codegen"),
+			)
 		codegenCmd = []string{"codegen"}
 	} else {
 		codegenCmd = []string{
@@ -520,10 +501,20 @@ func (m *PythonSdk) runSelfCallsCodegen(introspectionJSON *dagger.File) *dagger.
 			"python", "-m", "codegen",
 		}
 	}
+	ctr = ctr.WithExec(append(codegenCmd,
+		"generate", "-i", schemaForCodegen, "-o", "/gen.py",
+	))
 
-	return ctr.
-		WithExec(append(codegenCmd, "generate", "-i", "/extended-schema.json", "-o", "/gen.py")).
-		File("/gen.py")
+	// Phase 3: entrypoint codegen — always runs.
+	ctr = ctr.WithExec([]string{
+		"uv", "run", "--isolated", "--frozen",
+		"python", "-m", "dagger.mod._analyzer", "entrypoint",
+		"--metadata", "/module-metadata.json",
+		"--package", m.PackageName,
+		"--output", "/_dagger_main.py",
+	})
+
+	return ctr.File("/gen.py"), ctr.File("/_dagger_main.py")
 }
 
 // Add the module's source code
