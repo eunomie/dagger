@@ -17,6 +17,7 @@ from dagger.mod._analyzer.metadata import (
     ParameterMetadata,
     ResolvedType,
 )
+from dagger.mod._analyzer.parser import normalize_name, to_api_name
 
 # ResolvedType.kind -> schematool introspection kind (for named types).
 # LIST and NON_NULL wrappers are applied at the TypeRef level below.
@@ -35,6 +36,26 @@ _PRIMITIVE_TYPE_NAMES: dict[str, str] = {
     "int": "Int",
     "float": "Float",
     "bool": "Boolean",
+}
+
+# Dagger object types -> their ID scalar names.  When a Dagger built-in
+# type is used as a *function argument* the engine passes it as an ID
+# scalar (e.g. Directory → DirectoryID).  GraphQL requires argument
+# types to be input types (SCALAR, INPUT_OBJECT, or ENUM), not OBJECT
+# types, so we must emit the ID scalar rather than the object itself.
+_DAGGER_OBJECT_ID_SCALARS: dict[str, str] = {
+    "Container": "ContainerID",
+    "Directory": "DirectoryID",
+    "File": "FileID",
+    "Secret": "SecretID",
+    "Service": "ServiceID",
+    "CacheVolume": "CacheVolumeID",
+    "Socket": "SocketID",
+    "ModuleSource": "ModuleSourceID",
+    "Module": "ModuleID",
+    "GitRepository": "GitRepositoryID",
+    "GitRef": "GitRefID",
+    "Terminal": "TerminalID",
 }
 
 
@@ -115,8 +136,16 @@ def _enum_to_dict(enum: EnumTypeMetadata) -> dict[str, Any]:
 
 
 def _field_to_dict(field: FieldMetadata) -> dict[str, Any]:
+    # api_name from the analyzer uses normalize_name (snake_case).
+    # The schematool JSON must carry camelCase names so that the
+    # generated gen.py uses the same names as the live engine schema.
+    graphql_name = (
+        field.api_name
+        if _is_explicit_name(field.api_name, field.python_name)
+        else to_api_name(field.api_name)
+    )
     out: dict[str, Any] = {
-        "name": field.api_name,
+        "name": graphql_name,
         "type": _resolved_to_typeref(field.resolved_type),
     }
     if field.doc:
@@ -125,8 +154,16 @@ def _field_to_dict(field: FieldMetadata) -> dict[str, Any]:
 
 
 def _function_to_dict(fn: FunctionMetadata) -> dict[str, Any]:
+    # api_name from the analyzer uses normalize_name (snake_case).
+    # Convert to camelCase for the schematool JSON so the generated
+    # gen.py matches the live engine schema's camelCase field names.
+    graphql_name = (
+        fn.api_name
+        if _is_explicit_name(fn.api_name, fn.python_name)
+        else to_api_name(fn.api_name)
+    )
     out: dict[str, Any] = {
-        "name": fn.api_name,
+        "name": graphql_name,
         "returnType": _resolved_to_typeref(fn.resolved_return_type),
     }
     if fn.doc:
@@ -139,9 +176,31 @@ def _function_to_dict(fn: FunctionMetadata) -> dict[str, Any]:
 def _param_to_dict(param: ParameterMetadata) -> dict[str, Any]:
     # Optional parameters (default value OR nullable) => drop the outer
     # NON_NULL wrapper at the TypeRef level.
-    type_ref = _resolved_to_typeref(param.resolved_type, nullable=param.is_optional)
+    #
+    # If the parameter is a Dagger built-in object type (e.g. Directory,
+    # Container), substitute the corresponding ID scalar.  GraphQL requires
+    # argument types to be INPUT types (SCALAR, ENUM, or INPUT_OBJECT), not
+    # OBJECT types.  The engine passes built-in objects as ID scalars at the
+    # wire level, so emitting DirectoryID instead of Directory here keeps the
+    # merged schema valid and matches what the runtime expects.
+    rt = param.resolved_type
+    if rt.kind == "object" and rt.name in _DAGGER_OBJECT_ID_SCALARS:
+        rt = ResolvedType(
+            kind="scalar",
+            name=_DAGGER_OBJECT_ID_SCALARS[rt.name],
+            is_optional=rt.is_optional,
+        )
+    type_ref = _resolved_to_typeref(rt, nullable=param.is_optional)
+    # api_name from the analyzer uses normalize_name (snake_case).
+    # Convert to camelCase so the generated gen.py Arg() names match
+    # the live engine schema (which normalises to lowerCamelCase).
+    graphql_name = (
+        param.api_name
+        if _is_explicit_name(param.api_name, param.python_name)
+        else to_api_name(param.api_name)
+    )
     out: dict[str, Any] = {
-        "name": param.api_name,
+        "name": graphql_name,
         "type": type_ref,
     }
     if param.doc:
@@ -149,6 +208,17 @@ def _param_to_dict(param: ParameterMetadata) -> dict[str, Any]:
     if param.has_default:
         out["defaultValue"] = _render_default(param.default_value)
     return out
+
+
+def _is_explicit_name(api_name: str, python_name: str) -> bool:
+    """Return True when api_name was explicitly supplied by the user (e.g.,
+    via ``@dagger.function(name="myName")``).  In that case we honour it
+    verbatim rather than applying an automatic camelCase conversion.
+
+    An explicit name differs from what normalize_name(python_name) would
+    produce, which is the value assigned automatically.
+    """
+    return api_name != normalize_name(python_name)
 
 
 def _resolved_to_typeref(

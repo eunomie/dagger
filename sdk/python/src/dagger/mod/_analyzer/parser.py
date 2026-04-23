@@ -35,6 +35,7 @@ from dagger.mod._analyzer.visitors.decorators import (
     has_decorator,
     is_classmethod,
 )
+from dagger.mod._utils import to_camel_case
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +54,16 @@ def normalize_name(name: str) -> str:
     if is_trailing_underscore:
         return name[:-1]
     return name
+
+
+def to_api_name(python_name: str) -> str:
+    """Convert a Python identifier to a Dagger API name.
+
+    Removes a trailing underscore (reserved-word avoidance) and then
+    converts snake_case to camelCase to match the engine's naming
+    convention (e.g. ``string_arg`` → ``stringArg``).
+    """
+    return to_camel_case(normalize_name(python_name))
 
 
 def get_location(node: ast.AST, file_path: str) -> LocationMetadata:

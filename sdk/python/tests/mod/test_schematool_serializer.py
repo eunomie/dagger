@@ -135,7 +135,49 @@ class Test:
     )
 
     fields = to_schematool_json(md, _BASE_TYPE_NAMES)["objects"][0]["fields"]
-    assert [f["name"] for f in fields] == ["visible_field"]
+    assert [f["name"] for f in fields] == ["visibleField"]
+
+
+def test_multi_word_names_serialized_as_camel_case():
+    """snake_case function/field/arg names must be camelCased in module-types.json.
+
+    The generated gen.py queries the live engine schema which stores all
+    names in lowerCamelCase (e.g. ``container_echo`` → ``containerEcho``).
+    If we emitted snake_case in module-types.json the codegen would produce
+    ``_select("container_echo", ...)`` which would not resolve in the
+    engine's GraphQL schema.
+    """
+    md = analyze_source_string(
+        """
+import dagger
+
+@dagger.object_type
+class Test:
+    visible_field: str = dagger.field()
+
+    @dagger.function
+    def container_echo(self, string_arg: str = "hi") -> str: ...
+
+    @dagger.function
+    def print_default(self) -> str: ...
+""",
+        "Test",
+        module_name="test",
+    )
+
+    out = to_schematool_json(md, _BASE_TYPE_NAMES)
+    obj = out["objects"][0]
+
+    # Fields
+    assert [f["name"] for f in obj["fields"]] == ["visibleField"]
+
+    # Function names
+    fn_names = [f["name"] for f in obj["functions"]]
+    assert fn_names == ["containerEcho", "printDefault"]
+
+    # Argument names
+    echo_fn = next(f for f in obj["functions"] if f["name"] == "containerEcho")
+    assert echo_fn["args"][0]["name"] == "stringArg"
 
 
 def test_references_to_base_schema_types_not_re_declared():
@@ -160,6 +202,36 @@ class Test:
     ret = out["objects"][0]["functions"][0]["returnType"]
     assert ret["kind"] == "NON_NULL"
     assert ret["ofType"]["name"] == "Container"
+
+
+def test_dagger_object_as_argument_becomes_id_scalar():
+    """Dagger built-in OBJECT types used as function arguments must be
+    substituted with their ID scalars (GraphQL disallows OBJECT types
+    as input types).  See _DAGGER_OBJECT_ID_SCALARS in schematool.py."""
+    md = analyze_source_string(
+        """
+import dagger
+
+@dagger.object_type
+class Test:
+    @dagger.function
+    def upload(self, src: dagger.Directory, label: str) -> str: ...
+""",
+        "Test",
+        module_name="test",
+    )
+
+    args = to_schematool_json(md, _BASE_TYPE_NAMES)["objects"][0]["functions"][0]["args"]
+    # Dagger Directory parameter must be emitted as DirectoryID scalar, not
+    # as a Container/Directory OBJECT reference.
+    src = next(a for a in args if a["name"] == "src")
+    assert src["type"]["kind"] == "NON_NULL"
+    assert src["type"]["ofType"]["kind"] == "SCALAR"
+    assert src["type"]["ofType"]["name"] == "DirectoryID"
+
+    # Non-Dagger-object types are unaffected.
+    label = next(a for a in args if a["name"] == "label")
+    assert label["type"]["ofType"]["name"] == "String"
 
 
 def test_serializes_interface():

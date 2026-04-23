@@ -10920,6 +10920,17 @@ func (r *ModuleSource) EngineVersion(ctx context.Context) (string, error) {
 	return response, q.Execute(ctx)
 }
 
+// Whether the given experimental feature is enabled on this module source.
+func (r *ModuleSource) ExperimentalFeatureEnabled(ctx context.Context, feature ModuleSourceExperimentalFeature) (bool, error) {
+	q := r.query.Select("experimentalFeatureEnabled")
+	q = q.Arg("feature", feature)
+
+	var response bool
+
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
 // The generated files and directories made on top of the module source's context directory, returned as a Changeset.
 func (r *ModuleSource) GeneratedContextChangeset() *Changeset {
 	q := r.query.Select("generatedContextChangeset")
