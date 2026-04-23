@@ -10699,6 +10699,33 @@ func (r *ModuleConfigClient) UnmarshalJSON(bs []byte) error {
 	return nil
 }
 
+// Codegen configuration from a module source's dagger.json.
+type ModuleCodegenConfig struct {
+	query *querybuilder.Selection
+}
+
+func (r *ModuleCodegenConfig) WithGraphQLQuery(q *querybuilder.Selection) *ModuleCodegenConfig {
+	return &ModuleCodegenConfig{
+		query: q,
+	}
+}
+
+// Whether dagger-generated files are auto-appended to .gitignore. When false, the user commits generated files.
+func (r *ModuleCodegenConfig) AutomaticGitignore(ctx context.Context) (bool, error) {
+	q := r.query.Select("automaticGitignore")
+	var response bool
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
+// Whether the SDK re-runs codegen at runtime. When false, the SDK trusts committed generated files and skips codegen entirely.
+func (r *ModuleCodegenConfig) LegacyCodegenAtRuntime(ctx context.Context) (bool, error) {
+	q := r.query.Select("legacyCodegenAtRuntime")
+	var response bool
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
+}
+
 // The source needed to load and run a module, along with any metadata about the source such as versions/urls/etc.
 type ModuleSource struct {
 	query *querybuilder.Selection
@@ -10849,6 +10876,21 @@ func (r *ModuleSource) ContextDirectory() *Directory {
 	return &Directory{
 		query: q,
 	}
+}
+
+// The codegen configuration for the module source (from the "codegen" section of dagger.json).
+func (r *ModuleSource) CodegenConfig() *ModuleCodegenConfig {
+	return &ModuleCodegenConfig{
+		query: r.query.Select("codegenConfig"),
+	}
+}
+
+// Whether the SDK runs codegen at runtime (dagger call, dagger functions). Default true; the user opts into skip-codegen-at-runtime by setting codegen.legacyCodegenAtRuntime=false in dagger.json.
+func (r *ModuleSource) LegacyCodegenAtRuntime(ctx context.Context) (bool, error) {
+	q := r.query.Select("legacyCodegenAtRuntime")
+	var response bool
+	q = q.Bind(&response)
+	return response, q.Execute(ctx)
 }
 
 // The dependencies of the module source.

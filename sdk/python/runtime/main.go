@@ -149,6 +149,15 @@ type PythonSdk struct {
 	// pipeline so gen.py contains bindings for the module's declared types.
 	// +private
 	SelfCallsEnabled bool
+
+	// LegacyCodegenAtRuntime is true when the module has NOT opted
+	// into skip-codegen-at-runtime (i.e. the user has not set
+	// codegen.legacyCodegenAtRuntime=false in dagger.json).
+	// When false, Codegen short-circuits (trusting committed
+	// generated files) and ModuleRuntime skips WithSDK's codegen
+	// phases entirely.
+	// +private
+	LegacyCodegenAtRuntime bool
 }
 
 // Generated code for the Python module
@@ -162,23 +171,33 @@ func (m *PythonSdk) Codegen(
 		return nil, err
 	}
 
-	ignorePaths := []string{".venv", "**/__pycache__"}
-	genPaths := []string{
-		// TODO: uncomment when we start generating client bindings outside the library
-		// UserGenPath,
-	}
-
-	if m.VendorPath != "" {
-		ignorePaths = append(ignorePaths, m.VendorPath)
-		genPaths = []string{m.VendorPath + "/**"}
+	if !m.LegacyCodegenAtRuntime {
+		// Opted-in path: the user committed sdk/** and _dagger_main.py.
+		// Assert the committed files exist and return the source tree
+		// as-is, short-circuiting the mutations the legacy branch
+		// layers onto m.Container below.
+		//
+		// NOTE: Common() still runs WithSDK here, so this Codegen path
+		// currently re-generates the files before asserting their
+		// presence. The follow-up patch (skip WithSDK in ModuleRuntime)
+		// drops that redundant codegen pass, at which point
+		// requireGeneratedFiles becomes a genuine guard against stale
+		// checkouts.
+		if err := m.requireGeneratedFiles(ctx); err != nil {
+			return nil, err
+		}
+		return dag.
+			GeneratedCode(m.ContextDir.WithoutDirectory("sdk/runtime")).
+			WithVCSGeneratedPaths(m.genPaths()).
+			WithVCSIgnoredPaths(m.ignorePaths()), nil
 	}
 
 	return dag.
 		GeneratedCode(
 			m.Container.Directory(m.ContextDirPath).
 				WithoutDirectory("sdk/runtime")).
-		WithVCSGeneratedPaths(genPaths).
-		WithVCSIgnoredPaths(ignorePaths), nil
+		WithVCSGeneratedPaths(m.genPaths()).
+		WithVCSIgnoredPaths(m.ignorePaths()), nil
 }
 
 // Container for executing the Python module runtime
@@ -265,6 +284,12 @@ func (m *PythonSdk) Load(ctx context.Context, modSource *dagger.ModuleSource) (*
 		return nil, fmt.Errorf("runtime module load: check self-calls feature: %w", err)
 	}
 	m.SelfCallsEnabled = selfCalls
+
+	legacy, err := modSource.LegacyCodegenAtRuntime(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("runtime module load: check legacy-codegen flag: %w", err)
+	}
+	m.LegacyCodegenAtRuntime = legacy
 
 	if err := m.Discovery.Load(ctx, m); err != nil {
 		return nil, fmt.Errorf("runtime module load: %w", err)
@@ -515,6 +540,54 @@ func (m *PythonSdk) runCodegen(
 	})
 
 	return ctr.File("/gen.py"), ctr.File("/_dagger_main.py")
+}
+
+// requireGeneratedFiles ensures the module's committed generated
+// files are present when legacyCodegenAtRuntime is off. Returns an
+// actionable error if any required path is missing.
+func (m *PythonSdk) requireGeneratedFiles(ctx context.Context) error {
+	required := []string{
+		// Full vendored SDK tree (covers sdk/src/dagger/client/gen.py
+		// plus all other vendored files).
+		path.Join(m.SubPath, m.VendorPath),
+		// Generated runtime entrypoint (from spec 2).
+		path.Join(m.SubPath, "src", m.PackageName, "_dagger_main.py"),
+	}
+	for _, rel := range required {
+		exists, err := m.ContextDir.Exists(ctx, rel)
+		if err != nil {
+			return fmt.Errorf("check generated path %q: %w", rel, err)
+		}
+		if !exists {
+			return fmt.Errorf(
+				"module %q has codegen.legacyCodegenAtRuntime=false "+
+					"but required generated path %q is missing. "+
+					"Run `dagger develop` to regenerate.",
+				m.ModName, rel)
+		}
+	}
+	return nil
+}
+
+// genPaths returns the list of VCS-tracked (generated) paths for
+// this module. Shared between the legacy Codegen path and the
+// opted-in short-circuit.
+func (m *PythonSdk) genPaths() []string {
+	if m.VendorPath != "" {
+		return []string{m.VendorPath + "/**"}
+	}
+	return []string{}
+}
+
+// ignorePaths returns the list of VCS-ignored paths for this module.
+// Shared between the legacy Codegen path and the opted-in
+// short-circuit.
+func (m *PythonSdk) ignorePaths() []string {
+	ignore := []string{".venv", "**/__pycache__"}
+	if m.VendorPath != "" {
+		ignore = append(ignore, m.VendorPath)
+	}
+	return ignore
 }
 
 // Add the module's source code
