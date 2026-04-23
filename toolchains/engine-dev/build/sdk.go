@@ -96,6 +96,11 @@ func (build *Builder) pythonSDKContent(ctx context.Context) (*sdkContent, error)
 	rootfs = rootfs.
 		// bundle the codegen script and its dependencies into a single executable
 		WithFile("dist/codegen", codegenShiv).
+		// bundle cmd/codegen as `merge-schema`: sdk/python/runtime calls
+		// its `merge-schema` subcommand when SELF_CALLS is enabled, to
+		// extend the introspection schema with the module's declared
+		// types before invoking the Python codegen generator.
+		WithFile("dist/merge-schema", build.CodegenBinary()).
 		// bundle the Python client bindings (gen.py) generated from this
 		// engine's introspection schema. PythonSdk.WithSDK detects this
 		// file and skips the runtime `codegen generate` exec, saving
