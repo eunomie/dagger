@@ -493,7 +493,7 @@ func (m *PythonSdk) runSelfCallsCodegen(introspectionJSON *dagger.File) *dagger.
 		"--main-object", m.MainObjectName,
 		"--module-name", m.ModName,
 		"--introspection-json", SchemaPath,
-		"--output", "/module-types.json",
+		"--schematool-output", "/module-types.json",
 	})
 
 	// Phase 2: merge

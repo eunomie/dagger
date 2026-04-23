@@ -1,15 +1,24 @@
 """CLI for the AST-based module analyzer.
 
-    python -m dagger.mod._analyzer emit \\
-        --module-source-dir <dir> \\
-        --main-object <ClassName> \\
-        --module-name <name> \\
-        --introspection-json <schema.json> \\
-        --output <module-types.json>
+Subcommands:
 
-Writes a schematool.ModuleTypes JSON document. Consumed by
-``cmd/codegen merge-schema`` during Python codegen when the
-``SELF_CALLS`` experimental feature is enabled.
+    python -m dagger.mod._analyzer emit \\
+        --module-source-dir <dir> --main-object <ClassName> \\
+        [--module-name <name>] \\
+        [--introspection-json <schema.json>] \\
+        [--metadata-output <metadata.json>] \\
+        [--schematool-output <module-types.json>]
+
+        One AST walk, two possible outputs: the full ModuleMetadata JSON
+        (consumed by the `entrypoint` subcommand below) and the
+        schematool.ModuleTypes JSON (consumed by `cmd/codegen merge-schema`
+        when SELF_CALLS is on).  At least one output must be requested.
+
+    python -m dagger.mod._analyzer entrypoint \\
+        --metadata <metadata.json> --package <pkg> \\
+        [--output <out.py>]
+
+        Read ModuleMetadata JSON, generate `_dagger_main.py` source.
 """
 
 from __future__ import annotations
@@ -22,17 +31,13 @@ import sys
 from pathlib import Path
 
 from dagger.mod._analyzer.analyze import analyze_module
+from dagger.mod._analyzer.entrypoint_gen import generate_entrypoint
 from dagger.mod._analyzer.errors import AnalysisError, ParseError, ValidationError
+from dagger.mod._analyzer.metadata import ModuleMetadata
 from dagger.mod._analyzer.schematool import to_schematool_json
 
 
 def _find_source_files(root: Path) -> list[str]:
-    """Walk ``root`` for .py files, skipping private (``_``-prefixed) dirs.
-
-    Mirrors ``dagger.mod._discovery._collect_package_files`` semantics
-    closely enough for the analyzer (sorted, __init__.py last within a
-    directory).
-    """
     files: list[str] = []
 
     def _walk(pkg_path: Path) -> None:
@@ -43,7 +48,7 @@ def _find_source_files(root: Path) -> list[str]:
             else:
                 files.append(str(py_file))
         for subdir in sorted(pkg_path.iterdir()):
-            if subdir.is_dir() and not subdir.name.startswith("_"):
+            if subdir.is_dir() and not subdir.name.startswith(("_", ".")):
                 _walk(subdir)
         if init_file is not None:
             files.append(str(init_file))
@@ -60,7 +65,10 @@ def _load_base_type_names(introspection_path: Path | None) -> frozenset[str]:
         return frozenset()
     try:
         payload = json.loads(introspection_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+    except (OSError, json.JSONDecodeError) as exc:
+        logging.getLogger(__name__).warning(
+            "could not load introspection schema %s: %s", introspection_path, exc
+        )
         return frozenset()
     schema = payload.get("__schema", payload)
     types = schema.get("types", []) if isinstance(schema, dict) else []
@@ -71,6 +79,13 @@ def _load_base_type_names(introspection_path: Path | None) -> frozenset[str]:
 
 
 def _emit(args: argparse.Namespace) -> int:
+    if not args.metadata_output and not args.schematool_output:
+        sys.stderr.write(
+            "error: pass at least one of "
+            "--metadata-output / --schematool-output\n"
+        )
+        return 2
+
     main_object = args.main_object or os.environ.get("DAGGER_MAIN_OBJECT")
     module_name = args.module_name or os.environ.get("DAGGER_MODULE")
     if not main_object:
@@ -84,15 +99,8 @@ def _emit(args: argparse.Namespace) -> int:
     source_dir = Path(args.module_source_dir).resolve()
     source_files = _find_source_files(source_dir)
 
-    if not source_files:
-        # Empty module (e.g. greenfield ``dagger init`` before the
-        # template is rendered) — emit an empty ModuleTypes.
-        payload: dict[str, object] = {
-            "name": module_name,
-            "objects": [],
-            "enums": [],
-        }
-    else:
+    metadata: ModuleMetadata | None = None
+    if source_files:
         try:
             metadata = analyze_module(
                 source_files=source_files,
@@ -102,17 +110,60 @@ def _emit(args: argparse.Namespace) -> int:
         except (AnalysisError, ParseError, ValidationError) as exc:
             sys.stderr.write(f"analyzer: {exc}\n")
             return 1
-        base_types = _load_base_type_names(
-            Path(args.introspection_json) if args.introspection_json else None,
-        )
-        payload = to_schematool_json(metadata, base_types)
 
-    encoded = json.dumps(payload, indent=2)
+    if args.metadata_output:
+        if metadata is None:
+            payload: dict[str, object] = {
+                "module_name": module_name,
+                "main_object": main_object,
+                "doc": None,
+                "objects": {},
+                "enums": {},
+            }
+        else:
+            payload = metadata.to_dict()
+        Path(args.metadata_output).write_text(
+            json.dumps(payload, indent=2), encoding="utf-8"
+        )
+
+    if args.schematool_output:
+        if metadata is None:
+            payload = {"name": module_name, "objects": [], "enums": []}
+        else:
+            base_types = _load_base_type_names(
+                Path(args.introspection_json) if args.introspection_json else None,
+            )
+            payload = to_schematool_json(metadata, base_types)
+        Path(args.schematool_output).write_text(
+            json.dumps(payload, indent=2), encoding="utf-8"
+        )
+
+    return 0
+
+
+def _entrypoint(args: argparse.Namespace) -> int:
+    if not args.package:
+        sys.stderr.write(
+            "error: --package (user's import package name) is required\n"
+        )
+        return 2
+    try:
+        raw = Path(args.metadata).read_text(encoding="utf-8")
+    except OSError as exc:
+        sys.stderr.write(f"error: reading {args.metadata}: {exc}\n")
+        return 1
+    try:
+        metadata = ModuleMetadata.from_json(raw)
+    except (ValueError, KeyError) as exc:
+        sys.stderr.write(f"error: parsing metadata: {exc}\n")
+        return 1
+
+    src = generate_entrypoint(metadata, package=args.package)
+
     if args.output:
-        Path(args.output).write_text(encoded, encoding="utf-8")
+        Path(args.output).write_text(src, encoding="utf-8")
     else:
-        sys.stdout.write(encoded)
-        sys.stdout.write("\n")
+        sys.stdout.write(src)
     return 0
 
 
@@ -125,32 +176,21 @@ def main(argv: list[str] | None = None) -> int:
     )
     sub = parser.add_subparsers(dest="cmd", required=True)
 
-    emit = sub.add_parser(
-        "emit",
-        help="Emit schematool.ModuleTypes JSON for a module's source tree.",
-    )
-    emit.add_argument(
-        "--module-source-dir",
-        required=True,
-        help="Root of the user's Python package.",
-    )
-    emit.add_argument(
-        "--main-object",
-        help="Main object class name (defaults to $DAGGER_MAIN_OBJECT).",
-    )
-    emit.add_argument(
-        "--module-name",
-        help="Module name (defaults to $DAGGER_MODULE).",
-    )
-    emit.add_argument(
-        "--introspection-json",
-        help="Path to the base introspection schema JSON.",
-    )
-    emit.add_argument(
-        "--output",
-        help="Write JSON here instead of stdout.",
-    )
+    emit = sub.add_parser("emit")
+    emit.add_argument("--module-source-dir", required=True)
+    emit.add_argument("--main-object")
+    emit.add_argument("--module-name")
+    emit.add_argument("--introspection-json")
+    emit.add_argument("--metadata-output")
+    emit.add_argument("--schematool-output")
     emit.set_defaults(func=_emit)
+
+    entry = sub.add_parser("entrypoint")
+    entry.add_argument("--metadata", required=True)
+    entry.add_argument("--package", required=True,
+                       help="user's Python import package name")
+    entry.add_argument("--output")
+    entry.set_defaults(func=_entrypoint)
 
     args = parser.parse_args(argv)
     return args.func(args)

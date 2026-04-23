@@ -325,7 +325,7 @@ class Test:
             "test",
             "--introspection-json",
             str(schema),
-            "--output",
+            "--schematool-output",
             str(out),
         ],
         check=False,
