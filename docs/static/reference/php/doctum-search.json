@@ -988,6 +988,146 @@
 		},
 		{
 			"t": "C",
+			"n": "Dagger\\IntrospectionDirective",
+			"p": "Dagger/IntrospectionDirective.html",
+			"d": "<p>A directive applied to a GraphQL introspection element.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\IntrospectionDirectiveArg",
+			"p": "Dagger/IntrospectionDirectiveArg.html",
+			"d": "<p>An argument of an applied GraphQL introspection directive.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\IntrospectionDirectiveArgId",
+			"p": "Dagger/IntrospectionDirectiveArgId.html",
+			"d": "<p>The <code>IntrospectionDirectiveArgID</code> scalar type represents an identifier for an object of type IntrospectionDirectiveArg.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\IntrospectionDirectiveId",
+			"p": "Dagger/IntrospectionDirectiveId.html",
+			"d": "<p>The <code>IntrospectionDirectiveID</code> scalar type represents an identifier for an object of type IntrospectionDirective.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\IntrospectionEnumValue",
+			"p": "Dagger/IntrospectionEnumValue.html",
+			"d": "<p>A possible value of a GraphQL introspection enum type.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\IntrospectionEnumValueId",
+			"p": "Dagger/IntrospectionEnumValueId.html",
+			"d": "<p>The <code>IntrospectionEnumValueID</code> scalar type represents an identifier for an object of type IntrospectionEnumValue.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\IntrospectionField",
+			"p": "Dagger/IntrospectionField.html",
+			"d": "<p>A field of a GraphQL introspection object or interface type.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\IntrospectionFieldId",
+			"p": "Dagger/IntrospectionFieldId.html",
+			"d": "<p>The <code>IntrospectionFieldID</code> scalar type represents an identifier for an object of type IntrospectionField.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\IntrospectionInputValue",
+			"p": "Dagger/IntrospectionInputValue.html",
+			"d": "<p>A GraphQL introspection input field or argument.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\IntrospectionInputValueId",
+			"p": "Dagger/IntrospectionInputValueId.html",
+			"d": "<p>The <code>IntrospectionInputValueID</code> scalar type represents an identifier for an object of type IntrospectionInputValue.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\IntrospectionType",
+			"p": "Dagger/IntrospectionType.html",
+			"d": "<p>A type defined in a GraphQL introspection schema.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\IntrospectionTypeId",
+			"p": "Dagger/IntrospectionTypeId.html",
+			"d": "<p>The <code>IntrospectionTypeID</code> scalar type represents an identifier for an object of type IntrospectionType.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\IntrospectionTypeRef",
+			"p": "Dagger/IntrospectionTypeRef.html",
+			"d": "<p>A reference to a GraphQL introspection type.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\IntrospectionTypeRefId",
+			"p": "Dagger/IntrospectionTypeRefId.html",
+			"d": "<p>The <code>IntrospectionTypeRefID</code> scalar type represents an identifier for an object of type IntrospectionTypeRef.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
 			"n": "Dagger\\Json",
 			"p": "Dagger/Json.html",
 			"d": "<p>An arbitrary JSON-encoded value.</p>",
@@ -1311,6 +1451,26 @@
 			"n": "Dagger\\ScalarTypeDefId",
 			"p": "Dagger/ScalarTypeDefId.html",
 			"d": "<p>The <code>ScalarTypeDefID</code> scalar type represents an identifier for an object of type ScalarTypeDef.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\Schema",
+			"p": "Dagger/Schema.html",
+			"d": "<p>A GraphQL introspection schema that can be inspected and merged.</p>",
+			"f": {
+				"n": "Dagger",
+				"p": "Dagger.html"
+			}
+		},
+		{
+			"t": "C",
+			"n": "Dagger\\SchemaId",
+			"p": "Dagger/SchemaId.html",
+			"d": "<p>The <code>SchemaID</code> scalar type represents an identifier for an object of type Schema.</p>",
 			"f": {
 				"n": "Dagger",
 				"p": "Dagger.html"
@@ -1839,6 +1999,48 @@
 		},
 		{
 			"t": "M",
+			"n": "Dagger\\Binding::asIntrospectionDirective",
+			"p": "Dagger/Binding.html#method_asIntrospectionDirective",
+			"d": "<p>Retrieve the binding value, as type IntrospectionDirective</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Binding::asIntrospectionDirectiveArg",
+			"p": "Dagger/Binding.html#method_asIntrospectionDirectiveArg",
+			"d": "<p>Retrieve the binding value, as type IntrospectionDirectiveArg</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Binding::asIntrospectionEnumValue",
+			"p": "Dagger/Binding.html#method_asIntrospectionEnumValue",
+			"d": "<p>Retrieve the binding value, as type IntrospectionEnumValue</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Binding::asIntrospectionField",
+			"p": "Dagger/Binding.html#method_asIntrospectionField",
+			"d": "<p>Retrieve the binding value, as type IntrospectionField</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Binding::asIntrospectionInputValue",
+			"p": "Dagger/Binding.html#method_asIntrospectionInputValue",
+			"d": "<p>Retrieve the binding value, as type IntrospectionInputValue</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Binding::asIntrospectionType",
+			"p": "Dagger/Binding.html#method_asIntrospectionType",
+			"d": "<p>Retrieve the binding value, as type IntrospectionType</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Binding::asIntrospectionTypeRef",
+			"p": "Dagger/Binding.html#method_asIntrospectionTypeRef",
+			"d": "<p>Retrieve the binding value, as type IntrospectionTypeRef</p>"
+		},
+		{
+			"t": "M",
 			"n": "Dagger\\Binding::asJSONValue",
 			"p": "Dagger/Binding.html#method_asJSONValue",
 			"d": "<p>Retrieve the binding value, as type JSONValue</p>"
@@ -1866,6 +2068,12 @@
 			"n": "Dagger\\Binding::asPhpSdk",
 			"p": "Dagger/Binding.html#method_asPhpSdk",
 			"d": "<p>Retrieve the binding value, as type PhpSdk</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Binding::asSchema",
+			"p": "Dagger/Binding.html#method_asSchema",
+			"d": "<p>Retrieve the binding value, as type Schema</p>"
 		},
 		{
 			"t": "M",
@@ -2595,6 +2803,48 @@
 		},
 		{
 			"t": "M",
+			"n": "Dagger\\Client::loadIntrospectionDirectiveArgFromID",
+			"p": "Dagger/Client.html#method_loadIntrospectionDirectiveArgFromID",
+			"d": "<p>Load a IntrospectionDirectiveArg from its ID.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Client::loadIntrospectionDirectiveFromID",
+			"p": "Dagger/Client.html#method_loadIntrospectionDirectiveFromID",
+			"d": "<p>Load a IntrospectionDirective from its ID.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Client::loadIntrospectionEnumValueFromID",
+			"p": "Dagger/Client.html#method_loadIntrospectionEnumValueFromID",
+			"d": "<p>Load a IntrospectionEnumValue from its ID.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Client::loadIntrospectionFieldFromID",
+			"p": "Dagger/Client.html#method_loadIntrospectionFieldFromID",
+			"d": "<p>Load a IntrospectionField from its ID.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Client::loadIntrospectionInputValueFromID",
+			"p": "Dagger/Client.html#method_loadIntrospectionInputValueFromID",
+			"d": "<p>Load a IntrospectionInputValue from its ID.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Client::loadIntrospectionTypeFromID",
+			"p": "Dagger/Client.html#method_loadIntrospectionTypeFromID",
+			"d": "<p>Load a IntrospectionType from its ID.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Client::loadIntrospectionTypeRefFromID",
+			"p": "Dagger/Client.html#method_loadIntrospectionTypeRefFromID",
+			"d": "<p>Load a IntrospectionTypeRef from its ID.</p>"
+		},
+		{
+			"t": "M",
 			"n": "Dagger\\Client::loadJSONValueFromID",
 			"p": "Dagger/Client.html#method_loadJSONValueFromID",
 			"d": "<p>Load a JSONValue from its ID.</p>"
@@ -2682,6 +2932,12 @@
 			"n": "Dagger\\Client::loadScalarTypeDefFromID",
 			"p": "Dagger/Client.html#method_loadScalarTypeDefFromID",
 			"d": "<p>Load a ScalarTypeDef from its ID.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Client::loadSchemaFromID",
+			"p": "Dagger/Client.html#method_loadSchemaFromID",
+			"d": "<p>Load a Schema from its ID.</p>"
 		},
 		{
 			"t": "M",
@@ -2796,6 +3052,12 @@
 			"n": "Dagger\\Client::moduleSource",
 			"p": "Dagger/Client.html#method_moduleSource",
 			"d": "<p>Create a new module source instance from a source ref string</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Client::schema",
+			"p": "Dagger/Client.html#method_schema",
+			"d": "<p>Load a GraphQL introspection schema for inspection and merging.</p>"
 		},
 		{
 			"t": "M",
@@ -4233,6 +4495,90 @@
 		},
 		{
 			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionDirectiveArgInput",
+			"p": "Dagger/Env.html#method_withIntrospectionDirectiveArgInput",
+			"d": "<p>Create or update a binding of type IntrospectionDirectiveArg in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionDirectiveArgOutput",
+			"p": "Dagger/Env.html#method_withIntrospectionDirectiveArgOutput",
+			"d": "<p>Declare a desired IntrospectionDirectiveArg output to be assigned in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionDirectiveInput",
+			"p": "Dagger/Env.html#method_withIntrospectionDirectiveInput",
+			"d": "<p>Create or update a binding of type IntrospectionDirective in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionDirectiveOutput",
+			"p": "Dagger/Env.html#method_withIntrospectionDirectiveOutput",
+			"d": "<p>Declare a desired IntrospectionDirective output to be assigned in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionEnumValueInput",
+			"p": "Dagger/Env.html#method_withIntrospectionEnumValueInput",
+			"d": "<p>Create or update a binding of type IntrospectionEnumValue in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionEnumValueOutput",
+			"p": "Dagger/Env.html#method_withIntrospectionEnumValueOutput",
+			"d": "<p>Declare a desired IntrospectionEnumValue output to be assigned in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionFieldInput",
+			"p": "Dagger/Env.html#method_withIntrospectionFieldInput",
+			"d": "<p>Create or update a binding of type IntrospectionField in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionFieldOutput",
+			"p": "Dagger/Env.html#method_withIntrospectionFieldOutput",
+			"d": "<p>Declare a desired IntrospectionField output to be assigned in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionInputValueInput",
+			"p": "Dagger/Env.html#method_withIntrospectionInputValueInput",
+			"d": "<p>Create or update a binding of type IntrospectionInputValue in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionInputValueOutput",
+			"p": "Dagger/Env.html#method_withIntrospectionInputValueOutput",
+			"d": "<p>Declare a desired IntrospectionInputValue output to be assigned in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionTypeInput",
+			"p": "Dagger/Env.html#method_withIntrospectionTypeInput",
+			"d": "<p>Create or update a binding of type IntrospectionType in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionTypeOutput",
+			"p": "Dagger/Env.html#method_withIntrospectionTypeOutput",
+			"d": "<p>Declare a desired IntrospectionType output to be assigned in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionTypeRefInput",
+			"p": "Dagger/Env.html#method_withIntrospectionTypeRefInput",
+			"d": "<p>Create or update a binding of type IntrospectionTypeRef in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withIntrospectionTypeRefOutput",
+			"p": "Dagger/Env.html#method_withIntrospectionTypeRefOutput",
+			"d": "<p>Declare a desired IntrospectionTypeRef output to be assigned in the environment</p>"
+		},
+		{
+			"t": "M",
 			"n": "Dagger\\Env::withJSONValueInput",
 			"p": "Dagger/Env.html#method_withJSONValueInput",
 			"d": "<p>Create or update a binding of type JSONValue in the environment</p>"
@@ -4302,6 +4648,18 @@
 			"n": "Dagger\\Env::withPhpSdkOutput",
 			"p": "Dagger/Env.html#method_withPhpSdkOutput",
 			"d": "<p>Declare a desired PhpSdk output to be assigned in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withSchemaInput",
+			"p": "Dagger/Env.html#method_withSchemaInput",
+			"d": "<p>Create or update a binding of type Schema in the environment</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Env::withSchemaOutput",
+			"p": "Dagger/Env.html#method_withSchemaOutput",
+			"d": "<p>Declare a desired Schema output to be assigned in the environment</p>"
 		},
 		{
 			"t": "M",
@@ -5313,6 +5671,252 @@
 		},
 		{
 			"t": "M",
+			"n": "Dagger\\IntrospectionDirective::args",
+			"p": "Dagger/IntrospectionDirective.html#method_args",
+			"d": "<p>The arguments of the applied directive.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionDirective::id",
+			"p": "Dagger/IntrospectionDirective.html#method_id",
+			"d": "<p>A unique identifier for this IntrospectionDirective.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionDirective::name",
+			"p": "Dagger/IntrospectionDirective.html#method_name",
+			"d": "<p>The name of the directive.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionDirectiveArg::id",
+			"p": "Dagger/IntrospectionDirectiveArg.html#method_id",
+			"d": "<p>A unique identifier for this IntrospectionDirectiveArg.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionDirectiveArg::name",
+			"p": "Dagger/IntrospectionDirectiveArg.html#method_name",
+			"d": "<p>The name of the directive argument.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionDirectiveArg::value",
+			"p": "Dagger/IntrospectionDirectiveArg.html#method_value",
+			"d": "<p>The value of the directive argument, encoded as JSON, if any.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionEnumValue::deprecationReason",
+			"p": "Dagger/IntrospectionEnumValue.html#method_deprecationReason",
+			"d": "<p>Why the enum value is deprecated, if it is.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionEnumValue::description",
+			"p": "Dagger/IntrospectionEnumValue.html#method_description",
+			"d": "<p>The description of the enum value.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionEnumValue::directives",
+			"p": "Dagger/IntrospectionEnumValue.html#method_directives",
+			"d": "<p>The directives applied to the enum value.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionEnumValue::id",
+			"p": "Dagger/IntrospectionEnumValue.html#method_id",
+			"d": "<p>A unique identifier for this IntrospectionEnumValue.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionEnumValue::isDeprecated",
+			"p": "Dagger/IntrospectionEnumValue.html#method_isDeprecated",
+			"d": "<p>Whether the enum value is deprecated.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionEnumValue::name",
+			"p": "Dagger/IntrospectionEnumValue.html#method_name",
+			"d": "<p>The name of the enum value.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionField::args",
+			"p": "Dagger/IntrospectionField.html#method_args",
+			"d": "<p>The arguments accepted by the field.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionField::deprecationReason",
+			"p": "Dagger/IntrospectionField.html#method_deprecationReason",
+			"d": "<p>Why the field is deprecated, if it is.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionField::description",
+			"p": "Dagger/IntrospectionField.html#method_description",
+			"d": "<p>The description of the field.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionField::directives",
+			"p": "Dagger/IntrospectionField.html#method_directives",
+			"d": "<p>The directives applied to the field.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionField::id",
+			"p": "Dagger/IntrospectionField.html#method_id",
+			"d": "<p>A unique identifier for this IntrospectionField.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionField::isDeprecated",
+			"p": "Dagger/IntrospectionField.html#method_isDeprecated",
+			"d": "<p>Whether the field is deprecated.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionField::name",
+			"p": "Dagger/IntrospectionField.html#method_name",
+			"d": "<p>The name of the field.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionField::type",
+			"p": "Dagger/IntrospectionField.html#method_type",
+			"d": "<p>The type of the field.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionInputValue::defaultValue",
+			"p": "Dagger/IntrospectionInputValue.html#method_defaultValue",
+			"d": "<p>The default value of the input value, encoded as GraphQL, if any.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionInputValue::deprecationReason",
+			"p": "Dagger/IntrospectionInputValue.html#method_deprecationReason",
+			"d": "<p>Why the input value is deprecated, if it is.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionInputValue::description",
+			"p": "Dagger/IntrospectionInputValue.html#method_description",
+			"d": "<p>The description of the input value.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionInputValue::directives",
+			"p": "Dagger/IntrospectionInputValue.html#method_directives",
+			"d": "<p>The directives applied to the input value.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionInputValue::id",
+			"p": "Dagger/IntrospectionInputValue.html#method_id",
+			"d": "<p>A unique identifier for this IntrospectionInputValue.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionInputValue::isDeprecated",
+			"p": "Dagger/IntrospectionInputValue.html#method_isDeprecated",
+			"d": "<p>Whether the input value is deprecated.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionInputValue::name",
+			"p": "Dagger/IntrospectionInputValue.html#method_name",
+			"d": "<p>The name of the input value.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionInputValue::type",
+			"p": "Dagger/IntrospectionInputValue.html#method_type",
+			"d": "<p>The type of the input value.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionType::description",
+			"p": "Dagger/IntrospectionType.html#method_description",
+			"d": "<p>The description of the type.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionType::directives",
+			"p": "Dagger/IntrospectionType.html#method_directives",
+			"d": "<p>The directives applied to the type, including @sourceModuleName for module-defined types.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionType::enumValues",
+			"p": "Dagger/IntrospectionType.html#method_enumValues",
+			"d": "<p>The possible values of the type. Null unless the type is an enum.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionType::fields",
+			"p": "Dagger/IntrospectionType.html#method_fields",
+			"d": "<p>The fields of the type. Null unless the type is an object or interface.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionType::id",
+			"p": "Dagger/IntrospectionType.html#method_id",
+			"d": "<p>A unique identifier for this IntrospectionType.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionType::inputFields",
+			"p": "Dagger/IntrospectionType.html#method_inputFields",
+			"d": "<p>The input fields of the type. Null unless the type is an input object.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionType::interfaces",
+			"p": "Dagger/IntrospectionType.html#method_interfaces",
+			"d": "<p>The interfaces implemented by the type. Null unless the type is an object or interface.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionType::kind",
+			"p": "Dagger/IntrospectionType.html#method_kind",
+			"d": "<p>The kind of the type, e.g. &quot;OBJECT&quot;, &quot;INTERFACE&quot;, &quot;ENUM&quot; or &quot;SCALAR&quot;.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionType::name",
+			"p": "Dagger/IntrospectionType.html#method_name",
+			"d": "<p>The name of the type.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionTypeRef::id",
+			"p": "Dagger/IntrospectionTypeRef.html#method_id",
+			"d": "<p>A unique identifier for this IntrospectionTypeRef.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionTypeRef::kind",
+			"p": "Dagger/IntrospectionTypeRef.html#method_kind",
+			"d": "<p>The kind of the referenced type, e.g. &quot;OBJECT&quot;, &quot;LIST&quot; or &quot;NON_NULL&quot;.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionTypeRef::name",
+			"p": "Dagger/IntrospectionTypeRef.html#method_name",
+			"d": "<p>The name of the referenced type. Null for list and non-null wrappers.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\IntrospectionTypeRef::ofType",
+			"p": "Dagger/IntrospectionTypeRef.html#method_ofType",
+			"d": "<p>The type wrapped by a list or non-null reference. Null for named types.</p>"
+		},
+		{
+			"t": "M",
 			"n": "Dagger\\JsonValue::asArray",
 			"p": "Dagger/JsonValue.html#method_asArray",
 			"d": "<p>Decode an array from json</p>"
@@ -6252,6 +6856,42 @@
 			"n": "Dagger\\ScalarTypeDef::sourceModuleName",
 			"p": "Dagger/ScalarTypeDef.html#method_sourceModuleName",
 			"d": "<p>If this ScalarTypeDef is associated with a Module, the name of the module. Unset otherwise.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Schema::contents",
+			"p": "Dagger/Schema.html#method_contents",
+			"d": "<p>Serialize the schema back to introspection JSON.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Schema::describeType",
+			"p": "Dagger/Schema.html#method_describeType",
+			"d": "<p>Return the full introspection details of a named type, or null if the schema has no such type.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Schema::hasType",
+			"p": "Dagger/Schema.html#method_hasType",
+			"d": "<p>Check whether a type with the given name exists in the schema.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Schema::id",
+			"p": "Dagger/Schema.html#method_id",
+			"d": "<p>A unique identifier for this Schema.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Schema::listTypes",
+			"p": "Dagger/Schema.html#method_listTypes",
+			"d": "<p>List the names of the types defined in the schema.</p>"
+		},
+		{
+			"t": "M",
+			"n": "Dagger\\Schema::merge",
+			"p": "Dagger/Schema.html#method_merge",
+			"d": "<p>Merge a module's introspection-shaped type definitions into the schema, returning the combined schema.</p>"
 		},
 		{
 			"t": "M",

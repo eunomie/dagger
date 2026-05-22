@@ -446,6 +446,48 @@ func LoadInterfaceTypeDefFromID(id dagger.InterfaceTypeDefID) *dagger.InterfaceT
 	return client.LoadInterfaceTypeDefFromID(id)
 }
 
+// Load a IntrospectionDirectiveArg from its ID.
+func LoadIntrospectionDirectiveArgFromID(id dagger.IntrospectionDirectiveArgID) *dagger.IntrospectionDirectiveArg {
+	client := initClient()
+	return client.LoadIntrospectionDirectiveArgFromID(id)
+}
+
+// Load a IntrospectionDirective from its ID.
+func LoadIntrospectionDirectiveFromID(id dagger.IntrospectionDirectiveID) *dagger.IntrospectionDirective {
+	client := initClient()
+	return client.LoadIntrospectionDirectiveFromID(id)
+}
+
+// Load a IntrospectionEnumValue from its ID.
+func LoadIntrospectionEnumValueFromID(id dagger.IntrospectionEnumValueID) *dagger.IntrospectionEnumValue {
+	client := initClient()
+	return client.LoadIntrospectionEnumValueFromID(id)
+}
+
+// Load a IntrospectionField from its ID.
+func LoadIntrospectionFieldFromID(id dagger.IntrospectionFieldID) *dagger.IntrospectionField {
+	client := initClient()
+	return client.LoadIntrospectionFieldFromID(id)
+}
+
+// Load a IntrospectionInputValue from its ID.
+func LoadIntrospectionInputValueFromID(id dagger.IntrospectionInputValueID) *dagger.IntrospectionInputValue {
+	client := initClient()
+	return client.LoadIntrospectionInputValueFromID(id)
+}
+
+// Load a IntrospectionType from its ID.
+func LoadIntrospectionTypeFromID(id dagger.IntrospectionTypeID) *dagger.IntrospectionType {
+	client := initClient()
+	return client.LoadIntrospectionTypeFromID(id)
+}
+
+// Load a IntrospectionTypeRef from its ID.
+func LoadIntrospectionTypeRefFromID(id dagger.IntrospectionTypeRefID) *dagger.IntrospectionTypeRef {
+	client := initClient()
+	return client.LoadIntrospectionTypeRefFromID(id)
+}
+
 // Load a JSONValue from its ID.
 func LoadJSONValueFromID(id dagger.JSONValueID) *dagger.JSONValue {
 	client := initClient()
@@ -528,6 +570,12 @@ func LoadSDKConfigFromID(id dagger.SDKConfigID) *dagger.SDKConfig {
 func LoadScalarTypeDefFromID(id dagger.ScalarTypeDefID) *dagger.ScalarTypeDef {
 	client := initClient()
 	return client.LoadScalarTypeDefFromID(id)
+}
+
+// Load a Schema from its ID.
+func LoadSchemaFromID(id dagger.SchemaID) *dagger.Schema {
+	client := initClient()
+	return client.LoadSchemaFromID(id)
 }
 
 // Load a SearchResult from its ID.
@@ -636,6 +684,12 @@ func Module() *dagger.Module {
 func ModuleSource(refString string, opts ...dagger.ModuleSourceOpts) *dagger.ModuleSource {
 	client := initClient()
 	return client.ModuleSource(refString, opts...)
+}
+
+// Load a GraphQL introspection schema for inspection and merging.
+func Schema(json dagger.JSON) *dagger.Schema {
+	client := initClient()
+	return client.Schema(json)
 }
 
 // Creates a new secret.

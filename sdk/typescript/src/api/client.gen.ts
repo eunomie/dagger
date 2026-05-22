@@ -1990,6 +1990,51 @@ export type InputTypeDefID = string & { __InputTypeDefID: never }
 export type InterfaceTypeDefID = string & { __InterfaceTypeDefID: never }
 
 /**
+ * The `IntrospectionDirectiveArgID` scalar type represents an identifier for an object of type IntrospectionDirectiveArg.
+ */
+export type IntrospectionDirectiveArgID = string & {
+  __IntrospectionDirectiveArgID: never
+}
+
+/**
+ * The `IntrospectionDirectiveID` scalar type represents an identifier for an object of type IntrospectionDirective.
+ */
+export type IntrospectionDirectiveID = string & {
+  __IntrospectionDirectiveID: never
+}
+
+/**
+ * The `IntrospectionEnumValueID` scalar type represents an identifier for an object of type IntrospectionEnumValue.
+ */
+export type IntrospectionEnumValueID = string & {
+  __IntrospectionEnumValueID: never
+}
+
+/**
+ * The `IntrospectionFieldID` scalar type represents an identifier for an object of type IntrospectionField.
+ */
+export type IntrospectionFieldID = string & { __IntrospectionFieldID: never }
+
+/**
+ * The `IntrospectionInputValueID` scalar type represents an identifier for an object of type IntrospectionInputValue.
+ */
+export type IntrospectionInputValueID = string & {
+  __IntrospectionInputValueID: never
+}
+
+/**
+ * The `IntrospectionTypeID` scalar type represents an identifier for an object of type IntrospectionType.
+ */
+export type IntrospectionTypeID = string & { __IntrospectionTypeID: never }
+
+/**
+ * The `IntrospectionTypeRefID` scalar type represents an identifier for an object of type IntrospectionTypeRef.
+ */
+export type IntrospectionTypeRefID = string & {
+  __IntrospectionTypeRefID: never
+}
+
+/**
  * An arbitrary JSON-encoded value.
  */
 export type JSON = string & { __JSON: never }
@@ -2504,6 +2549,18 @@ export type SDKConfigID = string & { __SDKConfigID: never }
  * The `ScalarTypeDefID` scalar type represents an identifier for an object of type ScalarTypeDef.
  */
 export type ScalarTypeDefID = string & { __ScalarTypeDefID: never }
+
+export type SchemaListTypesOpts = {
+  /**
+   * Only list types of this kind, e.g. "OBJECT", "INTERFACE", "ENUM", "SCALAR" or "INPUT_OBJECT". Lists every type if omitted.
+   */
+  kind?: string
+}
+
+/**
+ * The `SchemaID` scalar type represents an identifier for an object of type Schema.
+ */
+export type SchemaID = string & { __SchemaID: never }
 
 /**
  * The `SearchResultID` scalar type represents an identifier for an object of type SearchResult.
@@ -3372,6 +3429,62 @@ export class Binding extends BaseClient {
   }
 
   /**
+   * Retrieve the binding value, as type IntrospectionDirective
+   */
+  asIntrospectionDirective = (): IntrospectionDirective => {
+    const ctx = this._ctx.select("asIntrospectionDirective")
+    return new IntrospectionDirective(ctx)
+  }
+
+  /**
+   * Retrieve the binding value, as type IntrospectionDirectiveArg
+   */
+  asIntrospectionDirectiveArg = (): IntrospectionDirectiveArg => {
+    const ctx = this._ctx.select("asIntrospectionDirectiveArg")
+    return new IntrospectionDirectiveArg(ctx)
+  }
+
+  /**
+   * Retrieve the binding value, as type IntrospectionEnumValue
+   */
+  asIntrospectionEnumValue = (): IntrospectionEnumValue => {
+    const ctx = this._ctx.select("asIntrospectionEnumValue")
+    return new IntrospectionEnumValue(ctx)
+  }
+
+  /**
+   * Retrieve the binding value, as type IntrospectionField
+   */
+  asIntrospectionField = (): IntrospectionField => {
+    const ctx = this._ctx.select("asIntrospectionField")
+    return new IntrospectionField(ctx)
+  }
+
+  /**
+   * Retrieve the binding value, as type IntrospectionInputValue
+   */
+  asIntrospectionInputValue = (): IntrospectionInputValue => {
+    const ctx = this._ctx.select("asIntrospectionInputValue")
+    return new IntrospectionInputValue(ctx)
+  }
+
+  /**
+   * Retrieve the binding value, as type IntrospectionType
+   */
+  asIntrospectionType = (): IntrospectionType => {
+    const ctx = this._ctx.select("asIntrospectionType")
+    return new IntrospectionType(ctx)
+  }
+
+  /**
+   * Retrieve the binding value, as type IntrospectionTypeRef
+   */
+  asIntrospectionTypeRef = (): IntrospectionTypeRef => {
+    const ctx = this._ctx.select("asIntrospectionTypeRef")
+    return new IntrospectionTypeRef(ctx)
+  }
+
+  /**
    * Retrieve the binding value, as type JSONValue
    */
   asJSONValue = (): JSONValue => {
@@ -3401,6 +3514,14 @@ export class Binding extends BaseClient {
   asModuleSource = (): ModuleSource => {
     const ctx = this._ctx.select("asModuleSource")
     return new ModuleSource(ctx)
+  }
+
+  /**
+   * Retrieve the binding value, as type Schema
+   */
+  asSchema = (): Schema => {
+    const ctx = this._ctx.select("asSchema")
+    return new Schema(ctx)
   }
 
   /**
@@ -7555,6 +7676,242 @@ export class Env extends BaseClient {
   }
 
   /**
+   * Create or update a binding of type IntrospectionDirectiveArg in the environment
+   * @param name The name of the binding
+   * @param value The IntrospectionDirectiveArg value to assign to the binding
+   * @param description The purpose of the input
+   */
+  withIntrospectionDirectiveArgInput = (
+    name: string,
+    value: IntrospectionDirectiveArg,
+    description: string,
+  ): Env => {
+    const ctx = this._ctx.select("withIntrospectionDirectiveArgInput", {
+      name,
+      value,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Declare a desired IntrospectionDirectiveArg output to be assigned in the environment
+   * @param name The name of the binding
+   * @param description A description of the desired value of the binding
+   */
+  withIntrospectionDirectiveArgOutput = (
+    name: string,
+    description: string,
+  ): Env => {
+    const ctx = this._ctx.select("withIntrospectionDirectiveArgOutput", {
+      name,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Create or update a binding of type IntrospectionDirective in the environment
+   * @param name The name of the binding
+   * @param value The IntrospectionDirective value to assign to the binding
+   * @param description The purpose of the input
+   */
+  withIntrospectionDirectiveInput = (
+    name: string,
+    value: IntrospectionDirective,
+    description: string,
+  ): Env => {
+    const ctx = this._ctx.select("withIntrospectionDirectiveInput", {
+      name,
+      value,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Declare a desired IntrospectionDirective output to be assigned in the environment
+   * @param name The name of the binding
+   * @param description A description of the desired value of the binding
+   */
+  withIntrospectionDirectiveOutput = (
+    name: string,
+    description: string,
+  ): Env => {
+    const ctx = this._ctx.select("withIntrospectionDirectiveOutput", {
+      name,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Create or update a binding of type IntrospectionEnumValue in the environment
+   * @param name The name of the binding
+   * @param value The IntrospectionEnumValue value to assign to the binding
+   * @param description The purpose of the input
+   */
+  withIntrospectionEnumValueInput = (
+    name: string,
+    value: IntrospectionEnumValue,
+    description: string,
+  ): Env => {
+    const ctx = this._ctx.select("withIntrospectionEnumValueInput", {
+      name,
+      value,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Declare a desired IntrospectionEnumValue output to be assigned in the environment
+   * @param name The name of the binding
+   * @param description A description of the desired value of the binding
+   */
+  withIntrospectionEnumValueOutput = (
+    name: string,
+    description: string,
+  ): Env => {
+    const ctx = this._ctx.select("withIntrospectionEnumValueOutput", {
+      name,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Create or update a binding of type IntrospectionField in the environment
+   * @param name The name of the binding
+   * @param value The IntrospectionField value to assign to the binding
+   * @param description The purpose of the input
+   */
+  withIntrospectionFieldInput = (
+    name: string,
+    value: IntrospectionField,
+    description: string,
+  ): Env => {
+    const ctx = this._ctx.select("withIntrospectionFieldInput", {
+      name,
+      value,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Declare a desired IntrospectionField output to be assigned in the environment
+   * @param name The name of the binding
+   * @param description A description of the desired value of the binding
+   */
+  withIntrospectionFieldOutput = (name: string, description: string): Env => {
+    const ctx = this._ctx.select("withIntrospectionFieldOutput", {
+      name,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Create or update a binding of type IntrospectionInputValue in the environment
+   * @param name The name of the binding
+   * @param value The IntrospectionInputValue value to assign to the binding
+   * @param description The purpose of the input
+   */
+  withIntrospectionInputValueInput = (
+    name: string,
+    value: IntrospectionInputValue,
+    description: string,
+  ): Env => {
+    const ctx = this._ctx.select("withIntrospectionInputValueInput", {
+      name,
+      value,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Declare a desired IntrospectionInputValue output to be assigned in the environment
+   * @param name The name of the binding
+   * @param description A description of the desired value of the binding
+   */
+  withIntrospectionInputValueOutput = (
+    name: string,
+    description: string,
+  ): Env => {
+    const ctx = this._ctx.select("withIntrospectionInputValueOutput", {
+      name,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Create or update a binding of type IntrospectionType in the environment
+   * @param name The name of the binding
+   * @param value The IntrospectionType value to assign to the binding
+   * @param description The purpose of the input
+   */
+  withIntrospectionTypeInput = (
+    name: string,
+    value: IntrospectionType,
+    description: string,
+  ): Env => {
+    const ctx = this._ctx.select("withIntrospectionTypeInput", {
+      name,
+      value,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Declare a desired IntrospectionType output to be assigned in the environment
+   * @param name The name of the binding
+   * @param description A description of the desired value of the binding
+   */
+  withIntrospectionTypeOutput = (name: string, description: string): Env => {
+    const ctx = this._ctx.select("withIntrospectionTypeOutput", {
+      name,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Create or update a binding of type IntrospectionTypeRef in the environment
+   * @param name The name of the binding
+   * @param value The IntrospectionTypeRef value to assign to the binding
+   * @param description The purpose of the input
+   */
+  withIntrospectionTypeRefInput = (
+    name: string,
+    value: IntrospectionTypeRef,
+    description: string,
+  ): Env => {
+    const ctx = this._ctx.select("withIntrospectionTypeRefInput", {
+      name,
+      value,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Declare a desired IntrospectionTypeRef output to be assigned in the environment
+   * @param name The name of the binding
+   * @param description A description of the desired value of the binding
+   */
+  withIntrospectionTypeRefOutput = (name: string, description: string): Env => {
+    const ctx = this._ctx.select("withIntrospectionTypeRefOutput", {
+      name,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
    * Create or update a binding of type JSONValue in the environment
    * @param name The name of the binding
    * @param value The JSONValue value to assign to the binding
@@ -7698,6 +8055,31 @@ export class Env extends BaseClient {
       name,
       description,
     })
+    return new Env(ctx)
+  }
+
+  /**
+   * Create or update a binding of type Schema in the environment
+   * @param name The name of the binding
+   * @param value The Schema value to assign to the binding
+   * @param description The purpose of the input
+   */
+  withSchemaInput = (name: string, value: Schema, description: string): Env => {
+    const ctx = this._ctx.select("withSchemaInput", {
+      name,
+      value,
+      description,
+    })
+    return new Env(ctx)
+  }
+
+  /**
+   * Declare a desired Schema output to be assigned in the environment
+   * @param name The name of the binding
+   * @param description A description of the desired value of the binding
+   */
+  withSchemaOutput = (name: string, description: string): Env => {
+    const ctx = this._ctx.select("withSchemaOutput", { name, description })
     return new Env(ctx)
   }
 
@@ -10527,6 +10909,812 @@ export class InterfaceTypeDef extends BaseClient {
   }
 }
 
+/**
+ * A directive applied to a GraphQL introspection element.
+ */
+export class IntrospectionDirective extends BaseClient {
+  private readonly _id?: IntrospectionDirectiveID = undefined
+  private readonly _name?: string = undefined
+
+  /**
+   * Constructor is used for internal usage only, do not create object from it.
+   */
+  constructor(ctx?: Context, _id?: IntrospectionDirectiveID, _name?: string) {
+    super(ctx)
+
+    this._id = _id
+    this._name = _name
+  }
+
+  /**
+   * A unique identifier for this IntrospectionDirective.
+   */
+  id = async (): Promise<IntrospectionDirectiveID> => {
+    if (this._id) {
+      return this._id
+    }
+
+    const ctx = this._ctx.select("id")
+
+    const response: Awaited<IntrospectionDirectiveID> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The arguments of the applied directive.
+   */
+  args = async (): Promise<IntrospectionDirectiveArg[]> => {
+    type args = {
+      id: IntrospectionDirectiveArgID
+    }
+
+    const ctx = this._ctx.select("args").select("id")
+
+    const response: Awaited<args[]> = await ctx.execute()
+
+    return response.map((r) =>
+      new Client(ctx.copy()).loadIntrospectionDirectiveArgFromID(r.id),
+    )
+  }
+
+  /**
+   * The name of the directive.
+   */
+  name = async (): Promise<string> => {
+    if (this._name) {
+      return this._name
+    }
+
+    const ctx = this._ctx.select("name")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+}
+
+/**
+ * An argument of an applied GraphQL introspection directive.
+ */
+export class IntrospectionDirectiveArg extends BaseClient {
+  private readonly _id?: IntrospectionDirectiveArgID = undefined
+  private readonly _name?: string = undefined
+  private readonly _value?: string = undefined
+
+  /**
+   * Constructor is used for internal usage only, do not create object from it.
+   */
+  constructor(
+    ctx?: Context,
+    _id?: IntrospectionDirectiveArgID,
+    _name?: string,
+    _value?: string,
+  ) {
+    super(ctx)
+
+    this._id = _id
+    this._name = _name
+    this._value = _value
+  }
+
+  /**
+   * A unique identifier for this IntrospectionDirectiveArg.
+   */
+  id = async (): Promise<IntrospectionDirectiveArgID> => {
+    if (this._id) {
+      return this._id
+    }
+
+    const ctx = this._ctx.select("id")
+
+    const response: Awaited<IntrospectionDirectiveArgID> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The name of the directive argument.
+   */
+  name = async (): Promise<string> => {
+    if (this._name) {
+      return this._name
+    }
+
+    const ctx = this._ctx.select("name")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The value of the directive argument, encoded as JSON, if any.
+   */
+  value = async (): Promise<string> => {
+    if (this._value) {
+      return this._value
+    }
+
+    const ctx = this._ctx.select("value")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+}
+
+/**
+ * A possible value of a GraphQL introspection enum type.
+ */
+export class IntrospectionEnumValue extends BaseClient {
+  private readonly _id?: IntrospectionEnumValueID = undefined
+  private readonly _deprecationReason?: string = undefined
+  private readonly _description?: string = undefined
+  private readonly _isDeprecated?: boolean = undefined
+  private readonly _name?: string = undefined
+
+  /**
+   * Constructor is used for internal usage only, do not create object from it.
+   */
+  constructor(
+    ctx?: Context,
+    _id?: IntrospectionEnumValueID,
+    _deprecationReason?: string,
+    _description?: string,
+    _isDeprecated?: boolean,
+    _name?: string,
+  ) {
+    super(ctx)
+
+    this._id = _id
+    this._deprecationReason = _deprecationReason
+    this._description = _description
+    this._isDeprecated = _isDeprecated
+    this._name = _name
+  }
+
+  /**
+   * A unique identifier for this IntrospectionEnumValue.
+   */
+  id = async (): Promise<IntrospectionEnumValueID> => {
+    if (this._id) {
+      return this._id
+    }
+
+    const ctx = this._ctx.select("id")
+
+    const response: Awaited<IntrospectionEnumValueID> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * Why the enum value is deprecated, if it is.
+   */
+  deprecationReason = async (): Promise<string> => {
+    if (this._deprecationReason) {
+      return this._deprecationReason
+    }
+
+    const ctx = this._ctx.select("deprecationReason")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The description of the enum value.
+   */
+  description = async (): Promise<string> => {
+    if (this._description) {
+      return this._description
+    }
+
+    const ctx = this._ctx.select("description")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The directives applied to the enum value.
+   */
+  directives = async (): Promise<IntrospectionDirective[]> => {
+    type directives = {
+      id: IntrospectionDirectiveID
+    }
+
+    const ctx = this._ctx.select("directives").select("id")
+
+    const response: Awaited<directives[]> = await ctx.execute()
+
+    return response.map((r) =>
+      new Client(ctx.copy()).loadIntrospectionDirectiveFromID(r.id),
+    )
+  }
+
+  /**
+   * Whether the enum value is deprecated.
+   */
+  isDeprecated = async (): Promise<boolean> => {
+    if (this._isDeprecated) {
+      return this._isDeprecated
+    }
+
+    const ctx = this._ctx.select("isDeprecated")
+
+    const response: Awaited<boolean> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The name of the enum value.
+   */
+  name = async (): Promise<string> => {
+    if (this._name) {
+      return this._name
+    }
+
+    const ctx = this._ctx.select("name")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+}
+
+/**
+ * A field of a GraphQL introspection object or interface type.
+ */
+export class IntrospectionField extends BaseClient {
+  private readonly _id?: IntrospectionFieldID = undefined
+  private readonly _deprecationReason?: string = undefined
+  private readonly _description?: string = undefined
+  private readonly _isDeprecated?: boolean = undefined
+  private readonly _name?: string = undefined
+
+  /**
+   * Constructor is used for internal usage only, do not create object from it.
+   */
+  constructor(
+    ctx?: Context,
+    _id?: IntrospectionFieldID,
+    _deprecationReason?: string,
+    _description?: string,
+    _isDeprecated?: boolean,
+    _name?: string,
+  ) {
+    super(ctx)
+
+    this._id = _id
+    this._deprecationReason = _deprecationReason
+    this._description = _description
+    this._isDeprecated = _isDeprecated
+    this._name = _name
+  }
+
+  /**
+   * A unique identifier for this IntrospectionField.
+   */
+  id = async (): Promise<IntrospectionFieldID> => {
+    if (this._id) {
+      return this._id
+    }
+
+    const ctx = this._ctx.select("id")
+
+    const response: Awaited<IntrospectionFieldID> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The arguments accepted by the field.
+   */
+  args = async (): Promise<IntrospectionInputValue[]> => {
+    type args = {
+      id: IntrospectionInputValueID
+    }
+
+    const ctx = this._ctx.select("args").select("id")
+
+    const response: Awaited<args[]> = await ctx.execute()
+
+    return response.map((r) =>
+      new Client(ctx.copy()).loadIntrospectionInputValueFromID(r.id),
+    )
+  }
+
+  /**
+   * Why the field is deprecated, if it is.
+   */
+  deprecationReason = async (): Promise<string> => {
+    if (this._deprecationReason) {
+      return this._deprecationReason
+    }
+
+    const ctx = this._ctx.select("deprecationReason")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The description of the field.
+   */
+  description = async (): Promise<string> => {
+    if (this._description) {
+      return this._description
+    }
+
+    const ctx = this._ctx.select("description")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The directives applied to the field.
+   */
+  directives = async (): Promise<IntrospectionDirective[]> => {
+    type directives = {
+      id: IntrospectionDirectiveID
+    }
+
+    const ctx = this._ctx.select("directives").select("id")
+
+    const response: Awaited<directives[]> = await ctx.execute()
+
+    return response.map((r) =>
+      new Client(ctx.copy()).loadIntrospectionDirectiveFromID(r.id),
+    )
+  }
+
+  /**
+   * Whether the field is deprecated.
+   */
+  isDeprecated = async (): Promise<boolean> => {
+    if (this._isDeprecated) {
+      return this._isDeprecated
+    }
+
+    const ctx = this._ctx.select("isDeprecated")
+
+    const response: Awaited<boolean> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The name of the field.
+   */
+  name = async (): Promise<string> => {
+    if (this._name) {
+      return this._name
+    }
+
+    const ctx = this._ctx.select("name")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The type of the field.
+   */
+  type_ = (): IntrospectionTypeRef => {
+    const ctx = this._ctx.select("type")
+    return new IntrospectionTypeRef(ctx)
+  }
+}
+
+/**
+ * A GraphQL introspection input field or argument.
+ */
+export class IntrospectionInputValue extends BaseClient {
+  private readonly _id?: IntrospectionInputValueID = undefined
+  private readonly _defaultValue?: string = undefined
+  private readonly _deprecationReason?: string = undefined
+  private readonly _description?: string = undefined
+  private readonly _isDeprecated?: boolean = undefined
+  private readonly _name?: string = undefined
+
+  /**
+   * Constructor is used for internal usage only, do not create object from it.
+   */
+  constructor(
+    ctx?: Context,
+    _id?: IntrospectionInputValueID,
+    _defaultValue?: string,
+    _deprecationReason?: string,
+    _description?: string,
+    _isDeprecated?: boolean,
+    _name?: string,
+  ) {
+    super(ctx)
+
+    this._id = _id
+    this._defaultValue = _defaultValue
+    this._deprecationReason = _deprecationReason
+    this._description = _description
+    this._isDeprecated = _isDeprecated
+    this._name = _name
+  }
+
+  /**
+   * A unique identifier for this IntrospectionInputValue.
+   */
+  id = async (): Promise<IntrospectionInputValueID> => {
+    if (this._id) {
+      return this._id
+    }
+
+    const ctx = this._ctx.select("id")
+
+    const response: Awaited<IntrospectionInputValueID> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The default value of the input value, encoded as GraphQL, if any.
+   */
+  defaultValue = async (): Promise<string> => {
+    if (this._defaultValue) {
+      return this._defaultValue
+    }
+
+    const ctx = this._ctx.select("defaultValue")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * Why the input value is deprecated, if it is.
+   */
+  deprecationReason = async (): Promise<string> => {
+    if (this._deprecationReason) {
+      return this._deprecationReason
+    }
+
+    const ctx = this._ctx.select("deprecationReason")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The description of the input value.
+   */
+  description = async (): Promise<string> => {
+    if (this._description) {
+      return this._description
+    }
+
+    const ctx = this._ctx.select("description")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The directives applied to the input value.
+   */
+  directives = async (): Promise<IntrospectionDirective[]> => {
+    type directives = {
+      id: IntrospectionDirectiveID
+    }
+
+    const ctx = this._ctx.select("directives").select("id")
+
+    const response: Awaited<directives[]> = await ctx.execute()
+
+    return response.map((r) =>
+      new Client(ctx.copy()).loadIntrospectionDirectiveFromID(r.id),
+    )
+  }
+
+  /**
+   * Whether the input value is deprecated.
+   */
+  isDeprecated = async (): Promise<boolean> => {
+    if (this._isDeprecated) {
+      return this._isDeprecated
+    }
+
+    const ctx = this._ctx.select("isDeprecated")
+
+    const response: Awaited<boolean> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The name of the input value.
+   */
+  name = async (): Promise<string> => {
+    if (this._name) {
+      return this._name
+    }
+
+    const ctx = this._ctx.select("name")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The type of the input value.
+   */
+  type_ = (): IntrospectionTypeRef => {
+    const ctx = this._ctx.select("type")
+    return new IntrospectionTypeRef(ctx)
+  }
+}
+
+/**
+ * A type defined in a GraphQL introspection schema.
+ */
+export class IntrospectionType extends BaseClient {
+  private readonly _id?: IntrospectionTypeID = undefined
+  private readonly _description?: string = undefined
+  private readonly _kind?: string = undefined
+  private readonly _name?: string = undefined
+
+  /**
+   * Constructor is used for internal usage only, do not create object from it.
+   */
+  constructor(
+    ctx?: Context,
+    _id?: IntrospectionTypeID,
+    _description?: string,
+    _kind?: string,
+    _name?: string,
+  ) {
+    super(ctx)
+
+    this._id = _id
+    this._description = _description
+    this._kind = _kind
+    this._name = _name
+  }
+
+  /**
+   * A unique identifier for this IntrospectionType.
+   */
+  id = async (): Promise<IntrospectionTypeID> => {
+    if (this._id) {
+      return this._id
+    }
+
+    const ctx = this._ctx.select("id")
+
+    const response: Awaited<IntrospectionTypeID> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The description of the type.
+   */
+  description = async (): Promise<string> => {
+    if (this._description) {
+      return this._description
+    }
+
+    const ctx = this._ctx.select("description")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The directives applied to the type, including @sourceModuleName for module-defined types.
+   */
+  directives = async (): Promise<IntrospectionDirective[]> => {
+    type directives = {
+      id: IntrospectionDirectiveID
+    }
+
+    const ctx = this._ctx.select("directives").select("id")
+
+    const response: Awaited<directives[]> = await ctx.execute()
+
+    return response.map((r) =>
+      new Client(ctx.copy()).loadIntrospectionDirectiveFromID(r.id),
+    )
+  }
+
+  /**
+   * The possible values of the type. Null unless the type is an enum.
+   */
+  enumValues = async (): Promise<IntrospectionEnumValue[]> => {
+    type enumValues = {
+      id: IntrospectionEnumValueID
+    }
+
+    const ctx = this._ctx.select("enumValues").select("id")
+
+    const response: Awaited<enumValues[]> = await ctx.execute()
+
+    return response.map((r) =>
+      new Client(ctx.copy()).loadIntrospectionEnumValueFromID(r.id),
+    )
+  }
+
+  /**
+   * The fields of the type. Null unless the type is an object or interface.
+   */
+  fields = async (): Promise<IntrospectionField[]> => {
+    type fields = {
+      id: IntrospectionFieldID
+    }
+
+    const ctx = this._ctx.select("fields").select("id")
+
+    const response: Awaited<fields[]> = await ctx.execute()
+
+    return response.map((r) =>
+      new Client(ctx.copy()).loadIntrospectionFieldFromID(r.id),
+    )
+  }
+
+  /**
+   * The input fields of the type. Null unless the type is an input object.
+   */
+  inputFields = async (): Promise<IntrospectionInputValue[]> => {
+    type inputFields = {
+      id: IntrospectionInputValueID
+    }
+
+    const ctx = this._ctx.select("inputFields").select("id")
+
+    const response: Awaited<inputFields[]> = await ctx.execute()
+
+    return response.map((r) =>
+      new Client(ctx.copy()).loadIntrospectionInputValueFromID(r.id),
+    )
+  }
+
+  /**
+   * The interfaces implemented by the type. Null unless the type is an object or interface.
+   */
+  interfaces = async (): Promise<IntrospectionType[]> => {
+    type interfaces = {
+      id: IntrospectionTypeID
+    }
+
+    const ctx = this._ctx.select("interfaces").select("id")
+
+    const response: Awaited<interfaces[]> = await ctx.execute()
+
+    return response.map((r) =>
+      new Client(ctx.copy()).loadIntrospectionTypeFromID(r.id),
+    )
+  }
+
+  /**
+   * The kind of the type, e.g. "OBJECT", "INTERFACE", "ENUM" or "SCALAR".
+   */
+  kind = async (): Promise<string> => {
+    if (this._kind) {
+      return this._kind
+    }
+
+    const ctx = this._ctx.select("kind")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The name of the type.
+   */
+  name = async (): Promise<string> => {
+    if (this._name) {
+      return this._name
+    }
+
+    const ctx = this._ctx.select("name")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+}
+
+/**
+ * A reference to a GraphQL introspection type.
+ */
+export class IntrospectionTypeRef extends BaseClient {
+  private readonly _id?: IntrospectionTypeRefID = undefined
+  private readonly _kind?: string = undefined
+  private readonly _name?: string = undefined
+
+  /**
+   * Constructor is used for internal usage only, do not create object from it.
+   */
+  constructor(
+    ctx?: Context,
+    _id?: IntrospectionTypeRefID,
+    _kind?: string,
+    _name?: string,
+  ) {
+    super(ctx)
+
+    this._id = _id
+    this._kind = _kind
+    this._name = _name
+  }
+
+  /**
+   * A unique identifier for this IntrospectionTypeRef.
+   */
+  id = async (): Promise<IntrospectionTypeRefID> => {
+    if (this._id) {
+      return this._id
+    }
+
+    const ctx = this._ctx.select("id")
+
+    const response: Awaited<IntrospectionTypeRefID> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The kind of the referenced type, e.g. "OBJECT", "LIST" or "NON_NULL".
+   */
+  kind = async (): Promise<string> => {
+    if (this._kind) {
+      return this._kind
+    }
+
+    const ctx = this._ctx.select("kind")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The name of the referenced type. Null for list and non-null wrappers.
+   */
+  name = async (): Promise<string> => {
+    if (this._name) {
+      return this._name
+    }
+
+    const ctx = this._ctx.select("name")
+
+    const response: Awaited<string> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * The type wrapped by a list or non-null reference. Null for named types.
+   */
+  ofType = (): IntrospectionTypeRef => {
+    const ctx = this._ctx.select("ofType")
+    return new IntrospectionTypeRef(ctx)
+  }
+}
+
 export class JSONValue extends BaseClient {
   private readonly _id?: JSONValueID = undefined
   private readonly _asBoolean?: boolean = undefined
@@ -13218,6 +14406,76 @@ export class Client extends BaseClient {
   }
 
   /**
+   * Load a IntrospectionDirectiveArg from its ID.
+   */
+  loadIntrospectionDirectiveArgFromID = (
+    id: IntrospectionDirectiveArgID,
+  ): IntrospectionDirectiveArg => {
+    const ctx = this._ctx.select("loadIntrospectionDirectiveArgFromID", { id })
+    return new IntrospectionDirectiveArg(ctx)
+  }
+
+  /**
+   * Load a IntrospectionDirective from its ID.
+   */
+  loadIntrospectionDirectiveFromID = (
+    id: IntrospectionDirectiveID,
+  ): IntrospectionDirective => {
+    const ctx = this._ctx.select("loadIntrospectionDirectiveFromID", { id })
+    return new IntrospectionDirective(ctx)
+  }
+
+  /**
+   * Load a IntrospectionEnumValue from its ID.
+   */
+  loadIntrospectionEnumValueFromID = (
+    id: IntrospectionEnumValueID,
+  ): IntrospectionEnumValue => {
+    const ctx = this._ctx.select("loadIntrospectionEnumValueFromID", { id })
+    return new IntrospectionEnumValue(ctx)
+  }
+
+  /**
+   * Load a IntrospectionField from its ID.
+   */
+  loadIntrospectionFieldFromID = (
+    id: IntrospectionFieldID,
+  ): IntrospectionField => {
+    const ctx = this._ctx.select("loadIntrospectionFieldFromID", { id })
+    return new IntrospectionField(ctx)
+  }
+
+  /**
+   * Load a IntrospectionInputValue from its ID.
+   */
+  loadIntrospectionInputValueFromID = (
+    id: IntrospectionInputValueID,
+  ): IntrospectionInputValue => {
+    const ctx = this._ctx.select("loadIntrospectionInputValueFromID", { id })
+    return new IntrospectionInputValue(ctx)
+  }
+
+  /**
+   * Load a IntrospectionType from its ID.
+   */
+  loadIntrospectionTypeFromID = (
+    id: IntrospectionTypeID,
+  ): IntrospectionType => {
+    const ctx = this._ctx.select("loadIntrospectionTypeFromID", { id })
+    return new IntrospectionType(ctx)
+  }
+
+  /**
+   * Load a IntrospectionTypeRef from its ID.
+   */
+  loadIntrospectionTypeRefFromID = (
+    id: IntrospectionTypeRefID,
+  ): IntrospectionTypeRef => {
+    const ctx = this._ctx.select("loadIntrospectionTypeRefFromID", { id })
+    return new IntrospectionTypeRef(ctx)
+  }
+
+  /**
    * Load a JSONValue from its ID.
    */
   loadJSONValueFromID = (id: JSONValueID): JSONValue => {
@@ -13329,6 +14587,14 @@ export class Client extends BaseClient {
   loadScalarTypeDefFromID = (id: ScalarTypeDefID): ScalarTypeDef => {
     const ctx = this._ctx.select("loadScalarTypeDefFromID", { id })
     return new ScalarTypeDef(ctx)
+  }
+
+  /**
+   * Load a Schema from its ID.
+   */
+  loadSchemaFromID = (id: SchemaID): Schema => {
+    const ctx = this._ctx.select("loadSchemaFromID", { id })
+    return new Schema(ctx)
   }
 
   /**
@@ -13498,6 +14764,15 @@ export class Client extends BaseClient {
       __metadata: metadata,
     })
     return new ModuleSource(ctx)
+  }
+
+  /**
+   * Load a GraphQL introspection schema for inspection and merging.
+   * @param json The introspection schema JSON to load.
+   */
+  schema = (json: JSON): Schema => {
+    const ctx = this._ctx.select("schema", { json })
+    return new Schema(ctx)
   }
 
   /**
@@ -13752,6 +15027,117 @@ export class ScalarTypeDef extends BaseClient {
     const response: Awaited<string> = await ctx.execute()
 
     return response
+  }
+}
+
+/**
+ * A GraphQL introspection schema that can be inspected and merged.
+ */
+export class Schema extends BaseClient {
+  private readonly _id?: SchemaID = undefined
+  private readonly _contents?: JSON = undefined
+  private readonly _hasType?: boolean = undefined
+
+  /**
+   * Constructor is used for internal usage only, do not create object from it.
+   */
+  constructor(
+    ctx?: Context,
+    _id?: SchemaID,
+    _contents?: JSON,
+    _hasType?: boolean,
+  ) {
+    super(ctx)
+
+    this._id = _id
+    this._contents = _contents
+    this._hasType = _hasType
+  }
+
+  /**
+   * A unique identifier for this Schema.
+   */
+  id = async (): Promise<SchemaID> => {
+    if (this._id) {
+      return this._id
+    }
+
+    const ctx = this._ctx.select("id")
+
+    const response: Awaited<SchemaID> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * Serialize the schema back to introspection JSON.
+   */
+  contents = async (): Promise<JSON> => {
+    if (this._contents) {
+      return this._contents
+    }
+
+    const ctx = this._ctx.select("contents")
+
+    const response: Awaited<JSON> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * Return the full introspection details of a named type, or null if the schema has no such type.
+   * @param name The name of the type to describe.
+   */
+  describeType = (name: string): IntrospectionType => {
+    const ctx = this._ctx.select("describeType", { name })
+    return new IntrospectionType(ctx)
+  }
+
+  /**
+   * Check whether a type with the given name exists in the schema.
+   * @param name The name of the type to look for.
+   */
+  hasType = async (name: string): Promise<boolean> => {
+    if (this._hasType) {
+      return this._hasType
+    }
+
+    const ctx = this._ctx.select("hasType", { name })
+
+    const response: Awaited<boolean> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * List the names of the types defined in the schema.
+   * @param opts.kind Only list types of this kind, e.g. "OBJECT", "INTERFACE", "ENUM", "SCALAR" or "INPUT_OBJECT". Lists every type if omitted.
+   */
+  listTypes = async (opts?: SchemaListTypesOpts): Promise<string[]> => {
+    const ctx = this._ctx.select("listTypes", { ...opts })
+
+    const response: Awaited<string[]> = await ctx.execute()
+
+    return response
+  }
+
+  /**
+   * Merge a module's introspection-shaped type definitions into the schema, returning the combined schema.
+   * @param moduleTypes Introspection JSON describing the types the module defines. Object, interface and enum types are appended to the schema, and a constructor field for the module is added to the Query type.
+   * @param moduleName The name of the module whose types are being merged. Used to stamp the @sourceModuleName directive and to derive the module's constructor field.
+   */
+  merge = (moduleTypes: JSON, moduleName: string): Schema => {
+    const ctx = this._ctx.select("merge", { moduleTypes, moduleName })
+    return new Schema(ctx)
+  }
+
+  /**
+   * Call the provided function with current Schema.
+   *
+   * This is useful for reusability and readability by not breaking the calling chain.
+   */
+  with = (arg: (param: Schema) => Schema) => {
+    return arg(this)
   }
 }
 

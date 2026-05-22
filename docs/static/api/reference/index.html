@@ -92,6 +92,13 @@
               <li><a href="#query-loadHostFromID">loadHostFromID</a></li>
               <li><a href="#query-loadInputTypeDefFromID">loadInputTypeDefFromID</a></li>
               <li><a href="#query-loadInterfaceTypeDefFromID">loadInterfaceTypeDefFromID</a></li>
+              <li><a href="#query-loadIntrospectionDirectiveArgFromID">loadIntrospectionDirectiveArgFromID</a></li>
+              <li><a href="#query-loadIntrospectionDirectiveFromID">loadIntrospectionDirectiveFromID</a></li>
+              <li><a href="#query-loadIntrospectionEnumValueFromID">loadIntrospectionEnumValueFromID</a></li>
+              <li><a href="#query-loadIntrospectionFieldFromID">loadIntrospectionFieldFromID</a></li>
+              <li><a href="#query-loadIntrospectionInputValueFromID">loadIntrospectionInputValueFromID</a></li>
+              <li><a href="#query-loadIntrospectionTypeFromID">loadIntrospectionTypeFromID</a></li>
+              <li><a href="#query-loadIntrospectionTypeRefFromID">loadIntrospectionTypeRefFromID</a></li>
               <li><a href="#query-loadJSONValueFromID">loadJSONValueFromID</a></li>
               <li><a href="#query-loadLLMFromID">loadLLMFromID</a></li>
               <li><a href="#query-loadLLMTokenUsageFromID">loadLLMTokenUsageFromID</a></li>
@@ -106,6 +113,7 @@
               <li><a href="#query-loadRemoteGitMirrorFromID">loadRemoteGitMirrorFromID</a></li>
               <li><a href="#query-loadSDKConfigFromID">loadSDKConfigFromID</a></li>
               <li><a href="#query-loadScalarTypeDefFromID">loadScalarTypeDefFromID</a></li>
+              <li><a href="#query-loadSchemaFromID">loadSchemaFromID</a></li>
               <li><a href="#query-loadSearchResultFromID">loadSearchResultFromID</a></li>
               <li><a href="#query-loadSearchSubmatchFromID">loadSearchSubmatchFromID</a></li>
               <li><a href="#query-loadSecretFromID">loadSecretFromID</a></li>
@@ -124,6 +132,7 @@
               <li><a href="#query-loadWorkspaceModuleSettingFromID">loadWorkspaceModuleSettingFromID</a></li>
               <li><a href="#query-module">module</a></li>
               <li><a href="#query-moduleSource">moduleSource</a></li>
+              <li><a href="#query-schema">schema</a></li>
               <li><a href="#query-secret">secret</a></li>
               <li><a href="#query-setSecret">setSecret</a></li>
               <li><a href="#query-sourceMap">sourceMap</a></li>
@@ -224,6 +233,20 @@
               <li><a href="#definition-Int">Int</a></li>
               <li><a href="#definition-InterfaceTypeDef">InterfaceTypeDef</a></li>
               <li><a href="#definition-InterfaceTypeDefID">InterfaceTypeDefID</a></li>
+              <li><a href="#definition-IntrospectionDirective">IntrospectionDirective</a></li>
+              <li><a href="#definition-IntrospectionDirectiveArg">IntrospectionDirectiveArg</a></li>
+              <li><a href="#definition-IntrospectionDirectiveArgID">IntrospectionDirectiveArgID</a></li>
+              <li><a href="#definition-IntrospectionDirectiveID">IntrospectionDirectiveID</a></li>
+              <li><a href="#definition-IntrospectionEnumValue">IntrospectionEnumValue</a></li>
+              <li><a href="#definition-IntrospectionEnumValueID">IntrospectionEnumValueID</a></li>
+              <li><a href="#definition-IntrospectionField">IntrospectionField</a></li>
+              <li><a href="#definition-IntrospectionFieldID">IntrospectionFieldID</a></li>
+              <li><a href="#definition-IntrospectionInputValue">IntrospectionInputValue</a></li>
+              <li><a href="#definition-IntrospectionInputValueID">IntrospectionInputValueID</a></li>
+              <li><a href="#definition-IntrospectionType">IntrospectionType</a></li>
+              <li><a href="#definition-IntrospectionTypeID">IntrospectionTypeID</a></li>
+              <li><a href="#definition-IntrospectionTypeRef">IntrospectionTypeRef</a></li>
+              <li><a href="#definition-IntrospectionTypeRefID">IntrospectionTypeRefID</a></li>
               <li><a href="#definition-JSON">JSON</a></li>
               <li><a href="#definition-JSONValue">JSONValue</a></li>
               <li><a href="#definition-JSONValueID">JSONValueID</a></li>
@@ -259,6 +282,8 @@
               <li><a href="#definition-SDKConfigID">SDKConfigID</a></li>
               <li><a href="#definition-ScalarTypeDef">ScalarTypeDef</a></li>
               <li><a href="#definition-ScalarTypeDefID">ScalarTypeDefID</a></li>
+              <li><a href="#definition-Schema">Schema</a></li>
+              <li><a href="#definition-SchemaID">SchemaID</a></li>
               <li><a href="#definition-SearchResult">SearchResult</a></li>
               <li><a href="#definition-SearchResultID">SearchResultID</a></li>
               <li><a href="#definition-SearchSubmatch">SearchSubmatch</a></li>
@@ -3675,6 +3700,377 @@
               </div>
             </div>
           </section>
+          <section id="query-loadIntrospectionDirectiveArgFromID" class="operation operation-query" data-traverse-target="query-loadIntrospectionDirectiveArgFromID">
+            <div class="operation-group-name">
+              <a href="#group-Queries">Queries</a>
+            </div>
+            <h2 class="operation-heading ">
+              <code>loadIntrospectionDirectiveArgFromID</code>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>Load a IntrospectionDirectiveArg from its ID.</p>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-response doc-copy-section">
+                  <h5>Type</h5>
+                  <p>
+                    <a href="#definition-IntrospectionDirectiveArg"><code>IntrospectionDirectiveArg!</code></a>
+                  </p>
+                </div>
+                <div class="operation-arguments test doc-copy-section">
+                  <h5>Arguments</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-IntrospectionDirectiveArgID"><code>IntrospectionDirectiveArgID!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-example doc-copy-section">
+                  <h5>Example</h5>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="query-loadIntrospectionDirectiveFromID" class="operation operation-query" data-traverse-target="query-loadIntrospectionDirectiveFromID">
+            <div class="operation-group-name">
+              <a href="#group-Queries">Queries</a>
+            </div>
+            <h2 class="operation-heading ">
+              <code>loadIntrospectionDirectiveFromID</code>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>Load a IntrospectionDirective from its ID.</p>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-response doc-copy-section">
+                  <h5>Type</h5>
+                  <p>
+                    <a href="#definition-IntrospectionDirective"><code>IntrospectionDirective!</code></a>
+                  </p>
+                </div>
+                <div class="operation-arguments test doc-copy-section">
+                  <h5>Arguments</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-IntrospectionDirectiveID"><code>IntrospectionDirectiveID!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-example doc-copy-section">
+                  <h5>Example</h5>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="query-loadIntrospectionEnumValueFromID" class="operation operation-query" data-traverse-target="query-loadIntrospectionEnumValueFromID">
+            <div class="operation-group-name">
+              <a href="#group-Queries">Queries</a>
+            </div>
+            <h2 class="operation-heading ">
+              <code>loadIntrospectionEnumValueFromID</code>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>Load a IntrospectionEnumValue from its ID.</p>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-response doc-copy-section">
+                  <h5>Type</h5>
+                  <p>
+                    <a href="#definition-IntrospectionEnumValue"><code>IntrospectionEnumValue!</code></a>
+                  </p>
+                </div>
+                <div class="operation-arguments test doc-copy-section">
+                  <h5>Arguments</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-IntrospectionEnumValueID"><code>IntrospectionEnumValueID!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-example doc-copy-section">
+                  <h5>Example</h5>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="query-loadIntrospectionFieldFromID" class="operation operation-query" data-traverse-target="query-loadIntrospectionFieldFromID">
+            <div class="operation-group-name">
+              <a href="#group-Queries">Queries</a>
+            </div>
+            <h2 class="operation-heading ">
+              <code>loadIntrospectionFieldFromID</code>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>Load a IntrospectionField from its ID.</p>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-response doc-copy-section">
+                  <h5>Type</h5>
+                  <p>
+                    <a href="#definition-IntrospectionField"><code>IntrospectionField!</code></a>
+                  </p>
+                </div>
+                <div class="operation-arguments test doc-copy-section">
+                  <h5>Arguments</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-IntrospectionFieldID"><code>IntrospectionFieldID!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-example doc-copy-section">
+                  <h5>Example</h5>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="query-loadIntrospectionInputValueFromID" class="operation operation-query" data-traverse-target="query-loadIntrospectionInputValueFromID">
+            <div class="operation-group-name">
+              <a href="#group-Queries">Queries</a>
+            </div>
+            <h2 class="operation-heading ">
+              <code>loadIntrospectionInputValueFromID</code>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>Load a IntrospectionInputValue from its ID.</p>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-response doc-copy-section">
+                  <h5>Type</h5>
+                  <p>
+                    <a href="#definition-IntrospectionInputValue"><code>IntrospectionInputValue!</code></a>
+                  </p>
+                </div>
+                <div class="operation-arguments test doc-copy-section">
+                  <h5>Arguments</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-IntrospectionInputValueID"><code>IntrospectionInputValueID!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-example doc-copy-section">
+                  <h5>Example</h5>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="query-loadIntrospectionTypeFromID" class="operation operation-query" data-traverse-target="query-loadIntrospectionTypeFromID">
+            <div class="operation-group-name">
+              <a href="#group-Queries">Queries</a>
+            </div>
+            <h2 class="operation-heading ">
+              <code>loadIntrospectionTypeFromID</code>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>Load a IntrospectionType from its ID.</p>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-response doc-copy-section">
+                  <h5>Type</h5>
+                  <p>
+                    <a href="#definition-IntrospectionType"><code>IntrospectionType!</code></a>
+                  </p>
+                </div>
+                <div class="operation-arguments test doc-copy-section">
+                  <h5>Arguments</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-IntrospectionTypeID"><code>IntrospectionTypeID!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-example doc-copy-section">
+                  <h5>Example</h5>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="query-loadIntrospectionTypeRefFromID" class="operation operation-query" data-traverse-target="query-loadIntrospectionTypeRefFromID">
+            <div class="operation-group-name">
+              <a href="#group-Queries">Queries</a>
+            </div>
+            <h2 class="operation-heading ">
+              <code>loadIntrospectionTypeRefFromID</code>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>Load a IntrospectionTypeRef from its ID.</p>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-response doc-copy-section">
+                  <h5>Type</h5>
+                  <p>
+                    <a href="#definition-IntrospectionTypeRef"><code>IntrospectionTypeRef!</code></a>
+                  </p>
+                </div>
+                <div class="operation-arguments test doc-copy-section">
+                  <h5>Arguments</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-IntrospectionTypeRefID"><code>IntrospectionTypeRefID!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-example doc-copy-section">
+                  <h5>Example</h5>
+                </div>
+              </div>
+            </div>
+          </section>
           <section id="query-loadJSONValueFromID" class="operation operation-query" data-traverse-target="query-loadJSONValueFromID">
             <div class="operation-group-name">
               <a href="#group-Queries">Queries</a>
@@ -4400,6 +4796,59 @@
                       <tr>
                         <td>
                           <span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-ScalarTypeDefID"><code>ScalarTypeDefID!</code></a></span>
+                        </td>
+                        <td>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-example doc-copy-section">
+                  <h5>Example</h5>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="query-loadSchemaFromID" class="operation operation-query" data-traverse-target="query-loadSchemaFromID">
+            <div class="operation-group-name">
+              <a href="#group-Queries">Queries</a>
+            </div>
+            <h2 class="operation-heading ">
+              <code>loadSchemaFromID</code>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>Load a Schema from its ID.</p>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-response doc-copy-section">
+                  <h5>Type</h5>
+                  <p>
+                    <a href="#definition-Schema"><code>Schema!</code></a>
+                  </p>
+                </div>
+                <div class="operation-arguments test doc-copy-section">
+                  <h5>Arguments</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>id</code></span> - <span class="property-type"><a href="#definition-SchemaID"><code>SchemaID!</code></a></span>
                         </td>
                         <td>
                         </td>
@@ -5374,6 +5823,58 @@
               </div>
             </div>
           </section>
+          <section id="query-schema" class="operation operation-query" data-traverse-target="query-schema">
+            <div class="operation-group-name">
+              <a href="#group-Queries">Queries</a>
+            </div>
+            <h2 class="operation-heading ">
+              <code>schema</code>
+            </h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>Load a GraphQL introspection schema for inspection and merging.</p>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-response doc-copy-section">
+                  <h5>Type</h5>
+                  <p>
+                    <a href="#definition-Schema"><code>Schema!</code></a>
+                  </p>
+                </div>
+                <div class="operation-arguments test doc-copy-section">
+                  <h5>Arguments</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <span class="property-name"><code>json</code></span> - <span class="property-type"><a href="#definition-JSON"><code>JSON!</code></a></span>
+                        </td>
+                        <td> The introspection schema JSON to load. </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="operation-example doc-copy-section">
+                  <h5>Example</h5>
+                </div>
+              </div>
+            </div>
+          </section>
           <section id="query-secret" class="operation operation-query" data-traverse-target="query-secret">
             <div class="operation-group-name">
               <a href="#group-Queries">Queries</a>
@@ -5838,6 +6339,34 @@
                         <td> Retrieve the binding value, as type HTTPState </td>
                       </tr>
                       <tr>
+                        <td data-property-name=""><a class="property-name" id="Binding-asIntrospectionDirective" href="#Binding-asIntrospectionDirective"><code>asIntrospectionDirective</code></a> - <span class="property-type"><a href="#definition-IntrospectionDirective"><code>IntrospectionDirective!</code></a></span> </td>
+                        <td> Retrieve the binding value, as type IntrospectionDirective </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="Binding-asIntrospectionDirectiveArg" href="#Binding-asIntrospectionDirectiveArg"><code>asIntrospectionDirectiveArg</code></a> - <span class="property-type"><a href="#definition-IntrospectionDirectiveArg"><code>IntrospectionDirectiveArg!</code></a></span> </td>
+                        <td> Retrieve the binding value, as type IntrospectionDirectiveArg </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="Binding-asIntrospectionEnumValue" href="#Binding-asIntrospectionEnumValue"><code>asIntrospectionEnumValue</code></a> - <span class="property-type"><a href="#definition-IntrospectionEnumValue"><code>IntrospectionEnumValue!</code></a></span> </td>
+                        <td> Retrieve the binding value, as type IntrospectionEnumValue </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="Binding-asIntrospectionField" href="#Binding-asIntrospectionField"><code>asIntrospectionField</code></a> - <span class="property-type"><a href="#definition-IntrospectionField"><code>IntrospectionField!</code></a></span> </td>
+                        <td> Retrieve the binding value, as type IntrospectionField </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="Binding-asIntrospectionInputValue" href="#Binding-asIntrospectionInputValue"><code>asIntrospectionInputValue</code></a> - <span class="property-type"><a href="#definition-IntrospectionInputValue"><code>IntrospectionInputValue!</code></a></span> </td>
+                        <td> Retrieve the binding value, as type IntrospectionInputValue </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="Binding-asIntrospectionType" href="#Binding-asIntrospectionType"><code>asIntrospectionType</code></a> - <span class="property-type"><a href="#definition-IntrospectionType"><code>IntrospectionType!</code></a></span> </td>
+                        <td> Retrieve the binding value, as type IntrospectionType </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="Binding-asIntrospectionTypeRef" href="#Binding-asIntrospectionTypeRef"><code>asIntrospectionTypeRef</code></a> - <span class="property-type"><a href="#definition-IntrospectionTypeRef"><code>IntrospectionTypeRef!</code></a></span> </td>
+                        <td> Retrieve the binding value, as type IntrospectionTypeRef </td>
+                      </tr>
+                      <tr>
                         <td data-property-name=""><a class="property-name" id="Binding-asJSONValue" href="#Binding-asJSONValue"><code>asJSONValue</code></a> - <span class="property-type"><a href="#definition-JSONValue"><code>JSONValue!</code></a></span> </td>
                         <td> Retrieve the binding value, as type JSONValue </td>
                       </tr>
@@ -5852,6 +6381,10 @@
                       <tr>
                         <td data-property-name=""><a class="property-name" id="Binding-asModuleSource" href="#Binding-asModuleSource"><code>asModuleSource</code></a> - <span class="property-type"><a href="#definition-ModuleSource"><code>ModuleSource!</code></a></span> </td>
                         <td> Retrieve the binding value, as type ModuleSource </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="Binding-asSchema" href="#Binding-asSchema"><code>asSchema</code></a> - <span class="property-type"><a href="#definition-Schema"><code>Schema!</code></a></span> </td>
+                        <td> Retrieve the binding value, as type Schema </td>
                       </tr>
                       <tr>
                         <td data-property-name=""><a class="property-name" id="Binding-asSearchResult" href="#Binding-asSearchResult"><code>asSearchResult</code></a> - <span class="property-type"><a href="#definition-SearchResult"><code>SearchResult!</code></a></span> </td>
@@ -10609,6 +11142,328 @@
                         </td>
                       </tr>
                       <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionDirectiveArgInput" href="#Env-withIntrospectionDirectiveArgInput"><code>withIntrospectionDirectiveArgInput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Create or update a binding of type IntrospectionDirectiveArg in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>value</code></span> - <span class="property-type"><a href="#definition-IntrospectionDirectiveArgID"><code>IntrospectionDirectiveArgID!</code></a></span></h6>
+                                <p>The IntrospectionDirectiveArg value to assign to the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The purpose of the input</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionDirectiveArgOutput" href="#Env-withIntrospectionDirectiveArgOutput"><code>withIntrospectionDirectiveArgOutput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Declare a desired IntrospectionDirectiveArg output to be assigned in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>A description of the desired value of the binding</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionDirectiveInput" href="#Env-withIntrospectionDirectiveInput"><code>withIntrospectionDirectiveInput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Create or update a binding of type IntrospectionDirective in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>value</code></span> - <span class="property-type"><a href="#definition-IntrospectionDirectiveID"><code>IntrospectionDirectiveID!</code></a></span></h6>
+                                <p>The IntrospectionDirective value to assign to the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The purpose of the input</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionDirectiveOutput" href="#Env-withIntrospectionDirectiveOutput"><code>withIntrospectionDirectiveOutput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Declare a desired IntrospectionDirective output to be assigned in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>A description of the desired value of the binding</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionEnumValueInput" href="#Env-withIntrospectionEnumValueInput"><code>withIntrospectionEnumValueInput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Create or update a binding of type IntrospectionEnumValue in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>value</code></span> - <span class="property-type"><a href="#definition-IntrospectionEnumValueID"><code>IntrospectionEnumValueID!</code></a></span></h6>
+                                <p>The IntrospectionEnumValue value to assign to the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The purpose of the input</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionEnumValueOutput" href="#Env-withIntrospectionEnumValueOutput"><code>withIntrospectionEnumValueOutput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Declare a desired IntrospectionEnumValue output to be assigned in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>A description of the desired value of the binding</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionFieldInput" href="#Env-withIntrospectionFieldInput"><code>withIntrospectionFieldInput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Create or update a binding of type IntrospectionField in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>value</code></span> - <span class="property-type"><a href="#definition-IntrospectionFieldID"><code>IntrospectionFieldID!</code></a></span></h6>
+                                <p>The IntrospectionField value to assign to the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The purpose of the input</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionFieldOutput" href="#Env-withIntrospectionFieldOutput"><code>withIntrospectionFieldOutput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Declare a desired IntrospectionField output to be assigned in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>A description of the desired value of the binding</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionInputValueInput" href="#Env-withIntrospectionInputValueInput"><code>withIntrospectionInputValueInput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Create or update a binding of type IntrospectionInputValue in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>value</code></span> - <span class="property-type"><a href="#definition-IntrospectionInputValueID"><code>IntrospectionInputValueID!</code></a></span></h6>
+                                <p>The IntrospectionInputValue value to assign to the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The purpose of the input</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionInputValueOutput" href="#Env-withIntrospectionInputValueOutput"><code>withIntrospectionInputValueOutput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Declare a desired IntrospectionInputValue output to be assigned in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>A description of the desired value of the binding</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionTypeInput" href="#Env-withIntrospectionTypeInput"><code>withIntrospectionTypeInput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Create or update a binding of type IntrospectionType in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>value</code></span> - <span class="property-type"><a href="#definition-IntrospectionTypeID"><code>IntrospectionTypeID!</code></a></span></h6>
+                                <p>The IntrospectionType value to assign to the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The purpose of the input</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionTypeOutput" href="#Env-withIntrospectionTypeOutput"><code>withIntrospectionTypeOutput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Declare a desired IntrospectionType output to be assigned in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>A description of the desired value of the binding</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionTypeRefInput" href="#Env-withIntrospectionTypeRefInput"><code>withIntrospectionTypeRefInput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Create or update a binding of type IntrospectionTypeRef in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>value</code></span> - <span class="property-type"><a href="#definition-IntrospectionTypeRefID"><code>IntrospectionTypeRefID!</code></a></span></h6>
+                                <p>The IntrospectionTypeRef value to assign to the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The purpose of the input</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withIntrospectionTypeRefOutput" href="#Env-withIntrospectionTypeRefOutput"><code>withIntrospectionTypeRefOutput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Declare a desired IntrospectionTypeRef output to be assigned in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>A description of the desired value of the binding</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
                         <td data-property-name=""><a class="property-name" id="Env-withJSONValueInput" href="#Env-withJSONValueInput"><code>withJSONValueInput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
                         <td> Create or update a binding of type JSONValue in the environment </td>
                       </tr>
@@ -10813,6 +11668,52 @@
                       <tr class="row-has-field-arguments">
                         <td data-property-name=""><a class="property-name" id="Env-withModuleSourceOutput" href="#Env-withModuleSourceOutput"><code>withModuleSourceOutput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
                         <td> Declare a desired ModuleSource output to be assigned in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>A description of the desired value of the binding</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withSchemaInput" href="#Env-withSchemaInput"><code>withSchemaInput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Create or update a binding of type Schema in the environment </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>value</code></span> - <span class="property-type"><a href="#definition-SchemaID"><code>SchemaID!</code></a></span></h6>
+                                <p>The Schema value to assign to the binding</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>description</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The purpose of the input</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Env-withSchemaOutput" href="#Env-withSchemaOutput"><code>withSchemaOutput</code></a> - <span class="property-type"><a href="#definition-Env"><code>Env!</code></a></span> </td>
+                        <td> Declare a desired Schema output to be assigned in the environment </td>
                       </tr>
                       <tr class="row-field-arguments">
                         <td colspan="2">
@@ -13926,6 +14827,457 @@
               </div>
             </div>
           </section>
+          <section id="definition-IntrospectionDirective" class="definition definition-object" data-traverse-target="definition-IntrospectionDirective">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionDirective</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>A directive applied to a GraphQL introspection element.</p>
+                </div>
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionDirective-args" href="#IntrospectionDirective-args"><code>args</code></a> - <span class="property-type"><a href="#definition-IntrospectionDirectiveArg"><code>[IntrospectionDirectiveArg!]!</code></a></span> </td>
+                        <td> The arguments of the applied directive. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionDirective-id" href="#IntrospectionDirective-id"><code>id</code></a> - <span class="property-type"><a href="#definition-IntrospectionDirectiveID"><code>IntrospectionDirectiveID!</code></a></span> </td>
+                        <td> A unique identifier for this IntrospectionDirective. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionDirective-name" href="#IntrospectionDirective-name"><code>name</code></a> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span> </td>
+                        <td> The name of the directive. </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-IntrospectionDirectiveArg" class="definition definition-object" data-traverse-target="definition-IntrospectionDirectiveArg">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionDirectiveArg</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>An argument of an applied GraphQL introspection directive.</p>
+                </div>
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionDirectiveArg-id" href="#IntrospectionDirectiveArg-id"><code>id</code></a> - <span class="property-type"><a href="#definition-IntrospectionDirectiveArgID"><code>IntrospectionDirectiveArgID!</code></a></span> </td>
+                        <td> A unique identifier for this IntrospectionDirectiveArg. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionDirectiveArg-name" href="#IntrospectionDirectiveArg-name"><code>name</code></a> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span> </td>
+                        <td> The name of the directive argument. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionDirectiveArg-value" href="#IntrospectionDirectiveArg-value"><code>value</code></a> - <span class="property-type"><a href="#definition-String"><code>String</code></a></span> </td>
+                        <td> The value of the directive argument, encoded as JSON, if any. </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-IntrospectionDirectiveArgID" class="definition definition-scalar" data-traverse-target="definition-IntrospectionDirectiveArgID">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionDirectiveArgID</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>The <code>IntrospectionDirectiveArgID</code> scalar type represents an identifier for an object of type IntrospectionDirectiveArg.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-IntrospectionDirectiveID" class="definition definition-scalar" data-traverse-target="definition-IntrospectionDirectiveID">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionDirectiveID</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>The <code>IntrospectionDirectiveID</code> scalar type represents an identifier for an object of type IntrospectionDirective.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-IntrospectionEnumValue" class="definition definition-object" data-traverse-target="definition-IntrospectionEnumValue">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionEnumValue</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>A possible value of a GraphQL introspection enum type.</p>
+                </div>
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionEnumValue-deprecationReason" href="#IntrospectionEnumValue-deprecationReason"><code>deprecationReason</code></a> - <span class="property-type"><a href="#definition-String"><code>String</code></a></span> </td>
+                        <td> Why the enum value is deprecated, if it is. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionEnumValue-description" href="#IntrospectionEnumValue-description"><code>description</code></a> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span> </td>
+                        <td> The description of the enum value. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionEnumValue-directives" href="#IntrospectionEnumValue-directives"><code>directives</code></a> - <span class="property-type"><a href="#definition-IntrospectionDirective"><code>[IntrospectionDirective!]!</code></a></span> </td>
+                        <td> The directives applied to the enum value. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionEnumValue-id" href="#IntrospectionEnumValue-id"><code>id</code></a> - <span class="property-type"><a href="#definition-IntrospectionEnumValueID"><code>IntrospectionEnumValueID!</code></a></span> </td>
+                        <td> A unique identifier for this IntrospectionEnumValue. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionEnumValue-isDeprecated" href="#IntrospectionEnumValue-isDeprecated"><code>isDeprecated</code></a> - <span class="property-type"><a href="#definition-Boolean"><code>Boolean!</code></a></span> </td>
+                        <td> Whether the enum value is deprecated. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionEnumValue-name" href="#IntrospectionEnumValue-name"><code>name</code></a> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span> </td>
+                        <td> The name of the enum value. </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-IntrospectionEnumValueID" class="definition definition-scalar" data-traverse-target="definition-IntrospectionEnumValueID">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionEnumValueID</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>The <code>IntrospectionEnumValueID</code> scalar type represents an identifier for an object of type IntrospectionEnumValue.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-IntrospectionField" class="definition definition-object" data-traverse-target="definition-IntrospectionField">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionField</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>A field of a GraphQL introspection object or interface type.</p>
+                </div>
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionField-args" href="#IntrospectionField-args"><code>args</code></a> - <span class="property-type"><a href="#definition-IntrospectionInputValue"><code>[IntrospectionInputValue!]!</code></a></span> </td>
+                        <td> The arguments accepted by the field. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionField-deprecationReason" href="#IntrospectionField-deprecationReason"><code>deprecationReason</code></a> - <span class="property-type"><a href="#definition-String"><code>String</code></a></span> </td>
+                        <td> Why the field is deprecated, if it is. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionField-description" href="#IntrospectionField-description"><code>description</code></a> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span> </td>
+                        <td> The description of the field. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionField-directives" href="#IntrospectionField-directives"><code>directives</code></a> - <span class="property-type"><a href="#definition-IntrospectionDirective"><code>[IntrospectionDirective!]!</code></a></span> </td>
+                        <td> The directives applied to the field. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionField-id" href="#IntrospectionField-id"><code>id</code></a> - <span class="property-type"><a href="#definition-IntrospectionFieldID"><code>IntrospectionFieldID!</code></a></span> </td>
+                        <td> A unique identifier for this IntrospectionField. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionField-isDeprecated" href="#IntrospectionField-isDeprecated"><code>isDeprecated</code></a> - <span class="property-type"><a href="#definition-Boolean"><code>Boolean!</code></a></span> </td>
+                        <td> Whether the field is deprecated. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionField-name" href="#IntrospectionField-name"><code>name</code></a> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span> </td>
+                        <td> The name of the field. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionField-type" href="#IntrospectionField-type"><code>type</code></a> - <span class="property-type"><a href="#definition-IntrospectionTypeRef"><code>IntrospectionTypeRef!</code></a></span> </td>
+                        <td> The type of the field. </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-IntrospectionFieldID" class="definition definition-scalar" data-traverse-target="definition-IntrospectionFieldID">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionFieldID</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>The <code>IntrospectionFieldID</code> scalar type represents an identifier for an object of type IntrospectionField.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-IntrospectionInputValue" class="definition definition-object" data-traverse-target="definition-IntrospectionInputValue">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionInputValue</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>A GraphQL introspection input field or argument.</p>
+                </div>
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionInputValue-defaultValue" href="#IntrospectionInputValue-defaultValue"><code>defaultValue</code></a> - <span class="property-type"><a href="#definition-String"><code>String</code></a></span> </td>
+                        <td> The default value of the input value, encoded as GraphQL, if any. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionInputValue-deprecationReason" href="#IntrospectionInputValue-deprecationReason"><code>deprecationReason</code></a> - <span class="property-type"><a href="#definition-String"><code>String</code></a></span> </td>
+                        <td> Why the input value is deprecated, if it is. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionInputValue-description" href="#IntrospectionInputValue-description"><code>description</code></a> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span> </td>
+                        <td> The description of the input value. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionInputValue-directives" href="#IntrospectionInputValue-directives"><code>directives</code></a> - <span class="property-type"><a href="#definition-IntrospectionDirective"><code>[IntrospectionDirective!]!</code></a></span> </td>
+                        <td> The directives applied to the input value. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionInputValue-id" href="#IntrospectionInputValue-id"><code>id</code></a> - <span class="property-type"><a href="#definition-IntrospectionInputValueID"><code>IntrospectionInputValueID!</code></a></span> </td>
+                        <td> A unique identifier for this IntrospectionInputValue. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionInputValue-isDeprecated" href="#IntrospectionInputValue-isDeprecated"><code>isDeprecated</code></a> - <span class="property-type"><a href="#definition-Boolean"><code>Boolean!</code></a></span> </td>
+                        <td> Whether the input value is deprecated. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionInputValue-name" href="#IntrospectionInputValue-name"><code>name</code></a> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span> </td>
+                        <td> The name of the input value. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionInputValue-type" href="#IntrospectionInputValue-type"><code>type</code></a> - <span class="property-type"><a href="#definition-IntrospectionTypeRef"><code>IntrospectionTypeRef!</code></a></span> </td>
+                        <td> The type of the input value. </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-IntrospectionInputValueID" class="definition definition-scalar" data-traverse-target="definition-IntrospectionInputValueID">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionInputValueID</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>The <code>IntrospectionInputValueID</code> scalar type represents an identifier for an object of type IntrospectionInputValue.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-IntrospectionType" class="definition definition-object" data-traverse-target="definition-IntrospectionType">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionType</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>A type defined in a GraphQL introspection schema.</p>
+                </div>
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionType-description" href="#IntrospectionType-description"><code>description</code></a> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span> </td>
+                        <td> The description of the type. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionType-directives" href="#IntrospectionType-directives"><code>directives</code></a> - <span class="property-type"><a href="#definition-IntrospectionDirective"><code>[IntrospectionDirective!]!</code></a></span> </td>
+                        <td> The directives applied to the type, including @sourceModuleName for module-defined types. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionType-enumValues" href="#IntrospectionType-enumValues"><code>enumValues</code></a> - <span class="property-type"><a href="#definition-IntrospectionEnumValue"><code>[IntrospectionEnumValue!]</code></a></span> </td>
+                        <td> The possible values of the type. Null unless the type is an enum. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionType-fields" href="#IntrospectionType-fields"><code>fields</code></a> - <span class="property-type"><a href="#definition-IntrospectionField"><code>[IntrospectionField!]</code></a></span> </td>
+                        <td> The fields of the type. Null unless the type is an object or interface. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionType-id" href="#IntrospectionType-id"><code>id</code></a> - <span class="property-type"><a href="#definition-IntrospectionTypeID"><code>IntrospectionTypeID!</code></a></span> </td>
+                        <td> A unique identifier for this IntrospectionType. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionType-inputFields" href="#IntrospectionType-inputFields"><code>inputFields</code></a> - <span class="property-type"><a href="#definition-IntrospectionInputValue"><code>[IntrospectionInputValue!]</code></a></span> </td>
+                        <td> The input fields of the type. Null unless the type is an input object. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionType-interfaces" href="#IntrospectionType-interfaces"><code>interfaces</code></a> - <span class="property-type"><a href="#definition-IntrospectionType"><code>[IntrospectionType!]</code></a></span> </td>
+                        <td> The interfaces implemented by the type. Null unless the type is an object or interface. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionType-kind" href="#IntrospectionType-kind"><code>kind</code></a> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span> </td>
+                        <td> The kind of the type, e.g. "OBJECT", "INTERFACE", "ENUM" or "SCALAR". </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionType-name" href="#IntrospectionType-name"><code>name</code></a> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span> </td>
+                        <td> The name of the type. </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-IntrospectionTypeID" class="definition definition-scalar" data-traverse-target="definition-IntrospectionTypeID">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionTypeID</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>The <code>IntrospectionTypeID</code> scalar type represents an identifier for an object of type IntrospectionType.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-IntrospectionTypeRef" class="definition definition-object" data-traverse-target="definition-IntrospectionTypeRef">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionTypeRef</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>A reference to a GraphQL introspection type.</p>
+                </div>
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionTypeRef-id" href="#IntrospectionTypeRef-id"><code>id</code></a> - <span class="property-type"><a href="#definition-IntrospectionTypeRefID"><code>IntrospectionTypeRefID!</code></a></span> </td>
+                        <td> A unique identifier for this IntrospectionTypeRef. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionTypeRef-kind" href="#IntrospectionTypeRef-kind"><code>kind</code></a> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span> </td>
+                        <td> The kind of the referenced type, e.g. "OBJECT", "LIST" or "NON_NULL". </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionTypeRef-name" href="#IntrospectionTypeRef-name"><code>name</code></a> - <span class="property-type"><a href="#definition-String"><code>String</code></a></span> </td>
+                        <td> The name of the referenced type. Null for list and non-null wrappers. </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="IntrospectionTypeRef-ofType" href="#IntrospectionTypeRef-ofType"><code>ofType</code></a> - <span class="property-type"><a href="#definition-IntrospectionTypeRef"><code>IntrospectionTypeRef</code></a></span> </td>
+                        <td> The type wrapped by a list or non-null reference. Null for named types. </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-IntrospectionTypeRefID" class="definition definition-scalar" data-traverse-target="definition-IntrospectionTypeRefID">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">IntrospectionTypeRefID</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>The <code>IntrospectionTypeRefID</code> scalar type represents an identifier for an object of type IntrospectionTypeRef.</p>
+                </div>
+              </div>
+            </div>
+          </section>
           <section id="definition-JSON" class="definition definition-scalar" data-traverse-target="definition-JSON">
             <div class="definition-group-name">
               <a href="#group-Types">Types</a>
@@ -16022,6 +17374,127 @@
                 <div class="definition-description doc-copy-section">
                   <h5>Description</h5>
                   <p>The <code>ScalarTypeDefID</code> scalar type represents an identifier for an object of type ScalarTypeDef.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-Schema" class="definition definition-object" data-traverse-target="definition-Schema">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">Schema</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>A GraphQL introspection schema that can be inspected and merged.</p>
+                </div>
+                <div class="definition-properties doc-copy-section">
+                  <h5>Fields</h5>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Field Name</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="Schema-contents" href="#Schema-contents"><code>contents</code></a> - <span class="property-type"><a href="#definition-JSON"><code>JSON!</code></a></span> </td>
+                        <td> Serialize the schema back to introspection JSON. </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Schema-describeType" href="#Schema-describeType"><code>describeType</code></a> - <span class="property-type"><a href="#definition-IntrospectionType"><code>IntrospectionType</code></a></span> </td>
+                        <td> Return the full introspection details of a named type, or null if the schema has no such type. </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the type to describe.</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Schema-hasType" href="#Schema-hasType"><code>hasType</code></a> - <span class="property-type"><a href="#definition-Boolean"><code>Boolean!</code></a></span> </td>
+                        <td> Check whether a type with the given name exists in the schema. </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>name</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the type to look for.</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td data-property-name=""><a class="property-name" id="Schema-id" href="#Schema-id"><code>id</code></a> - <span class="property-type"><a href="#definition-SchemaID"><code>SchemaID!</code></a></span> </td>
+                        <td> A unique identifier for this Schema. </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Schema-listTypes" href="#Schema-listTypes"><code>listTypes</code></a> - <span class="property-type"><a href="#definition-String"><code>[String!]!</code></a></span> </td>
+                        <td> List the names of the types defined in the schema. </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>kind</code></span> - <span class="property-type"><a href="#definition-String"><code>String</code></a></span></h6>
+                                <p>Only list types of this kind, e.g. &quot;OBJECT&quot;, &quot;INTERFACE&quot;, &quot;ENUM&quot;, &quot;SCALAR&quot; or &quot;INPUT_OBJECT&quot;. Lists every type if omitted.</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="row-has-field-arguments">
+                        <td data-property-name=""><a class="property-name" id="Schema-merge" href="#Schema-merge"><code>merge</code></a> - <span class="property-type"><a href="#definition-Schema"><code>Schema!</code></a></span> </td>
+                        <td> Merge a module's introspection-shaped type definitions into the schema, returning the combined schema. </td>
+                      </tr>
+                      <tr class="row-field-arguments">
+                        <td colspan="2">
+                          <div class="field-arguments">
+                            <h5 class="field-arguments-heading"> Arguments </h5>
+                            <div class="field-argument-list">
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>moduleTypes</code></span> - <span class="property-type"><a href="#definition-JSON"><code>JSON!</code></a></span></h6>
+                                <p>Introspection JSON describing the types the module defines. Object, interface and enum types are appended to the schema, and a constructor field for the module is added to the Query type.</p>
+                              </div>
+                              <div class="field-argument">
+                                <h6 class="field-argument-name"><span class="property-name"><code>moduleName</code></span> - <span class="property-type"><a href="#definition-String"><code>String!</code></a></span></h6>
+                                <p>The name of the module whose types are being merged. Used to stamp the @sourceModuleName directive and to derive the module&#39;s constructor field.</p>
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="definition-SchemaID" class="definition definition-scalar" data-traverse-target="definition-SchemaID">
+            <div class="definition-group-name">
+              <a href="#group-Types">Types</a>
+            </div>
+            <h2 class="definition-heading">SchemaID</h2>
+            <div class="doc-row">
+              <div class="doc-copy">
+                <div class="definition-description doc-copy-section">
+                  <h5>Description</h5>
+                  <p>The <code>SchemaID</code> scalar type represents an identifier for an object of type Schema.</p>
                 </div>
               </div>
             </div>
