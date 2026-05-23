@@ -124,7 +124,7 @@ defmodule Dagger.Codegen.ElixirGenerator.ObjectRenderer do
     cond do
       TypeRef.is_list_of?(field.type, "OBJECT") ->
         output_type = Formatter.format_output_type(field.type.of_type)
-        load_type_name = field.type.of_type.of_type.of_type.name
+        load_type_name = TypeRef.unwrap_list(field.type).name
 
         [
           "with {:ok, items} <- Client.execute(#{module_var}.client, query_builder) do",

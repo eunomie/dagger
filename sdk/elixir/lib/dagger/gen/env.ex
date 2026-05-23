@@ -774,6 +774,278 @@ defmodule Dagger.Env do
   end
 
   @doc """
+  Create or update a binding of type IntrospectionDirectiveArg in the environment
+  """
+  @spec with_introspection_directive_arg_input(
+          t(),
+          String.t(),
+          Dagger.IntrospectionDirectiveArg.t(),
+          String.t()
+        ) :: Dagger.Env.t()
+  def with_introspection_directive_arg_input(%__MODULE__{} = env, name, value, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionDirectiveArgInput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("value", Dagger.ID.id!(value))
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Declare a desired IntrospectionDirectiveArg output to be assigned in the environment
+  """
+  @spec with_introspection_directive_arg_output(t(), String.t(), String.t()) :: Dagger.Env.t()
+  def with_introspection_directive_arg_output(%__MODULE__{} = env, name, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionDirectiveArgOutput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Create or update a binding of type IntrospectionDirective in the environment
+  """
+  @spec with_introspection_directive_input(
+          t(),
+          String.t(),
+          Dagger.IntrospectionDirective.t(),
+          String.t()
+        ) :: Dagger.Env.t()
+  def with_introspection_directive_input(%__MODULE__{} = env, name, value, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionDirectiveInput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("value", Dagger.ID.id!(value))
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Declare a desired IntrospectionDirective output to be assigned in the environment
+  """
+  @spec with_introspection_directive_output(t(), String.t(), String.t()) :: Dagger.Env.t()
+  def with_introspection_directive_output(%__MODULE__{} = env, name, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionDirectiveOutput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Create or update a binding of type IntrospectionEnumValue in the environment
+  """
+  @spec with_introspection_enum_value_input(
+          t(),
+          String.t(),
+          Dagger.IntrospectionEnumValue.t(),
+          String.t()
+        ) :: Dagger.Env.t()
+  def with_introspection_enum_value_input(%__MODULE__{} = env, name, value, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionEnumValueInput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("value", Dagger.ID.id!(value))
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Declare a desired IntrospectionEnumValue output to be assigned in the environment
+  """
+  @spec with_introspection_enum_value_output(t(), String.t(), String.t()) :: Dagger.Env.t()
+  def with_introspection_enum_value_output(%__MODULE__{} = env, name, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionEnumValueOutput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Create or update a binding of type IntrospectionField in the environment
+  """
+  @spec with_introspection_field_input(t(), String.t(), Dagger.IntrospectionField.t(), String.t()) ::
+          Dagger.Env.t()
+  def with_introspection_field_input(%__MODULE__{} = env, name, value, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionFieldInput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("value", Dagger.ID.id!(value))
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Declare a desired IntrospectionField output to be assigned in the environment
+  """
+  @spec with_introspection_field_output(t(), String.t(), String.t()) :: Dagger.Env.t()
+  def with_introspection_field_output(%__MODULE__{} = env, name, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionFieldOutput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Create or update a binding of type IntrospectionInputValue in the environment
+  """
+  @spec with_introspection_input_value_input(
+          t(),
+          String.t(),
+          Dagger.IntrospectionInputValue.t(),
+          String.t()
+        ) :: Dagger.Env.t()
+  def with_introspection_input_value_input(%__MODULE__{} = env, name, value, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionInputValueInput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("value", Dagger.ID.id!(value))
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Declare a desired IntrospectionInputValue output to be assigned in the environment
+  """
+  @spec with_introspection_input_value_output(t(), String.t(), String.t()) :: Dagger.Env.t()
+  def with_introspection_input_value_output(%__MODULE__{} = env, name, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionInputValueOutput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Create or update a binding of type IntrospectionType in the environment
+  """
+  @spec with_introspection_type_input(t(), String.t(), Dagger.IntrospectionType.t(), String.t()) ::
+          Dagger.Env.t()
+  def with_introspection_type_input(%__MODULE__{} = env, name, value, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionTypeInput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("value", Dagger.ID.id!(value))
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Declare a desired IntrospectionType output to be assigned in the environment
+  """
+  @spec with_introspection_type_output(t(), String.t(), String.t()) :: Dagger.Env.t()
+  def with_introspection_type_output(%__MODULE__{} = env, name, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionTypeOutput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Create or update a binding of type IntrospectionTypeRef in the environment
+  """
+  @spec with_introspection_type_ref_input(
+          t(),
+          String.t(),
+          Dagger.IntrospectionTypeRef.t(),
+          String.t()
+        ) :: Dagger.Env.t()
+  def with_introspection_type_ref_input(%__MODULE__{} = env, name, value, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionTypeRefInput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("value", Dagger.ID.id!(value))
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Declare a desired IntrospectionTypeRef output to be assigned in the environment
+  """
+  @spec with_introspection_type_ref_output(t(), String.t(), String.t()) :: Dagger.Env.t()
+  def with_introspection_type_ref_output(%__MODULE__{} = env, name, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withIntrospectionTypeRefOutput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
   Create or update a binding of type JSONValue in the environment
   """
   @spec with_json_value_input(t(), String.t(), Dagger.JSONValue.t(), String.t()) :: Dagger.Env.t()
@@ -947,6 +1219,41 @@ defmodule Dagger.Env do
     query_builder =
       env.query_builder
       |> QB.select("withModuleSourceOutput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Create or update a binding of type Schema in the environment
+  """
+  @spec with_schema_input(t(), String.t(), Dagger.Schema.t(), String.t()) :: Dagger.Env.t()
+  def with_schema_input(%__MODULE__{} = env, name, value, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withSchemaInput")
+      |> QB.put_arg("name", name)
+      |> QB.put_arg("value", Dagger.ID.id!(value))
+      |> QB.put_arg("description", description)
+
+    %Dagger.Env{
+      query_builder: query_builder,
+      client: env.client
+    }
+  end
+
+  @doc """
+  Declare a desired Schema output to be assigned in the environment
+  """
+  @spec with_schema_output(t(), String.t(), String.t()) :: Dagger.Env.t()
+  def with_schema_output(%__MODULE__{} = env, name, description) do
+    query_builder =
+      env.query_builder
+      |> QB.select("withSchemaOutput")
       |> QB.put_arg("name", name)
       |> QB.put_arg("description", description)
 

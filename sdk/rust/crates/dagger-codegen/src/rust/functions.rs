@@ -20,6 +20,7 @@ pub fn format_struct_name(s: &str) -> String {
         "ref" => "r#ref".to_string(),
         "enum" => "r#enum".to_string(),
         "loop" => "r#loop".to_string(),
+        "type" => "r#type".to_string(),
         _ => s,
     }
 }

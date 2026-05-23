@@ -1349,6 +1349,271 @@ impl InterfaceTypeDefId {
     }
 }
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub struct IntrospectionDirectiveArgId(pub String);
+impl From<&str> for IntrospectionDirectiveArgId {
+    fn from(value: &str) -> Self {
+        Self(value.to_string())
+    }
+}
+impl From<String> for IntrospectionDirectiveArgId {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+impl IntoID<IntrospectionDirectiveArgId> for IntrospectionDirectiveArg {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<
+            dyn core::future::Future<Output = Result<IntrospectionDirectiveArgId, DaggerError>>
+                + Send,
+        >,
+    > {
+        Box::pin(async move { self.id().await })
+    }
+}
+impl IntoID<IntrospectionDirectiveArgId> for IntrospectionDirectiveArgId {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<
+            dyn core::future::Future<Output = Result<IntrospectionDirectiveArgId, DaggerError>>
+                + Send,
+        >,
+    > {
+        Box::pin(async move { Ok::<IntrospectionDirectiveArgId, DaggerError>(self) })
+    }
+}
+impl IntrospectionDirectiveArgId {
+    fn quote(&self) -> String {
+        format!("\"{}\"", self.0.clone())
+    }
+}
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub struct IntrospectionDirectiveId(pub String);
+impl From<&str> for IntrospectionDirectiveId {
+    fn from(value: &str) -> Self {
+        Self(value.to_string())
+    }
+}
+impl From<String> for IntrospectionDirectiveId {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+impl IntoID<IntrospectionDirectiveId> for IntrospectionDirective {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<
+            dyn core::future::Future<Output = Result<IntrospectionDirectiveId, DaggerError>> + Send,
+        >,
+    > {
+        Box::pin(async move { self.id().await })
+    }
+}
+impl IntoID<IntrospectionDirectiveId> for IntrospectionDirectiveId {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<
+            dyn core::future::Future<Output = Result<IntrospectionDirectiveId, DaggerError>> + Send,
+        >,
+    > {
+        Box::pin(async move { Ok::<IntrospectionDirectiveId, DaggerError>(self) })
+    }
+}
+impl IntrospectionDirectiveId {
+    fn quote(&self) -> String {
+        format!("\"{}\"", self.0.clone())
+    }
+}
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub struct IntrospectionEnumValueId(pub String);
+impl From<&str> for IntrospectionEnumValueId {
+    fn from(value: &str) -> Self {
+        Self(value.to_string())
+    }
+}
+impl From<String> for IntrospectionEnumValueId {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+impl IntoID<IntrospectionEnumValueId> for IntrospectionEnumValue {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<
+            dyn core::future::Future<Output = Result<IntrospectionEnumValueId, DaggerError>> + Send,
+        >,
+    > {
+        Box::pin(async move { self.id().await })
+    }
+}
+impl IntoID<IntrospectionEnumValueId> for IntrospectionEnumValueId {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<
+            dyn core::future::Future<Output = Result<IntrospectionEnumValueId, DaggerError>> + Send,
+        >,
+    > {
+        Box::pin(async move { Ok::<IntrospectionEnumValueId, DaggerError>(self) })
+    }
+}
+impl IntrospectionEnumValueId {
+    fn quote(&self) -> String {
+        format!("\"{}\"", self.0.clone())
+    }
+}
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub struct IntrospectionFieldId(pub String);
+impl From<&str> for IntrospectionFieldId {
+    fn from(value: &str) -> Self {
+        Self(value.to_string())
+    }
+}
+impl From<String> for IntrospectionFieldId {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+impl IntoID<IntrospectionFieldId> for IntrospectionField {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<dyn core::future::Future<Output = Result<IntrospectionFieldId, DaggerError>> + Send>,
+    > {
+        Box::pin(async move { self.id().await })
+    }
+}
+impl IntoID<IntrospectionFieldId> for IntrospectionFieldId {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<dyn core::future::Future<Output = Result<IntrospectionFieldId, DaggerError>> + Send>,
+    > {
+        Box::pin(async move { Ok::<IntrospectionFieldId, DaggerError>(self) })
+    }
+}
+impl IntrospectionFieldId {
+    fn quote(&self) -> String {
+        format!("\"{}\"", self.0.clone())
+    }
+}
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub struct IntrospectionInputValueId(pub String);
+impl From<&str> for IntrospectionInputValueId {
+    fn from(value: &str) -> Self {
+        Self(value.to_string())
+    }
+}
+impl From<String> for IntrospectionInputValueId {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+impl IntoID<IntrospectionInputValueId> for IntrospectionInputValue {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<
+            dyn core::future::Future<Output = Result<IntrospectionInputValueId, DaggerError>>
+                + Send,
+        >,
+    > {
+        Box::pin(async move { self.id().await })
+    }
+}
+impl IntoID<IntrospectionInputValueId> for IntrospectionInputValueId {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<
+            dyn core::future::Future<Output = Result<IntrospectionInputValueId, DaggerError>>
+                + Send,
+        >,
+    > {
+        Box::pin(async move { Ok::<IntrospectionInputValueId, DaggerError>(self) })
+    }
+}
+impl IntrospectionInputValueId {
+    fn quote(&self) -> String {
+        format!("\"{}\"", self.0.clone())
+    }
+}
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub struct IntrospectionTypeId(pub String);
+impl From<&str> for IntrospectionTypeId {
+    fn from(value: &str) -> Self {
+        Self(value.to_string())
+    }
+}
+impl From<String> for IntrospectionTypeId {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+impl IntoID<IntrospectionTypeId> for IntrospectionType {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<dyn core::future::Future<Output = Result<IntrospectionTypeId, DaggerError>> + Send>,
+    > {
+        Box::pin(async move { self.id().await })
+    }
+}
+impl IntoID<IntrospectionTypeId> for IntrospectionTypeId {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<dyn core::future::Future<Output = Result<IntrospectionTypeId, DaggerError>> + Send>,
+    > {
+        Box::pin(async move { Ok::<IntrospectionTypeId, DaggerError>(self) })
+    }
+}
+impl IntrospectionTypeId {
+    fn quote(&self) -> String {
+        format!("\"{}\"", self.0.clone())
+    }
+}
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub struct IntrospectionTypeRefId(pub String);
+impl From<&str> for IntrospectionTypeRefId {
+    fn from(value: &str) -> Self {
+        Self(value.to_string())
+    }
+}
+impl From<String> for IntrospectionTypeRefId {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+impl IntoID<IntrospectionTypeRefId> for IntrospectionTypeRef {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<dyn core::future::Future<Output = Result<IntrospectionTypeRefId, DaggerError>> + Send>,
+    > {
+        Box::pin(async move { self.id().await })
+    }
+}
+impl IntoID<IntrospectionTypeRefId> for IntrospectionTypeRefId {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<
+        Box<dyn core::future::Future<Output = Result<IntrospectionTypeRefId, DaggerError>> + Send>,
+    > {
+        Box::pin(async move { Ok::<IntrospectionTypeRefId, DaggerError>(self) })
+    }
+}
+impl IntrospectionTypeRefId {
+    fn quote(&self) -> String {
+        format!("\"{}\"", self.0.clone())
+    }
+}
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Json(pub String);
 impl From<&str> for Json {
     fn from(value: &str) -> Self {
@@ -1858,6 +2123,39 @@ impl IntoID<ScalarTypeDefId> for ScalarTypeDefId {
     }
 }
 impl ScalarTypeDefId {
+    fn quote(&self) -> String {
+        format!("\"{}\"", self.0.clone())
+    }
+}
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub struct SchemaId(pub String);
+impl From<&str> for SchemaId {
+    fn from(value: &str) -> Self {
+        Self(value.to_string())
+    }
+}
+impl From<String> for SchemaId {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+impl IntoID<SchemaId> for Schema {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<Box<dyn core::future::Future<Output = Result<SchemaId, DaggerError>> + Send>>
+    {
+        Box::pin(async move { self.id().await })
+    }
+}
+impl IntoID<SchemaId> for SchemaId {
+    fn into_id(
+        self,
+    ) -> std::pin::Pin<Box<dyn core::future::Future<Output = Result<SchemaId, DaggerError>> + Send>>
+    {
+        Box::pin(async move { Ok::<SchemaId, DaggerError>(self) })
+    }
+}
+impl SchemaId {
     fn quote(&self) -> String {
         format!("\"{}\"", self.0.clone())
     }
@@ -2777,6 +3075,69 @@ impl Binding {
             graphql_client: self.graphql_client.clone(),
         }
     }
+    /// Retrieve the binding value, as type IntrospectionDirective
+    pub fn as_introspection_directive(&self) -> IntrospectionDirective {
+        let query = self.selection.select("asIntrospectionDirective");
+        IntrospectionDirective {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Retrieve the binding value, as type IntrospectionDirectiveArg
+    pub fn as_introspection_directive_arg(&self) -> IntrospectionDirectiveArg {
+        let query = self.selection.select("asIntrospectionDirectiveArg");
+        IntrospectionDirectiveArg {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Retrieve the binding value, as type IntrospectionEnumValue
+    pub fn as_introspection_enum_value(&self) -> IntrospectionEnumValue {
+        let query = self.selection.select("asIntrospectionEnumValue");
+        IntrospectionEnumValue {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Retrieve the binding value, as type IntrospectionField
+    pub fn as_introspection_field(&self) -> IntrospectionField {
+        let query = self.selection.select("asIntrospectionField");
+        IntrospectionField {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Retrieve the binding value, as type IntrospectionInputValue
+    pub fn as_introspection_input_value(&self) -> IntrospectionInputValue {
+        let query = self.selection.select("asIntrospectionInputValue");
+        IntrospectionInputValue {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Retrieve the binding value, as type IntrospectionType
+    pub fn as_introspection_type(&self) -> IntrospectionType {
+        let query = self.selection.select("asIntrospectionType");
+        IntrospectionType {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Retrieve the binding value, as type IntrospectionTypeRef
+    pub fn as_introspection_type_ref(&self) -> IntrospectionTypeRef {
+        let query = self.selection.select("asIntrospectionTypeRef");
+        IntrospectionTypeRef {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
     /// Retrieve the binding value, as type JSONValue
     pub fn as_json_value(&self) -> JsonValue {
         let query = self.selection.select("asJSONValue");
@@ -2808,6 +3169,15 @@ impl Binding {
     pub fn as_module_source(&self) -> ModuleSource {
         let query = self.selection.select("asModuleSource");
         ModuleSource {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Retrieve the binding value, as type Schema
+    pub fn as_schema(&self) -> Schema {
+        let query = self.selection.select("asSchema");
+        Schema {
             proc: self.proc.clone(),
             selection: query,
             graphql_client: self.graphql_client.clone(),
@@ -8690,6 +9060,349 @@ impl Env {
             graphql_client: self.graphql_client.clone(),
         }
     }
+    /// Create or update a binding of type IntrospectionDirectiveArg in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `value` - The IntrospectionDirectiveArg value to assign to the binding
+    /// * `description` - The purpose of the input
+    pub fn with_introspection_directive_arg_input(
+        &self,
+        name: impl Into<String>,
+        value: impl IntoID<IntrospectionDirectiveArgId>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionDirectiveArgInput");
+        query = query.arg("name", name.into());
+        query = query.arg_lazy(
+            "value",
+            Box::new(move || {
+                let value = value.clone();
+                Box::pin(async move { value.into_id().await.unwrap().quote() })
+            }),
+        );
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Declare a desired IntrospectionDirectiveArg output to be assigned in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `description` - A description of the desired value of the binding
+    pub fn with_introspection_directive_arg_output(
+        &self,
+        name: impl Into<String>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionDirectiveArgOutput");
+        query = query.arg("name", name.into());
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Create or update a binding of type IntrospectionDirective in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `value` - The IntrospectionDirective value to assign to the binding
+    /// * `description` - The purpose of the input
+    pub fn with_introspection_directive_input(
+        &self,
+        name: impl Into<String>,
+        value: impl IntoID<IntrospectionDirectiveId>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionDirectiveInput");
+        query = query.arg("name", name.into());
+        query = query.arg_lazy(
+            "value",
+            Box::new(move || {
+                let value = value.clone();
+                Box::pin(async move { value.into_id().await.unwrap().quote() })
+            }),
+        );
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Declare a desired IntrospectionDirective output to be assigned in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `description` - A description of the desired value of the binding
+    pub fn with_introspection_directive_output(
+        &self,
+        name: impl Into<String>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionDirectiveOutput");
+        query = query.arg("name", name.into());
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Create or update a binding of type IntrospectionEnumValue in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `value` - The IntrospectionEnumValue value to assign to the binding
+    /// * `description` - The purpose of the input
+    pub fn with_introspection_enum_value_input(
+        &self,
+        name: impl Into<String>,
+        value: impl IntoID<IntrospectionEnumValueId>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionEnumValueInput");
+        query = query.arg("name", name.into());
+        query = query.arg_lazy(
+            "value",
+            Box::new(move || {
+                let value = value.clone();
+                Box::pin(async move { value.into_id().await.unwrap().quote() })
+            }),
+        );
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Declare a desired IntrospectionEnumValue output to be assigned in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `description` - A description of the desired value of the binding
+    pub fn with_introspection_enum_value_output(
+        &self,
+        name: impl Into<String>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionEnumValueOutput");
+        query = query.arg("name", name.into());
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Create or update a binding of type IntrospectionField in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `value` - The IntrospectionField value to assign to the binding
+    /// * `description` - The purpose of the input
+    pub fn with_introspection_field_input(
+        &self,
+        name: impl Into<String>,
+        value: impl IntoID<IntrospectionFieldId>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionFieldInput");
+        query = query.arg("name", name.into());
+        query = query.arg_lazy(
+            "value",
+            Box::new(move || {
+                let value = value.clone();
+                Box::pin(async move { value.into_id().await.unwrap().quote() })
+            }),
+        );
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Declare a desired IntrospectionField output to be assigned in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `description` - A description of the desired value of the binding
+    pub fn with_introspection_field_output(
+        &self,
+        name: impl Into<String>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionFieldOutput");
+        query = query.arg("name", name.into());
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Create or update a binding of type IntrospectionInputValue in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `value` - The IntrospectionInputValue value to assign to the binding
+    /// * `description` - The purpose of the input
+    pub fn with_introspection_input_value_input(
+        &self,
+        name: impl Into<String>,
+        value: impl IntoID<IntrospectionInputValueId>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionInputValueInput");
+        query = query.arg("name", name.into());
+        query = query.arg_lazy(
+            "value",
+            Box::new(move || {
+                let value = value.clone();
+                Box::pin(async move { value.into_id().await.unwrap().quote() })
+            }),
+        );
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Declare a desired IntrospectionInputValue output to be assigned in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `description` - A description of the desired value of the binding
+    pub fn with_introspection_input_value_output(
+        &self,
+        name: impl Into<String>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionInputValueOutput");
+        query = query.arg("name", name.into());
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Create or update a binding of type IntrospectionType in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `value` - The IntrospectionType value to assign to the binding
+    /// * `description` - The purpose of the input
+    pub fn with_introspection_type_input(
+        &self,
+        name: impl Into<String>,
+        value: impl IntoID<IntrospectionTypeId>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionTypeInput");
+        query = query.arg("name", name.into());
+        query = query.arg_lazy(
+            "value",
+            Box::new(move || {
+                let value = value.clone();
+                Box::pin(async move { value.into_id().await.unwrap().quote() })
+            }),
+        );
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Declare a desired IntrospectionType output to be assigned in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `description` - A description of the desired value of the binding
+    pub fn with_introspection_type_output(
+        &self,
+        name: impl Into<String>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionTypeOutput");
+        query = query.arg("name", name.into());
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Create or update a binding of type IntrospectionTypeRef in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `value` - The IntrospectionTypeRef value to assign to the binding
+    /// * `description` - The purpose of the input
+    pub fn with_introspection_type_ref_input(
+        &self,
+        name: impl Into<String>,
+        value: impl IntoID<IntrospectionTypeRefId>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionTypeRefInput");
+        query = query.arg("name", name.into());
+        query = query.arg_lazy(
+            "value",
+            Box::new(move || {
+                let value = value.clone();
+                Box::pin(async move { value.into_id().await.unwrap().quote() })
+            }),
+        );
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Declare a desired IntrospectionTypeRef output to be assigned in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `description` - A description of the desired value of the binding
+    pub fn with_introspection_type_ref_output(
+        &self,
+        name: impl Into<String>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withIntrospectionTypeRefOutput");
+        query = query.arg("name", name.into());
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
     /// Create or update a binding of type JSONValue in the environment
     ///
     /// # Arguments
@@ -8912,6 +9625,55 @@ impl Env {
         description: impl Into<String>,
     ) -> Env {
         let mut query = self.selection.select("withModuleSourceOutput");
+        query = query.arg("name", name.into());
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Create or update a binding of type Schema in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `value` - The Schema value to assign to the binding
+    /// * `description` - The purpose of the input
+    pub fn with_schema_input(
+        &self,
+        name: impl Into<String>,
+        value: impl IntoID<SchemaId>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withSchemaInput");
+        query = query.arg("name", name.into());
+        query = query.arg_lazy(
+            "value",
+            Box::new(move || {
+                let value = value.clone();
+                Box::pin(async move { value.into_id().await.unwrap().quote() })
+            }),
+        );
+        query = query.arg("description", description.into());
+        Env {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Declare a desired Schema output to be assigned in the environment
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the binding
+    /// * `description` - A description of the desired value of the binding
+    pub fn with_schema_output(
+        &self,
+        name: impl Into<String>,
+        description: impl Into<String>,
+    ) -> Env {
+        let mut query = self.selection.select("withSchemaOutput");
         query = query.arg("name", name.into());
         query = query.arg("description", description.into());
         Env {
@@ -11670,6 +12432,382 @@ impl InterfaceTypeDef {
     pub async fn source_module_name(&self) -> Result<String, DaggerError> {
         let query = self.selection.select("sourceModuleName");
         query.execute(self.graphql_client.clone()).await
+    }
+}
+#[derive(Clone)]
+pub struct IntrospectionDirective {
+    pub proc: Option<Arc<DaggerSessionProc>>,
+    pub selection: Selection,
+    pub graphql_client: DynGraphQLClient,
+}
+impl IntrospectionDirective {
+    /// The arguments of the applied directive.
+    pub async fn args(&self) -> Result<Vec<IntrospectionDirectiveArg>, DaggerError> {
+        let query = self.selection.select("args");
+        let query = query.select("id");
+        let ids: Vec<IntrospectionDirectiveArgId> =
+            query.execute(self.graphql_client.clone()).await?;
+        let root = Query {
+            proc: self.proc.clone(),
+            selection: crate::querybuilder::query(),
+            graphql_client: self.graphql_client.clone(),
+        };
+        Ok(ids
+            .into_iter()
+            .map(|id| root.load_introspection_directive_arg_from_id(id))
+            .collect())
+    }
+    /// A unique identifier for this IntrospectionDirective.
+    pub async fn id(&self) -> Result<IntrospectionDirectiveId, DaggerError> {
+        let query = self.selection.select("id");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The name of the directive.
+    pub async fn name(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("name");
+        query.execute(self.graphql_client.clone()).await
+    }
+}
+#[derive(Clone)]
+pub struct IntrospectionDirectiveArg {
+    pub proc: Option<Arc<DaggerSessionProc>>,
+    pub selection: Selection,
+    pub graphql_client: DynGraphQLClient,
+}
+impl IntrospectionDirectiveArg {
+    /// A unique identifier for this IntrospectionDirectiveArg.
+    pub async fn id(&self) -> Result<IntrospectionDirectiveArgId, DaggerError> {
+        let query = self.selection.select("id");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The name of the directive argument.
+    pub async fn name(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("name");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The value of the directive argument, encoded as JSON, if any.
+    pub async fn value(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("value");
+        query.execute(self.graphql_client.clone()).await
+    }
+}
+#[derive(Clone)]
+pub struct IntrospectionEnumValue {
+    pub proc: Option<Arc<DaggerSessionProc>>,
+    pub selection: Selection,
+    pub graphql_client: DynGraphQLClient,
+}
+impl IntrospectionEnumValue {
+    /// Why the enum value is deprecated, if it is.
+    pub async fn deprecation_reason(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("deprecationReason");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The description of the enum value.
+    pub async fn description(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("description");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The directives applied to the enum value.
+    pub async fn directives(&self) -> Result<Vec<IntrospectionDirective>, DaggerError> {
+        let query = self.selection.select("directives");
+        let query = query.select("id");
+        let ids: Vec<IntrospectionDirectiveId> = query.execute(self.graphql_client.clone()).await?;
+        let root = Query {
+            proc: self.proc.clone(),
+            selection: crate::querybuilder::query(),
+            graphql_client: self.graphql_client.clone(),
+        };
+        Ok(ids
+            .into_iter()
+            .map(|id| root.load_introspection_directive_from_id(id))
+            .collect())
+    }
+    /// A unique identifier for this IntrospectionEnumValue.
+    pub async fn id(&self) -> Result<IntrospectionEnumValueId, DaggerError> {
+        let query = self.selection.select("id");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// Whether the enum value is deprecated.
+    pub async fn is_deprecated(&self) -> Result<bool, DaggerError> {
+        let query = self.selection.select("isDeprecated");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The name of the enum value.
+    pub async fn name(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("name");
+        query.execute(self.graphql_client.clone()).await
+    }
+}
+#[derive(Clone)]
+pub struct IntrospectionField {
+    pub proc: Option<Arc<DaggerSessionProc>>,
+    pub selection: Selection,
+    pub graphql_client: DynGraphQLClient,
+}
+impl IntrospectionField {
+    /// The arguments accepted by the field.
+    pub async fn args(&self) -> Result<Vec<IntrospectionInputValue>, DaggerError> {
+        let query = self.selection.select("args");
+        let query = query.select("id");
+        let ids: Vec<IntrospectionInputValueId> =
+            query.execute(self.graphql_client.clone()).await?;
+        let root = Query {
+            proc: self.proc.clone(),
+            selection: crate::querybuilder::query(),
+            graphql_client: self.graphql_client.clone(),
+        };
+        Ok(ids
+            .into_iter()
+            .map(|id| root.load_introspection_input_value_from_id(id))
+            .collect())
+    }
+    /// Why the field is deprecated, if it is.
+    pub async fn deprecation_reason(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("deprecationReason");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The description of the field.
+    pub async fn description(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("description");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The directives applied to the field.
+    pub async fn directives(&self) -> Result<Vec<IntrospectionDirective>, DaggerError> {
+        let query = self.selection.select("directives");
+        let query = query.select("id");
+        let ids: Vec<IntrospectionDirectiveId> = query.execute(self.graphql_client.clone()).await?;
+        let root = Query {
+            proc: self.proc.clone(),
+            selection: crate::querybuilder::query(),
+            graphql_client: self.graphql_client.clone(),
+        };
+        Ok(ids
+            .into_iter()
+            .map(|id| root.load_introspection_directive_from_id(id))
+            .collect())
+    }
+    /// A unique identifier for this IntrospectionField.
+    pub async fn id(&self) -> Result<IntrospectionFieldId, DaggerError> {
+        let query = self.selection.select("id");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// Whether the field is deprecated.
+    pub async fn is_deprecated(&self) -> Result<bool, DaggerError> {
+        let query = self.selection.select("isDeprecated");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The name of the field.
+    pub async fn name(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("name");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The type of the field.
+    pub fn r#type(&self) -> IntrospectionTypeRef {
+        let query = self.selection.select("type");
+        IntrospectionTypeRef {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+}
+#[derive(Clone)]
+pub struct IntrospectionInputValue {
+    pub proc: Option<Arc<DaggerSessionProc>>,
+    pub selection: Selection,
+    pub graphql_client: DynGraphQLClient,
+}
+impl IntrospectionInputValue {
+    /// The default value of the input value, encoded as GraphQL, if any.
+    pub async fn default_value(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("defaultValue");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// Why the input value is deprecated, if it is.
+    pub async fn deprecation_reason(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("deprecationReason");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The description of the input value.
+    pub async fn description(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("description");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The directives applied to the input value.
+    pub async fn directives(&self) -> Result<Vec<IntrospectionDirective>, DaggerError> {
+        let query = self.selection.select("directives");
+        let query = query.select("id");
+        let ids: Vec<IntrospectionDirectiveId> = query.execute(self.graphql_client.clone()).await?;
+        let root = Query {
+            proc: self.proc.clone(),
+            selection: crate::querybuilder::query(),
+            graphql_client: self.graphql_client.clone(),
+        };
+        Ok(ids
+            .into_iter()
+            .map(|id| root.load_introspection_directive_from_id(id))
+            .collect())
+    }
+    /// A unique identifier for this IntrospectionInputValue.
+    pub async fn id(&self) -> Result<IntrospectionInputValueId, DaggerError> {
+        let query = self.selection.select("id");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// Whether the input value is deprecated.
+    pub async fn is_deprecated(&self) -> Result<bool, DaggerError> {
+        let query = self.selection.select("isDeprecated");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The name of the input value.
+    pub async fn name(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("name");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The type of the input value.
+    pub fn r#type(&self) -> IntrospectionTypeRef {
+        let query = self.selection.select("type");
+        IntrospectionTypeRef {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+}
+#[derive(Clone)]
+pub struct IntrospectionType {
+    pub proc: Option<Arc<DaggerSessionProc>>,
+    pub selection: Selection,
+    pub graphql_client: DynGraphQLClient,
+}
+impl IntrospectionType {
+    /// The description of the type.
+    pub async fn description(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("description");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The directives applied to the type, including @sourceModuleName for module-defined types.
+    pub async fn directives(&self) -> Result<Vec<IntrospectionDirective>, DaggerError> {
+        let query = self.selection.select("directives");
+        let query = query.select("id");
+        let ids: Vec<IntrospectionDirectiveId> = query.execute(self.graphql_client.clone()).await?;
+        let root = Query {
+            proc: self.proc.clone(),
+            selection: crate::querybuilder::query(),
+            graphql_client: self.graphql_client.clone(),
+        };
+        Ok(ids
+            .into_iter()
+            .map(|id| root.load_introspection_directive_from_id(id))
+            .collect())
+    }
+    /// The possible values of the type. Null unless the type is an enum.
+    pub async fn enum_values(&self) -> Result<Vec<IntrospectionEnumValue>, DaggerError> {
+        let query = self.selection.select("enumValues");
+        let query = query.select("id");
+        let ids: Vec<IntrospectionEnumValueId> = query.execute(self.graphql_client.clone()).await?;
+        let root = Query {
+            proc: self.proc.clone(),
+            selection: crate::querybuilder::query(),
+            graphql_client: self.graphql_client.clone(),
+        };
+        Ok(ids
+            .into_iter()
+            .map(|id| root.load_introspection_enum_value_from_id(id))
+            .collect())
+    }
+    /// The fields of the type. Null unless the type is an object or interface.
+    pub async fn fields(&self) -> Result<Vec<IntrospectionField>, DaggerError> {
+        let query = self.selection.select("fields");
+        let query = query.select("id");
+        let ids: Vec<IntrospectionFieldId> = query.execute(self.graphql_client.clone()).await?;
+        let root = Query {
+            proc: self.proc.clone(),
+            selection: crate::querybuilder::query(),
+            graphql_client: self.graphql_client.clone(),
+        };
+        Ok(ids
+            .into_iter()
+            .map(|id| root.load_introspection_field_from_id(id))
+            .collect())
+    }
+    /// A unique identifier for this IntrospectionType.
+    pub async fn id(&self) -> Result<IntrospectionTypeId, DaggerError> {
+        let query = self.selection.select("id");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The input fields of the type. Null unless the type is an input object.
+    pub async fn input_fields(&self) -> Result<Vec<IntrospectionInputValue>, DaggerError> {
+        let query = self.selection.select("inputFields");
+        let query = query.select("id");
+        let ids: Vec<IntrospectionInputValueId> =
+            query.execute(self.graphql_client.clone()).await?;
+        let root = Query {
+            proc: self.proc.clone(),
+            selection: crate::querybuilder::query(),
+            graphql_client: self.graphql_client.clone(),
+        };
+        Ok(ids
+            .into_iter()
+            .map(|id| root.load_introspection_input_value_from_id(id))
+            .collect())
+    }
+    /// The interfaces implemented by the type. Null unless the type is an object or interface.
+    pub async fn interfaces(&self) -> Result<Vec<IntrospectionType>, DaggerError> {
+        let query = self.selection.select("interfaces");
+        let query = query.select("id");
+        let ids: Vec<IntrospectionTypeId> = query.execute(self.graphql_client.clone()).await?;
+        let root = Query {
+            proc: self.proc.clone(),
+            selection: crate::querybuilder::query(),
+            graphql_client: self.graphql_client.clone(),
+        };
+        Ok(ids
+            .into_iter()
+            .map(|id| root.load_introspection_type_from_id(id))
+            .collect())
+    }
+    /// The kind of the type, e.g. "OBJECT", "INTERFACE", "ENUM" or "SCALAR".
+    pub async fn kind(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("kind");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The name of the type.
+    pub async fn name(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("name");
+        query.execute(self.graphql_client.clone()).await
+    }
+}
+#[derive(Clone)]
+pub struct IntrospectionTypeRef {
+    pub proc: Option<Arc<DaggerSessionProc>>,
+    pub selection: Selection,
+    pub graphql_client: DynGraphQLClient,
+}
+impl IntrospectionTypeRef {
+    /// A unique identifier for this IntrospectionTypeRef.
+    pub async fn id(&self) -> Result<IntrospectionTypeRefId, DaggerError> {
+        let query = self.selection.select("id");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The kind of the referenced type, e.g. "OBJECT", "LIST" or "NON_NULL".
+    pub async fn kind(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("kind");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The name of the referenced type. Null for list and non-null wrappers.
+    pub async fn name(&self) -> Result<String, DaggerError> {
+        let query = self.selection.select("name");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// The type wrapped by a list or non-null reference. Null for named types.
+    pub fn of_type(&self) -> IntrospectionTypeRef {
+        let query = self.selection.select("ofType");
+        IntrospectionTypeRef {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
     }
 }
 #[derive(Clone)]
@@ -14576,6 +15714,139 @@ impl Query {
             graphql_client: self.graphql_client.clone(),
         }
     }
+    /// Load a IntrospectionDirectiveArg from its ID.
+    pub fn load_introspection_directive_arg_from_id(
+        &self,
+        id: impl IntoID<IntrospectionDirectiveArgId>,
+    ) -> IntrospectionDirectiveArg {
+        let mut query = self.selection.select("loadIntrospectionDirectiveArgFromID");
+        query = query.arg_lazy(
+            "id",
+            Box::new(move || {
+                let id = id.clone();
+                Box::pin(async move { id.into_id().await.unwrap().quote() })
+            }),
+        );
+        IntrospectionDirectiveArg {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Load a IntrospectionDirective from its ID.
+    pub fn load_introspection_directive_from_id(
+        &self,
+        id: impl IntoID<IntrospectionDirectiveId>,
+    ) -> IntrospectionDirective {
+        let mut query = self.selection.select("loadIntrospectionDirectiveFromID");
+        query = query.arg_lazy(
+            "id",
+            Box::new(move || {
+                let id = id.clone();
+                Box::pin(async move { id.into_id().await.unwrap().quote() })
+            }),
+        );
+        IntrospectionDirective {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Load a IntrospectionEnumValue from its ID.
+    pub fn load_introspection_enum_value_from_id(
+        &self,
+        id: impl IntoID<IntrospectionEnumValueId>,
+    ) -> IntrospectionEnumValue {
+        let mut query = self.selection.select("loadIntrospectionEnumValueFromID");
+        query = query.arg_lazy(
+            "id",
+            Box::new(move || {
+                let id = id.clone();
+                Box::pin(async move { id.into_id().await.unwrap().quote() })
+            }),
+        );
+        IntrospectionEnumValue {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Load a IntrospectionField from its ID.
+    pub fn load_introspection_field_from_id(
+        &self,
+        id: impl IntoID<IntrospectionFieldId>,
+    ) -> IntrospectionField {
+        let mut query = self.selection.select("loadIntrospectionFieldFromID");
+        query = query.arg_lazy(
+            "id",
+            Box::new(move || {
+                let id = id.clone();
+                Box::pin(async move { id.into_id().await.unwrap().quote() })
+            }),
+        );
+        IntrospectionField {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Load a IntrospectionInputValue from its ID.
+    pub fn load_introspection_input_value_from_id(
+        &self,
+        id: impl IntoID<IntrospectionInputValueId>,
+    ) -> IntrospectionInputValue {
+        let mut query = self.selection.select("loadIntrospectionInputValueFromID");
+        query = query.arg_lazy(
+            "id",
+            Box::new(move || {
+                let id = id.clone();
+                Box::pin(async move { id.into_id().await.unwrap().quote() })
+            }),
+        );
+        IntrospectionInputValue {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Load a IntrospectionType from its ID.
+    pub fn load_introspection_type_from_id(
+        &self,
+        id: impl IntoID<IntrospectionTypeId>,
+    ) -> IntrospectionType {
+        let mut query = self.selection.select("loadIntrospectionTypeFromID");
+        query = query.arg_lazy(
+            "id",
+            Box::new(move || {
+                let id = id.clone();
+                Box::pin(async move { id.into_id().await.unwrap().quote() })
+            }),
+        );
+        IntrospectionType {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Load a IntrospectionTypeRef from its ID.
+    pub fn load_introspection_type_ref_from_id(
+        &self,
+        id: impl IntoID<IntrospectionTypeRefId>,
+    ) -> IntrospectionTypeRef {
+        let mut query = self.selection.select("loadIntrospectionTypeRefFromID");
+        query = query.arg_lazy(
+            "id",
+            Box::new(move || {
+                let id = id.clone();
+                Box::pin(async move { id.into_id().await.unwrap().quote() })
+            }),
+        );
+        IntrospectionTypeRef {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
     /// Load a JSONValue from its ID.
     pub fn load_json_value_from_id(&self, id: impl IntoID<JsonValueId>) -> JsonValue {
         let mut query = self.selection.select("loadJSONValueFromID");
@@ -14801,6 +16072,22 @@ impl Query {
             }),
         );
         ScalarTypeDef {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Load a Schema from its ID.
+    pub fn load_schema_from_id(&self, id: impl IntoID<SchemaId>) -> Schema {
+        let mut query = self.selection.select("loadSchemaFromID");
+        query = query.arg_lazy(
+            "id",
+            Box::new(move || {
+                let id = id.clone();
+                Box::pin(async move { id.into_id().await.unwrap().quote() })
+            }),
+        );
+        Schema {
             proc: self.proc.clone(),
             selection: query,
             graphql_client: self.graphql_client.clone(),
@@ -15132,6 +16419,20 @@ impl Query {
             graphql_client: self.graphql_client.clone(),
         }
     }
+    /// Load a GraphQL introspection schema for inspection and merging.
+    ///
+    /// # Arguments
+    ///
+    /// * `json` - The introspection schema JSON to load.
+    pub fn schema(&self, json: Json) -> Schema {
+        let mut query = self.selection.select("schema");
+        query = query.arg("json", json);
+        Schema {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
     /// Creates a new secret.
     ///
     /// # Arguments
@@ -15277,6 +16578,94 @@ impl ScalarTypeDef {
     pub async fn source_module_name(&self) -> Result<String, DaggerError> {
         let query = self.selection.select("sourceModuleName");
         query.execute(self.graphql_client.clone()).await
+    }
+}
+#[derive(Clone)]
+pub struct Schema {
+    pub proc: Option<Arc<DaggerSessionProc>>,
+    pub selection: Selection,
+    pub graphql_client: DynGraphQLClient,
+}
+#[derive(Builder, Debug, PartialEq)]
+pub struct SchemaListTypesOpts<'a> {
+    /// Only list types of this kind, e.g. "OBJECT", "INTERFACE", "ENUM", "SCALAR" or "INPUT_OBJECT". Lists every type if omitted.
+    #[builder(setter(into, strip_option), default)]
+    pub kind: Option<&'a str>,
+}
+impl Schema {
+    /// Serialize the schema back to introspection JSON.
+    pub async fn contents(&self) -> Result<Json, DaggerError> {
+        let query = self.selection.select("contents");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// Return the full introspection details of a named type, or null if the schema has no such type.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the type to describe.
+    pub fn describe_type(&self, name: impl Into<String>) -> IntrospectionType {
+        let mut query = self.selection.select("describeType");
+        query = query.arg("name", name.into());
+        IntrospectionType {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
+    }
+    /// Check whether a type with the given name exists in the schema.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the type to look for.
+    pub async fn has_type(&self, name: impl Into<String>) -> Result<bool, DaggerError> {
+        let mut query = self.selection.select("hasType");
+        query = query.arg("name", name.into());
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// A unique identifier for this Schema.
+    pub async fn id(&self) -> Result<SchemaId, DaggerError> {
+        let query = self.selection.select("id");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// List the names of the types defined in the schema.
+    ///
+    /// # Arguments
+    ///
+    /// * `opt` - optional argument, see inner type for documentation, use <func>_opts to use
+    pub async fn list_types(&self) -> Result<Vec<String>, DaggerError> {
+        let query = self.selection.select("listTypes");
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// List the names of the types defined in the schema.
+    ///
+    /// # Arguments
+    ///
+    /// * `opt` - optional argument, see inner type for documentation, use <func>_opts to use
+    pub async fn list_types_opts<'a>(
+        &self,
+        opts: SchemaListTypesOpts<'a>,
+    ) -> Result<Vec<String>, DaggerError> {
+        let mut query = self.selection.select("listTypes");
+        if let Some(kind) = opts.kind {
+            query = query.arg("kind", kind);
+        }
+        query.execute(self.graphql_client.clone()).await
+    }
+    /// Merge a module's introspection-shaped type definitions into the schema, returning the combined schema.
+    ///
+    /// # Arguments
+    ///
+    /// * `module_types` - Introspection JSON describing the types the module defines. Object, interface and enum types are appended to the schema, and a constructor field for the module is added to the Query type.
+    /// * `module_name` - The name of the module whose types are being merged. Used to stamp the @sourceModuleName directive and to derive the module's constructor field.
+    pub fn merge(&self, module_types: Json, module_name: impl Into<String>) -> Schema {
+        let mut query = self.selection.select("merge");
+        query = query.arg("moduleTypes", module_types);
+        query = query.arg("moduleName", module_name.into());
+        Schema {
+            proc: self.proc.clone(),
+            selection: query,
+            graphql_client: self.graphql_client.clone(),
+        }
     }
 }
 #[derive(Clone)]

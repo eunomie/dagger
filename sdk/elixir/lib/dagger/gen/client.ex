@@ -1012,6 +1012,119 @@ defmodule Dagger.Client do
   end
 
   @doc """
+  Load a IntrospectionDirectiveArg from its ID.
+  """
+  @spec load_introspection_directive_arg_from_id(t(), Dagger.IntrospectionDirectiveArgID.t()) ::
+          Dagger.IntrospectionDirectiveArg.t()
+  def load_introspection_directive_arg_from_id(%__MODULE__{} = client, id) do
+    query_builder =
+      client.query_builder
+      |> QB.select("loadIntrospectionDirectiveArgFromID")
+      |> QB.put_arg("id", id)
+
+    %Dagger.IntrospectionDirectiveArg{
+      query_builder: query_builder,
+      client: client.client
+    }
+  end
+
+  @doc """
+  Load a IntrospectionDirective from its ID.
+  """
+  @spec load_introspection_directive_from_id(t(), Dagger.IntrospectionDirectiveID.t()) ::
+          Dagger.IntrospectionDirective.t()
+  def load_introspection_directive_from_id(%__MODULE__{} = client, id) do
+    query_builder =
+      client.query_builder
+      |> QB.select("loadIntrospectionDirectiveFromID")
+      |> QB.put_arg("id", id)
+
+    %Dagger.IntrospectionDirective{
+      query_builder: query_builder,
+      client: client.client
+    }
+  end
+
+  @doc """
+  Load a IntrospectionEnumValue from its ID.
+  """
+  @spec load_introspection_enum_value_from_id(t(), Dagger.IntrospectionEnumValueID.t()) ::
+          Dagger.IntrospectionEnumValue.t()
+  def load_introspection_enum_value_from_id(%__MODULE__{} = client, id) do
+    query_builder =
+      client.query_builder
+      |> QB.select("loadIntrospectionEnumValueFromID")
+      |> QB.put_arg("id", id)
+
+    %Dagger.IntrospectionEnumValue{
+      query_builder: query_builder,
+      client: client.client
+    }
+  end
+
+  @doc """
+  Load a IntrospectionField from its ID.
+  """
+  @spec load_introspection_field_from_id(t(), Dagger.IntrospectionFieldID.t()) ::
+          Dagger.IntrospectionField.t()
+  def load_introspection_field_from_id(%__MODULE__{} = client, id) do
+    query_builder =
+      client.query_builder |> QB.select("loadIntrospectionFieldFromID") |> QB.put_arg("id", id)
+
+    %Dagger.IntrospectionField{
+      query_builder: query_builder,
+      client: client.client
+    }
+  end
+
+  @doc """
+  Load a IntrospectionInputValue from its ID.
+  """
+  @spec load_introspection_input_value_from_id(t(), Dagger.IntrospectionInputValueID.t()) ::
+          Dagger.IntrospectionInputValue.t()
+  def load_introspection_input_value_from_id(%__MODULE__{} = client, id) do
+    query_builder =
+      client.query_builder
+      |> QB.select("loadIntrospectionInputValueFromID")
+      |> QB.put_arg("id", id)
+
+    %Dagger.IntrospectionInputValue{
+      query_builder: query_builder,
+      client: client.client
+    }
+  end
+
+  @doc """
+  Load a IntrospectionType from its ID.
+  """
+  @spec load_introspection_type_from_id(t(), Dagger.IntrospectionTypeID.t()) ::
+          Dagger.IntrospectionType.t()
+  def load_introspection_type_from_id(%__MODULE__{} = client, id) do
+    query_builder =
+      client.query_builder |> QB.select("loadIntrospectionTypeFromID") |> QB.put_arg("id", id)
+
+    %Dagger.IntrospectionType{
+      query_builder: query_builder,
+      client: client.client
+    }
+  end
+
+  @doc """
+  Load a IntrospectionTypeRef from its ID.
+  """
+  @spec load_introspection_type_ref_from_id(t(), Dagger.IntrospectionTypeRefID.t()) ::
+          Dagger.IntrospectionTypeRef.t()
+  def load_introspection_type_ref_from_id(%__MODULE__{} = client, id) do
+    query_builder =
+      client.query_builder |> QB.select("loadIntrospectionTypeRefFromID") |> QB.put_arg("id", id)
+
+    %Dagger.IntrospectionTypeRef{
+      query_builder: query_builder,
+      client: client.client
+    }
+  end
+
+  @doc """
   Load a JSONValue from its ID.
   """
   @spec load_json_value_from_id(t(), Dagger.JSONValueID.t()) :: Dagger.JSONValue.t()
@@ -1204,6 +1317,20 @@ defmodule Dagger.Client do
       client.query_builder |> QB.select("loadScalarTypeDefFromID") |> QB.put_arg("id", id)
 
     %Dagger.ScalarTypeDef{
+      query_builder: query_builder,
+      client: client.client
+    }
+  end
+
+  @doc """
+  Load a Schema from its ID.
+  """
+  @spec load_schema_from_id(t(), Dagger.SchemaID.t()) :: Dagger.Schema.t()
+  def load_schema_from_id(%__MODULE__{} = client, id) do
+    query_builder =
+      client.query_builder |> QB.select("loadSchemaFromID") |> QB.put_arg("id", id)
+
+    %Dagger.Schema{
       query_builder: query_builder,
       client: client.client
     }
@@ -1476,6 +1603,20 @@ defmodule Dagger.Client do
       |> QB.maybe_put_arg("requireKind", optional_args[:require_kind])
 
     %Dagger.ModuleSource{
+      query_builder: query_builder,
+      client: client.client
+    }
+  end
+
+  @doc """
+  Load a GraphQL introspection schema for inspection and merging.
+  """
+  @spec schema(t(), Dagger.JSON.t()) :: Dagger.Schema.t()
+  def schema(%__MODULE__{} = client, json) do
+    query_builder =
+      client.query_builder |> QB.select("schema") |> QB.put_arg("json", json)
+
+    %Dagger.Schema{
       query_builder: query_builder,
       client: client.client
     }
