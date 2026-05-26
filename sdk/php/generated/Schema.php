@@ -23,44 +23,12 @@ class Schema extends Client\AbstractObject implements Client\IdAble
     }
 
     /**
-     * Return the full introspection details of a named type, or null if the schema has no such type.
-     */
-    public function describeType(string $name): IntrospectionType
-    {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('describeType');
-        $innerQueryBuilder->setArgument('name', $name);
-        return new \Dagger\IntrospectionType($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
-     * Check whether a type with the given name exists in the schema.
-     */
-    public function hasType(string $name): bool
-    {
-        $leafQueryBuilder = new \Dagger\Client\QueryBuilder('hasType');
-        $leafQueryBuilder->setArgument('name', $name);
-        return (bool)$this->queryLeaf($leafQueryBuilder, 'hasType');
-    }
-
-    /**
      * A unique identifier for this Schema.
      */
     public function id(): SchemaId
     {
         $leafQueryBuilder = new \Dagger\Client\QueryBuilder('id');
         return new \Dagger\SchemaId((string)$this->queryLeaf($leafQueryBuilder, 'id'));
-    }
-
-    /**
-     * List the names of the types defined in the schema.
-     */
-    public function listTypes(?string $kind = ''): array
-    {
-        $leafQueryBuilder = new \Dagger\Client\QueryBuilder('listTypes');
-        if (null !== $kind) {
-        $leafQueryBuilder->setArgument('kind', $kind);
-        }
-        return (array)$this->queryLeaf($leafQueryBuilder, 'listTypes');
     }
 
     /**

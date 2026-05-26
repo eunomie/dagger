@@ -164,69 +164,6 @@ class Binding extends Client\AbstractObject implements Client\IdAble
     }
 
     /**
-     * Retrieve the binding value, as type IntrospectionDirective
-     */
-    public function asIntrospectionDirective(): IntrospectionDirective
-    {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('asIntrospectionDirective');
-        return new \Dagger\IntrospectionDirective($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
-     * Retrieve the binding value, as type IntrospectionDirectiveArg
-     */
-    public function asIntrospectionDirectiveArg(): IntrospectionDirectiveArg
-    {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('asIntrospectionDirectiveArg');
-        return new \Dagger\IntrospectionDirectiveArg($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
-     * Retrieve the binding value, as type IntrospectionEnumValue
-     */
-    public function asIntrospectionEnumValue(): IntrospectionEnumValue
-    {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('asIntrospectionEnumValue');
-        return new \Dagger\IntrospectionEnumValue($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
-     * Retrieve the binding value, as type IntrospectionField
-     */
-    public function asIntrospectionField(): IntrospectionField
-    {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('asIntrospectionField');
-        return new \Dagger\IntrospectionField($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
-     * Retrieve the binding value, as type IntrospectionInputValue
-     */
-    public function asIntrospectionInputValue(): IntrospectionInputValue
-    {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('asIntrospectionInputValue');
-        return new \Dagger\IntrospectionInputValue($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
-     * Retrieve the binding value, as type IntrospectionType
-     */
-    public function asIntrospectionType(): IntrospectionType
-    {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('asIntrospectionType');
-        return new \Dagger\IntrospectionType($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
-     * Retrieve the binding value, as type IntrospectionTypeRef
-     */
-    public function asIntrospectionTypeRef(): IntrospectionTypeRef
-    {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('asIntrospectionTypeRef');
-        return new \Dagger\IntrospectionTypeRef($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
      * Retrieve the binding value, as type JSONValue
      */
     public function asJSONValue(): JsonValue

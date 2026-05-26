@@ -755,81 +755,6 @@ class Client extends Client\AbstractClient implements Client\IdAble
     }
 
     /**
-     * Load a IntrospectionDirectiveArg from its ID.
-     */
-    public function loadIntrospectionDirectiveArgFromID(
-        IntrospectionDirectiveArgId|IntrospectionDirectiveArg $id,
-    ): IntrospectionDirectiveArg {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('loadIntrospectionDirectiveArgFromID');
-        $innerQueryBuilder->setArgument('id', $id);
-        return new \Dagger\IntrospectionDirectiveArg($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
-     * Load a IntrospectionDirective from its ID.
-     */
-    public function loadIntrospectionDirectiveFromID(
-        IntrospectionDirectiveId|IntrospectionDirective $id,
-    ): IntrospectionDirective {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('loadIntrospectionDirectiveFromID');
-        $innerQueryBuilder->setArgument('id', $id);
-        return new \Dagger\IntrospectionDirective($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
-     * Load a IntrospectionEnumValue from its ID.
-     */
-    public function loadIntrospectionEnumValueFromID(
-        IntrospectionEnumValueId|IntrospectionEnumValue $id,
-    ): IntrospectionEnumValue {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('loadIntrospectionEnumValueFromID');
-        $innerQueryBuilder->setArgument('id', $id);
-        return new \Dagger\IntrospectionEnumValue($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
-     * Load a IntrospectionField from its ID.
-     */
-    public function loadIntrospectionFieldFromID(IntrospectionFieldId|IntrospectionField $id): IntrospectionField
-    {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('loadIntrospectionFieldFromID');
-        $innerQueryBuilder->setArgument('id', $id);
-        return new \Dagger\IntrospectionField($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
-     * Load a IntrospectionInputValue from its ID.
-     */
-    public function loadIntrospectionInputValueFromID(
-        IntrospectionInputValueId|IntrospectionInputValue $id,
-    ): IntrospectionInputValue {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('loadIntrospectionInputValueFromID');
-        $innerQueryBuilder->setArgument('id', $id);
-        return new \Dagger\IntrospectionInputValue($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
-     * Load a IntrospectionType from its ID.
-     */
-    public function loadIntrospectionTypeFromID(IntrospectionTypeId|IntrospectionType $id): IntrospectionType
-    {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('loadIntrospectionTypeFromID');
-        $innerQueryBuilder->setArgument('id', $id);
-        return new \Dagger\IntrospectionType($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
-     * Load a IntrospectionTypeRef from its ID.
-     */
-    public function loadIntrospectionTypeRefFromID(
-        IntrospectionTypeRefId|IntrospectionTypeRef $id,
-    ): IntrospectionTypeRef {
-        $innerQueryBuilder = new \Dagger\Client\QueryBuilder('loadIntrospectionTypeRefFromID');
-        $innerQueryBuilder->setArgument('id', $id);
-        return new \Dagger\IntrospectionTypeRef($this->client, $this->queryBuilderChain->chain($innerQueryBuilder));
-    }
-
-    /**
      * Load a JSONValue from its ID.
      */
     public function loadJSONValueFromID(JsonValueId|JsonValue $id): JsonValue
@@ -1196,7 +1121,7 @@ class Client extends Client\AbstractClient implements Client\IdAble
     }
 
     /**
-     * Load a GraphQL introspection schema for inspection and merging.
+     * Load a GraphQL introspection schema for merging.
      */
     public function schema(Json $json): Schema
     {

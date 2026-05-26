@@ -97,11 +97,33 @@ func mustSchema(t *testing.T, jsonStr string) *Schema {
 	return s
 }
 
+// The Schema type only exposes merge/contents, so these helpers read the
+// parsed introspection directly to assert on a merged schema's contents.
+
+func schemaType(s *Schema, name string) *codegenintrospection.Type {
+	return s.Introspection.Schema.Types.Get(name)
+}
+
+func schemaHas(s *Schema, name string) bool {
+	return schemaType(s, name) != nil
+}
+
+func schemaTypeNames(s *Schema, kind string) []string {
+	out := []string{}
+	for _, t := range s.Introspection.Schema.Types {
+		if kind != "" && string(t.Kind) != kind {
+			continue
+		}
+		out = append(out, t.Name)
+	}
+	return out
+}
+
 func TestNewSchema(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
 		s, err := NewSchema(JSON(baseSchemaJSON))
 		require.NoError(t, err)
-		require.True(t, s.HasType("Query"))
+		require.True(t, schemaHas(s, "Query"))
 	})
 	t.Run("malformed JSON", func(t *testing.T) {
 		_, err := NewSchema(JSON(`{not json`))
@@ -119,7 +141,7 @@ func TestSchemaMerge(t *testing.T) {
 	require.NoError(t, err)
 
 	// The module's type is added and stamped with @sourceModuleName.
-	echo := merged.DescribeType("Echo")
+	echo := schemaType(merged, "Echo")
 	require.NotNil(t, echo)
 	stamp := echo.Directives.Directive(sourceModuleDirectiveName)
 	require.NotNil(t, stamp)
@@ -133,7 +155,7 @@ func TestSchemaMerge(t *testing.T) {
 	require.Equal(t, "echo", echoSM.Module)
 
 	// A no-arg constructor pointing at the main object is synthesized.
-	ctor := findField(merged.DescribeType("Query"), "echo")
+	ctor := findField(schemaType(merged, "Query"), "echo")
 	require.NotNil(t, ctor)
 	require.Equal(t, codegenintrospection.TypeKindNonNull, ctor.TypeRef.Kind)
 	require.Equal(t, "Echo", ctor.TypeRef.OfType.Name)
@@ -146,21 +168,21 @@ func TestSchemaMerge(t *testing.T) {
 	require.Equal(t, "echo", ctorSM.Module)
 
 	// The receiver is never mutated.
-	require.False(t, base.HasType("Echo"))
-	require.Nil(t, findField(base.DescribeType("Query"), "echo"))
+	require.False(t, schemaHas(base, "Echo"))
+	require.Nil(t, findField(schemaType(base, "Query"), "echo"))
 }
 
 func TestSchemaMergeReusesModuleConstructor(t *testing.T) {
 	merged, err := mustSchema(t, baseSchemaJSON).Merge(JSON(greeterModuleJSON), "greeter")
 	require.NoError(t, err)
 
-	require.True(t, merged.HasType("Greeter"))
+	require.True(t, schemaHas(merged, "Greeter"))
 	// The module's Query type is not merged as a module-defined type.
-	require.Equal(t, []string{"Query", "Container", "Greeter"}, merged.ListTypes("OBJECT"))
+	require.Equal(t, []string{"Query", "Container", "Greeter"}, schemaTypeNames(merged, "OBJECT"))
 
 	// The constructor field declared by the module is reused, arguments
 	// and all.
-	ctor := findField(merged.DescribeType("Query"), "greeter")
+	ctor := findField(schemaType(merged, "Query"), "greeter")
 	require.NotNil(t, ctor)
 	require.Len(t, ctor.Args, 1)
 	require.Equal(t, "prefix", ctor.Args[0].Name)
@@ -181,9 +203,9 @@ func TestSchemaMergeIdempotent(t *testing.T) {
 	twice, err := once.Merge(JSON(echoModuleJSON), "echo")
 	require.NoError(t, err)
 
-	require.Equal(t, once.ListTypes(""), twice.ListTypes(""))
+	require.Equal(t, schemaTypeNames(once, ""), schemaTypeNames(twice, ""))
 	var echoFields int
-	for _, f := range twice.DescribeType("Query").Fields {
+	for _, f := range schemaType(twice, "Query").Fields {
 		if f.Name == "echo" {
 			echoFields++
 		}
@@ -205,7 +227,7 @@ func TestSchemaMergeInterfaceAndEnum(t *testing.T) {
 	t.Run("interface", func(t *testing.T) {
 		merged, err := mustSchema(t, baseSchemaJSON).Merge(JSON(zooModuleJSON), "zoo")
 		require.NoError(t, err)
-		animal := merged.DescribeType("Animal")
+		animal := schemaType(merged, "Animal")
 		require.NotNil(t, animal)
 		require.Equal(t, codegenintrospection.TypeKindInterface, animal.Kind)
 		require.NotNil(t, animal.Directives.Directive(sourceModuleDirectiveName))
@@ -216,7 +238,7 @@ func TestSchemaMergeInterfaceAndEnum(t *testing.T) {
 	t.Run("enum", func(t *testing.T) {
 		merged, err := mustSchema(t, baseSchemaJSON).Merge(JSON(workflowModuleJSON), "workflow")
 		require.NoError(t, err)
-		status := merged.DescribeType("Status")
+		status := schemaType(merged, "Status")
 		require.NotNil(t, status)
 		require.Equal(t, codegenintrospection.TypeKindEnum, status.Kind)
 		require.Len(t, status.EnumValues, 2)
@@ -226,24 +248,6 @@ func TestSchemaMergeInterfaceAndEnum(t *testing.T) {
 	})
 }
 
-func TestSchemaInspect(t *testing.T) {
-	merged, err := mustSchema(t, baseSchemaJSON).Merge(JSON(echoModuleJSON), "echo")
-	require.NoError(t, err)
-
-	require.ElementsMatch(t, []string{"Query", "Container", "Echo"}, merged.ListTypes(""))
-
-	for _, name := range merged.ListTypes("OBJECT") {
-		require.Equal(t, codegenintrospection.TypeKindObject, merged.DescribeType(name).Kind)
-	}
-	require.Empty(t, merged.ListTypes("ENUM"))
-
-	require.True(t, merged.HasType("Echo"))
-	require.False(t, merged.HasType("Nonexistent"))
-
-	require.Equal(t, "Echo", merged.DescribeType("Echo").Name)
-	require.Nil(t, merged.DescribeType("Nonexistent"))
-}
-
 func TestSchemaContentsRoundTrip(t *testing.T) {
 	s := mustSchema(t, baseSchemaJSON)
 	data, err := s.Contents()
@@ -251,5 +255,5 @@ func TestSchemaContentsRoundTrip(t *testing.T) {
 
 	reparsed, err := NewSchema(data)
 	require.NoError(t, err)
-	require.ElementsMatch(t, s.ListTypes(""), reparsed.ListTypes(""))
+	require.ElementsMatch(t, schemaTypeNames(s, ""), schemaTypeNames(reparsed, ""))
 }

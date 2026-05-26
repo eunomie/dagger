@@ -1,12 +1,13 @@
 package core
 
-// These tests exercise the engine's schemaTools surface (the `schema(json)`
-// constructor plus the Schema object's merge/inspect operations and the
-// IntrospectionType object graph) via raw GraphQL. The SDK does not yet expose
-// typed bindings for these fields, so each test issues GraphQL directly.
+// These tests exercise the engine's schemaTools surface: the `schema(json)`
+// constructor plus the Schema object's `merge` and `contents` operations.
+// They issue GraphQL directly and assert on the merged introspection JSON
+// returned by `contents`.
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 
 	"github.com/dagger/testctx"
@@ -51,133 +52,122 @@ const echoSchemaToolsModuleJSON = `{
   }
 }`
 
-func (SchemaToolsSuite) TestInspect(ctx context.Context, t *testctx.T) {
-	res, err := testutil.Query[struct {
-		Schema struct {
-			Types        []string `json:"types"`
-			Objects      []string `json:"objects"`
-			HasContainer bool     `json:"hasContainer"`
-			HasGhost     bool     `json:"hasGhost"`
-			Container    *struct {
-				Kind string `json:"kind"`
-				Name string `json:"name"`
-			} `json:"container"`
-			Missing *struct {
-				Name string `json:"name"`
-			} `json:"missing"`
-		} `json:"schema"`
-	}](t, `query Inspect($json: JSON!) {
-		schema(json: $json) {
-			types: listTypes
-			objects: listTypes(kind: "OBJECT")
-			hasContainer: hasType(name: "Container")
-			hasGhost: hasType(name: "Ghost")
-			container: describeType(name: "Container") { kind name }
-			missing: describeType(name: "Ghost") { name }
-		}
-	}`, &testutil.QueryOptions{Variables: map[string]any{"json": baseSchemaToolsJSON}})
-	require.NoError(t, err)
-
-	require.ElementsMatch(t, []string{"Query", "Container"}, res.Schema.Objects)
-	require.Contains(t, res.Schema.Types, "Query")
-	require.Contains(t, res.Schema.Types, "Container")
-	require.True(t, res.Schema.HasContainer)
-	require.False(t, res.Schema.HasGhost)
-	require.NotNil(t, res.Schema.Container)
-	require.Equal(t, "OBJECT", res.Schema.Container.Kind)
-	require.Equal(t, "Container", res.Schema.Container.Name)
-	require.Nil(t, res.Schema.Missing)
+// introspection JSON shapes used to assert on merged `contents`.
+type introDirective struct {
+	Name string `json:"name"`
+	Args []struct {
+		Name  string  `json:"name"`
+		Value *string `json:"value"`
+	} `json:"args"`
 }
 
-func (SchemaToolsSuite) TestMerge(ctx context.Context, t *testctx.T) {
-	type directive struct {
-		Name string `json:"name"`
-		Args []struct {
-			Name  string  `json:"name"`
-			Value *string `json:"value"`
-		} `json:"args"`
+type introField struct {
+	Name string `json:"name"`
+	Type struct {
+		Kind   string `json:"kind"`
+		OfType *struct {
+			Kind string  `json:"kind"`
+			Name *string `json:"name"`
+		} `json:"ofType"`
+	} `json:"type"`
+	Directives []introDirective `json:"directives"`
+}
+
+type introType struct {
+	Kind        string           `json:"kind"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	Fields      []introField     `json:"fields"`
+	Directives  []introDirective `json:"directives"`
+}
+
+type introSchema struct {
+	Schema struct {
+		Types []introType `json:"types"`
+	} `json:"__schema"`
+}
+
+func parseSchemaContents(t *testctx.T, contents string) introSchema {
+	t.Helper()
+	var s introSchema
+	require.NoError(t, json.Unmarshal([]byte(contents), &s))
+	return s
+}
+
+func (s introSchema) typeNames() []string {
+	names := make([]string, 0, len(s.Schema.Types))
+	for _, t := range s.Schema.Types {
+		names = append(names, t.Name)
 	}
-	type field struct {
-		Name string `json:"name"`
-		Type struct {
-			Kind   string `json:"kind"`
-			OfType *struct {
-				Kind string  `json:"kind"`
-				Name *string `json:"name"`
-			} `json:"ofType"`
-		} `json:"type"`
-		Directives []directive `json:"directives"`
+	return names
+}
+
+func (s introSchema) findType(name string) *introType {
+	for i, t := range s.Schema.Types {
+		if t.Name == name {
+			return &s.Schema.Types[i]
+		}
 	}
-	hasSourceModuleStamp := func(directives []directive, encodedName string) bool {
-		for _, d := range directives {
-			if d.Name != "sourceModuleName" {
-				continue
-			}
-			for _, a := range d.Args {
-				if a.Name == "name" && a.Value != nil && *a.Value == encodedName {
-					return true
-				}
+	return nil
+}
+
+func hasSourceModuleStamp(directives []introDirective, encodedName string) bool {
+	for _, d := range directives {
+		if d.Name != "sourceModuleName" {
+			continue
+		}
+		for _, a := range d.Args {
+			if a.Name == "name" && a.Value != nil && *a.Value == encodedName {
+				return true
 			}
 		}
-		return false
 	}
+	return false
+}
 
+// mergeContents merges a module into the base schema and returns the parsed
+// merged introspection JSON.
+func mergeContents(t *testctx.T, base, module, moduleName string) introSchema {
+	t.Helper()
 	res, err := testutil.Query[struct {
 		Schema struct {
 			Merged struct {
-				HasEcho bool     `json:"hasEcho"`
-				Types   []string `json:"types"`
-				Echo    *struct {
-					Kind        string      `json:"kind"`
-					Name        string      `json:"name"`
-					Description string      `json:"description"`
-					Directives  []directive `json:"directives"`
-				} `json:"echo"`
-				Query *struct {
-					Fields []field `json:"fields"`
-				} `json:"query"`
+				Contents string `json:"contents"`
 			} `json:"merged"`
 		} `json:"schema"`
-	}](t, `query Merge($base: JSON!, $module: JSON!) {
+	}](t, `query Merge($base: JSON!, $module: JSON!, $name: String!) {
 		schema(json: $base) {
-			merged: merge(moduleTypes: $module, moduleName: "echo") {
-				hasEcho: hasType(name: "Echo")
-				types: listTypes(kind: "OBJECT")
-				echo: describeType(name: "Echo") {
-					kind name description
-					directives { name args { name value } }
-				}
-				query: describeType(name: "Query") {
-					fields {
-						name
-						type { kind ofType { kind name } }
-						directives { name args { name value } }
-					}
-				}
+			merged: merge(moduleTypes: $module, moduleName: $name) {
+				contents
 			}
 		}
 	}`, &testutil.QueryOptions{Variables: map[string]any{
-		"base":   baseSchemaToolsJSON,
-		"module": echoSchemaToolsModuleJSON,
+		"base":   base,
+		"module": module,
+		"name":   moduleName,
 	}})
 	require.NoError(t, err)
+	return parseSchemaContents(t, res.Schema.Merged.Contents)
+}
 
-	merged := res.Schema.Merged
-	require.True(t, merged.HasEcho)
-	require.ElementsMatch(t, []string{"Query", "Container", "Echo"}, merged.Types)
+func (SchemaToolsSuite) TestMerge(ctx context.Context, t *testctx.T) {
+	merged := mergeContents(t, baseSchemaToolsJSON, echoSchemaToolsModuleJSON, "echo")
 
-	require.NotNil(t, merged.Echo)
-	require.Equal(t, "OBJECT", merged.Echo.Kind)
-	require.Equal(t, "Echo", merged.Echo.Name)
-	require.Equal(t, "Echo object", merged.Echo.Description)
-	require.True(t, hasSourceModuleStamp(merged.Echo.Directives, `"echo"`),
+	require.ElementsMatch(t, []string{"Query", "Container", "Echo"}, merged.typeNames())
+
+	echo := merged.findType("Echo")
+	require.NotNil(t, echo)
+	require.Equal(t, "OBJECT", echo.Kind)
+	require.Equal(t, "Echo object", echo.Description)
+	require.True(t, hasSourceModuleStamp(echo.Directives, `"echo"`),
 		"Echo type should carry @sourceModuleName")
 
-	require.NotNil(t, merged.Query)
-	var ctor *field
-	for i, f := range merged.Query.Fields {
+	query := merged.findType("Query")
+	require.NotNil(t, query)
+	var ctor *introField
+	for i, f := range query.Fields {
 		if f.Name == "echo" {
-			ctor = &merged.Query.Fields[i]
+			ctor = &query.Fields[i]
 			break
 		}
 	}
@@ -192,16 +182,13 @@ func (SchemaToolsSuite) TestMerge(ctx context.Context, t *testctx.T) {
 }
 
 func (SchemaToolsSuite) TestMergeIdempotent(ctx context.Context, t *testctx.T) {
+	// Merge twice via nested calls and assert the second merge did not
+	// duplicate the Echo type or the constructor field.
 	res, err := testutil.Query[struct {
 		Schema struct {
 			Once struct {
 				Again struct {
-					HasEcho bool `json:"hasEcho"`
-					Query   struct {
-						Fields []struct {
-							Name string `json:"name"`
-						} `json:"fields"`
-					} `json:"query"`
+					Contents string `json:"contents"`
 				} `json:"again"`
 			} `json:"once"`
 		} `json:"schema"`
@@ -209,8 +196,7 @@ func (SchemaToolsSuite) TestMergeIdempotent(ctx context.Context, t *testctx.T) {
 		schema(json: $base) {
 			once: merge(moduleTypes: $module, moduleName: "echo") {
 				again: merge(moduleTypes: $module, moduleName: "echo") {
-					hasEcho: hasType(name: "Echo")
-					query: describeType(name: "Query") { fields { name } }
+					contents
 				}
 			}
 		}
@@ -219,15 +205,26 @@ func (SchemaToolsSuite) TestMergeIdempotent(ctx context.Context, t *testctx.T) {
 		"module": echoSchemaToolsModuleJSON,
 	}})
 	require.NoError(t, err)
-	require.True(t, res.Schema.Once.Again.HasEcho)
 
-	var echoCount int
-	for _, f := range res.Schema.Once.Again.Query.Fields {
-		if f.Name == "echo" {
-			echoCount++
+	merged := parseSchemaContents(t, res.Schema.Once.Again.Contents)
+
+	var echoTypeCount int
+	for _, name := range merged.typeNames() {
+		if name == "Echo" {
+			echoTypeCount++
 		}
 	}
-	require.Equal(t, 1, echoCount, "re-merging the same module must not duplicate the constructor")
+	require.Equal(t, 1, echoTypeCount, "re-merging must not duplicate the type")
+
+	query := merged.findType("Query")
+	require.NotNil(t, query)
+	var echoFieldCount int
+	for _, f := range query.Fields {
+		if f.Name == "echo" {
+			echoFieldCount++
+		}
+	}
+	require.Equal(t, 1, echoFieldCount, "re-merging the same module must not duplicate the constructor")
 }
 
 func (SchemaToolsSuite) TestMergeConflict(ctx context.Context, t *testctx.T) {
@@ -235,7 +232,7 @@ func (SchemaToolsSuite) TestMergeConflict(ctx context.Context, t *testctx.T) {
 	_, err := testutil.Query[struct{}](t, `query Conflict($base: JSON!, $module: JSON!) {
 		schema(json: $base) {
 			merge(moduleTypes: $module, moduleName: "conflicting") {
-				hasType(name: "Container")
+				contents
 			}
 		}
 	}`, &testutil.QueryOptions{Variables: map[string]any{
@@ -253,78 +250,20 @@ func (SchemaToolsSuite) TestContentsRoundTrip(ctx context.Context, t *testctx.T)
 	}](t, `query Contents($json: JSON!) { schema(json: $json) { contents } }`,
 		&testutil.QueryOptions{Variables: map[string]any{"json": baseSchemaToolsJSON}})
 	require.NoError(t, err)
-	require.Contains(t, res.Schema.Contents, "Container")
+
+	parsed := parseSchemaContents(t, res.Schema.Contents)
+	require.ElementsMatch(t, []string{"Query", "Container"}, parsed.typeNames())
 
 	// Round-trip the serialized JSON back into the engine and verify the
 	// types are preserved.
 	back, err := testutil.Query[struct {
 		Schema struct {
-			Types []string `json:"types"`
+			Contents string `json:"contents"`
 		} `json:"schema"`
-	}](t, `query RoundTrip($json: JSON!) { schema(json: $json) { types: listTypes } }`,
+	}](t, `query RoundTrip($json: JSON!) { schema(json: $json) { contents } }`,
 		&testutil.QueryOptions{Variables: map[string]any{"json": res.Schema.Contents}})
 	require.NoError(t, err)
-	require.ElementsMatch(t, []string{"Query", "Container"}, back.Schema.Types)
-}
-
-func (SchemaToolsSuite) TestIntrospectionGraph(ctx context.Context, t *testctx.T) {
-	res, err := testutil.Query[struct {
-		Schema struct {
-			Merged struct {
-				Echo *struct {
-					Kind   string `json:"kind"`
-					Fields *[]struct {
-						Name string `json:"name"`
-						Type struct {
-							Kind   string  `json:"kind"`
-							Name   *string `json:"name"`
-							OfType *struct {
-								Kind string  `json:"kind"`
-								Name *string `json:"name"`
-							} `json:"ofType"`
-						} `json:"type"`
-					} `json:"fields"`
-					InputFields *[]struct {
-						Name string `json:"name"`
-					} `json:"inputFields"`
-					EnumValues *[]struct {
-						Name string `json:"name"`
-					} `json:"enumValues"`
-				} `json:"echo"`
-			} `json:"merged"`
-		} `json:"schema"`
-	}](t, `query Graph($base: JSON!, $module: JSON!) {
-		schema(json: $base) {
-			merged: merge(moduleTypes: $module, moduleName: "echo") {
-				echo: describeType(name: "Echo") {
-					kind
-					fields { name type { kind name ofType { kind name } } }
-					inputFields { name }
-					enumValues { name }
-				}
-			}
-		}
-	}`, &testutil.QueryOptions{Variables: map[string]any{
-		"base":   baseSchemaToolsJSON,
-		"module": echoSchemaToolsModuleJSON,
-	}})
-	require.NoError(t, err)
-
-	echo := res.Schema.Merged.Echo
-	require.NotNil(t, echo)
-	require.Equal(t, "OBJECT", echo.Kind)
-	require.NotNil(t, echo.Fields, "OBJECT type's fields must not be null")
-	require.Len(t, *echo.Fields, 1)
-	say := (*echo.Fields)[0]
-	require.Equal(t, "say", say.Name)
-	require.Equal(t, "NON_NULL", say.Type.Kind)
-	require.Nil(t, say.Type.Name)
-	require.NotNil(t, say.Type.OfType)
-	require.Equal(t, "SCALAR", say.Type.OfType.Kind)
-	require.NotNil(t, say.Type.OfType.Name)
-	require.Equal(t, "String", *say.Type.OfType.Name)
-	require.Nil(t, echo.InputFields, "OBJECT type's inputFields must be null")
-	require.Nil(t, echo.EnumValues, "OBJECT type's enumValues must be null")
+	require.ElementsMatch(t, []string{"Query", "Container"}, parseSchemaContents(t, back.Schema.Contents).typeNames())
 }
 
 func (SchemaToolsSuite) TestLiveEngineSchema(ctx context.Context, t *testctx.T) {
@@ -341,19 +280,14 @@ func (SchemaToolsSuite) TestLiveEngineSchema(ctx context.Context, t *testctx.T) 
 
 	res, err := testutil.Query[struct {
 		Schema struct {
-			HasContainer bool `json:"hasContainer"`
-			HasFile      bool `json:"hasFile"`
-			HasSchema    bool `json:"hasSchema"`
+			Contents string `json:"contents"`
 		} `json:"schema"`
-	}](t, `query Live($json: JSON!) {
-		schema(json: $json) {
-			hasContainer: hasType(name: "Container")
-			hasFile: hasType(name: "File")
-			hasSchema: hasType(name: "Schema")
-		}
-	}`, &testutil.QueryOptions{Variables: map[string]any{"json": live.File.Contents}})
+	}](t, `query Live($json: JSON!) { schema(json: $json) { contents } }`,
+		&testutil.QueryOptions{Variables: map[string]any{"json": live.File.Contents}})
 	require.NoError(t, err)
-	require.True(t, res.Schema.HasContainer)
-	require.True(t, res.Schema.HasFile)
-	require.True(t, res.Schema.HasSchema, "the new Schema type should be present in the live engine schema")
+
+	names := parseSchemaContents(t, res.Schema.Contents).typeNames()
+	require.Contains(t, names, "Container")
+	require.Contains(t, names, "File")
+	require.Contains(t, names, "Schema", "the Schema type should be present in the live engine schema")
 }

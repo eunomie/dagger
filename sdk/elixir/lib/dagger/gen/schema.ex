@@ -27,50 +27,12 @@ defmodule Dagger.Schema do
   end
 
   @doc """
-  Return the full introspection details of a named type, or null if the schema has no such type.
-  """
-  @spec describe_type(t(), String.t()) :: Dagger.IntrospectionType.t() | nil
-  def describe_type(%__MODULE__{} = schema, name) do
-    query_builder =
-      schema.query_builder |> QB.select("describeType") |> QB.put_arg("name", name)
-
-    %Dagger.IntrospectionType{
-      query_builder: query_builder,
-      client: schema.client
-    }
-  end
-
-  @doc """
-  Check whether a type with the given name exists in the schema.
-  """
-  @spec has_type(t(), String.t()) :: {:ok, boolean()} | {:error, term()}
-  def has_type(%__MODULE__{} = schema, name) do
-    query_builder =
-      schema.query_builder |> QB.select("hasType") |> QB.put_arg("name", name)
-
-    Client.execute(schema.client, query_builder)
-  end
-
-  @doc """
   A unique identifier for this Schema.
   """
   @spec id(t()) :: {:ok, Dagger.SchemaID.t()} | {:error, term()}
   def id(%__MODULE__{} = schema) do
     query_builder =
       schema.query_builder |> QB.select("id")
-
-    Client.execute(schema.client, query_builder)
-  end
-
-  @doc """
-  List the names of the types defined in the schema.
-  """
-  @spec list_types(t(), [{:kind, String.t() | nil}]) :: {:ok, [String.t()]} | {:error, term()}
-  def list_types(%__MODULE__{} = schema, optional_args \\ []) do
-    query_builder =
-      schema.query_builder
-      |> QB.select("listTypes")
-      |> QB.maybe_put_arg("kind", optional_args[:kind])
 
     Client.execute(schema.client, query_builder)
   end
