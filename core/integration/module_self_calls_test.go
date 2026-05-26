@@ -53,6 +53,16 @@ func (ModuleSuite) TestSelfCalls(ctx context.Context, t *testctx.T) {
 				require.NoError(t, err)
 				require.JSONEq(t, `{"printDefault":"Hello Self Calls\n"}`, out)
 			})
+
+			if tc.sdk == "go" {
+				t.Run("can expose exported scalar fields", func(ctx context.Context, t *testctx.T) {
+					out, err := modGen.
+						With(daggerQueryAt(".", `{message}`)).
+						Stdout(ctx)
+					require.NoError(t, err)
+					require.JSONEq(t, `{"message":"hello from field"}`, out)
+				})
+			}
 		})
 	}
 }
