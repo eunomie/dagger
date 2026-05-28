@@ -27,8 +27,15 @@ A [Dagger.io](https://dagger.io) SDK written in Java.
 
 ### Create a new module
 
+New Java modules are scaffolded by the external
+[`github.com/dagger/java-sdk`](https://github.com/dagger/java-sdk) helper module,
+not by this runtime. The created module keeps `sdk.source: "java"`, so it is run by
+this builtin runtime.
+
 ```console
-$ dagger module init --sdk=java my-java-module
+$ dagger install github.com/dagger/java-sdk
+
+$ dagger call java-sdk init --name=my-java-module
 
 $ tree my-java-module
 my-java-module
