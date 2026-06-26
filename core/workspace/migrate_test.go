@@ -26,6 +26,24 @@ func TestPlanMigrationPreservesLegacyWorkspacePinsInSources(t *testing.T) {
 	require.Contains(t, configData, `source = "github.com/acme/blueprint@2222222"`)
 }
 
+// TestPlanMigrationEnablesCheckGenerated verifies a migrated workspace config
+// carries check-generated like a freshly-created workspace (initialWorkspaceConfig).
+func TestPlanMigrationEnablesCheckGenerated(t *testing.T) {
+	t.Parallel()
+
+	plan := testMigrationPlan(t, "repo", `{
+  "name": "myapp",
+  "sdk": {"source": "go"},
+  "source": "src"
+}`)
+
+	cfg, err := ParseConfig(plan.WorkspaceConfigData)
+	require.NoError(t, err)
+	require.NotNil(t, cfg.CheckGenerated)
+	require.True(t, *cfg.CheckGenerated)
+	require.Contains(t, string(plan.WorkspaceConfigData), CheckGeneratedComment+"\ncheck-generated = true")
+}
+
 func TestPlanMigrationPreservesDependencyPinsInModuleConfig(t *testing.T) {
 	t.Parallel()
 

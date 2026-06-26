@@ -92,6 +92,11 @@ func PlanMigration(compatWorkspace *CompatWorkspace) (*MigrationPlan, error) {
 	}
 
 	wsCfg := compatWorkspace.WorkspaceConfig()
+	// A migrated dagger.toml is a freshly-created workspace config, so it must
+	// carry the same defaults as new-workspace creation (initialWorkspaceConfig
+	// / loadWorkspaceConfigForMutation), which enable check-generated.
+	checkGenerated := true
+	wsCfg.CheckGenerated = &checkGenerated
 	if needsProjectModuleMigration && compatWorkspace.MainModule != nil {
 		wsCfg.Modules[cfg.Name] = compatWorkspace.MainModule.Entry
 	}
@@ -133,6 +138,14 @@ func PlanMigration(compatWorkspace *CompatWorkspace) (*MigrationPlan, error) {
 }
 
 func renderMigrationWorkspaceConfig(cfg *Config, mainModule *CompatMainModule) ([]byte, error) {
+	data, err := renderMigrationWorkspaceConfigBytes(cfg, mainModule)
+	if err != nil {
+		return nil, err
+	}
+	return insertCheckGeneratedComment(data, cfg), nil
+}
+
+func renderMigrationWorkspaceConfigBytes(cfg *Config, mainModule *CompatMainModule) ([]byte, error) {
 	if mainModule == nil {
 		return UpdateConfigBytes(nil, cfg)
 	}

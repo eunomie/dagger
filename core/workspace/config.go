@@ -12,6 +12,13 @@ import (
 	toml "github.com/pelletier/go-toml"
 )
 
+// CheckGeneratedComment is the explanatory comment written above the
+// check-generated setting. Shared by the freshly-created workspace template
+// (dagger workspace init) and the setup migration so both surface the same
+// guidance.
+const CheckGeneratedComment = "# Run generators as part of 'dagger check' and fail when generated files are\n" +
+	"# stale. Set to false to skip them by default (like 'dagger check --no-generate')."
+
 // Config represents a parsed dagger.toml workspace configuration.
 type Config struct {
 	Modules            map[string]ModuleEntry `json:"modules,omitempty" toml:"modules"`

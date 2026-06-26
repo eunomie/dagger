@@ -473,6 +473,28 @@ func insertWorkspaceSettingHintComments(data []byte, cfg *Config, hints map[stri
 	return []byte(strings.Join(lines, "\n"))
 }
 
+// insertCheckGeneratedComment prepends the shared explanatory comment above the
+// check-generated line so a migrated config surfaces the same guidance as a
+// freshly created workspace (initialWorkspaceConfig).
+func insertCheckGeneratedComment(data []byte, cfg *Config) []byte {
+	if cfg.CheckGenerated == nil {
+		return data
+	}
+	lines := strings.Split(string(data), "\n")
+	for i, line := range lines {
+		if !strings.HasPrefix(strings.TrimSpace(line), "check-generated") {
+			continue
+		}
+		comment := strings.Split(CheckGeneratedComment, "\n")
+		updated := make([]string, 0, len(lines)+len(comment))
+		updated = append(updated, lines[:i]...)
+		updated = append(updated, comment...)
+		updated = append(updated, lines[i:]...)
+		return []byte(strings.Join(updated, "\n"))
+	}
+	return data
+}
+
 func hintDescriptionLine(description string) string {
 	for _, line := range strings.Split(description, "\n") {
 		line = strings.TrimSpace(line)

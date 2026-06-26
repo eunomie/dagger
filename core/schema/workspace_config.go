@@ -19,8 +19,7 @@ const initialWorkspaceConfig = `# Dagger workspace configuration
 # Example:
 #   dagger mod install github.com/dagger/dagger/modules/wolfi
 
-# Run generators as part of 'dagger check' and fail when generated files are
-# stale. Set to false to skip them by default (like 'dagger check --no-generate').
+` + workspace.CheckGeneratedComment + `
 check-generated = true
 
 [modules]
