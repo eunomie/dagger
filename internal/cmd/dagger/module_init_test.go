@@ -4,8 +4,38 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/dagger/dagger/core/workspace"
 	"github.com/stretchr/testify/require"
 )
+
+func TestPlanMigratedSDKFixups(t *testing.T) {
+	cfg := &workspace.Config{
+		Modules: map[string]workspace.ModuleEntry{
+			// builtin SDK recorded by migration (keyed by basename, bare source):
+			// resolve the bare source to its real ref + name
+			"php-sdk": {Source: "php", AsSDK: &workspace.ModuleAsSDK{}},
+			"go-sdk":  {Source: "go", AsSDK: &workspace.ModuleAsSDK{}},
+			// versioned builtin source: resolve, preserving the @version
+			"java-sdk": {Source: "java@v0.18", AsSDK: &workspace.ModuleAsSDK{}},
+			// already a full ref: leave untouched
+			"custom-sdk": {Source: "github.com/dagger/go-sdk@v1.2.3", AsSDK: &workspace.ModuleAsSDK{}},
+			// not an SDK install: ignore even with a bare source
+			"plain": {Source: "mymod"},
+			// local path SDK: leave untouched
+			"local": {Source: "./sdks/local", AsSDK: &workspace.ModuleAsSDK{}},
+			// bare name absent from the registry: leave untouched
+			"mystery": {Source: "mystery", AsSDK: &workspace.ModuleAsSDK{}},
+		},
+	}
+
+	require.Equal(t, []migratedSDKFixup{
+		{ModuleName: "go-sdk", Ref: "github.com/dagger/go-sdk", SDKName: "go"},
+		{ModuleName: "java-sdk", Ref: "github.com/dagger/java-sdk@v0.18", SDKName: "java"},
+		{ModuleName: "php-sdk", Ref: "github.com/dagger/php-sdk", SDKName: "php"},
+	}, planMigratedSDKFixups(cfg))
+
+	require.Nil(t, planMigratedSDKFixups(nil))
+}
 
 func TestSDKResolve(t *testing.T) {
 	for _, tt := range []struct {
