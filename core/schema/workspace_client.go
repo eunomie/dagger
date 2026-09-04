@@ -11,6 +11,14 @@ import (
 	"github.com/dagger/dagger/dagql"
 )
 
+// resolveClientTargetModule loads the module a client target names, from the
+// given workspace.
+//
+// ws must be a workspace result dagql produced, never one minted for the call
+// in progress: the module source retains its workspace, so attaching the source
+// would publish a minted result as a second result of the caller's own field
+// (dagger/dagger#13992). The withWorkdir hop below is load-bearing for that, not
+// just for the cwd it roots.
 func (s *workspaceSchema) resolveClientTargetModule(
 	ctx context.Context,
 	ws dagql.ObjectResult[*core.Workspace],
@@ -23,9 +31,19 @@ func (s *workspaceSchema) resolveClientTargetModule(
 	}
 	if workspace.IsLocalRef(ref, "") {
 		// Local client refs have already been normalized to workspace-root
-		// coordinates. Anchor them so Workspace.moduleSource does not resolve
-		// them against a non-root workspace cwd a second time.
-		if err := srv.Select(ctx, ws, &src, dagql.Selector{
+		// coordinates. Root the workspace as well, so neither this lookup nor
+		// the target's own dependency paths resolve against a scope cwd a
+		// second time.
+		var rooted dagql.ObjectResult[*core.Workspace]
+		if err := srv.Select(ctx, ws, &rooted, dagql.Selector{
+			Field: "withWorkdir",
+			Args: []dagql.NamedInput{
+				{Name: "path", Value: dagql.String(".")},
+			},
+		}); err != nil {
+			return src, fmt.Errorf("root client workspace: %w", err)
+		}
+		if err := srv.Select(ctx, rooted, &src, dagql.Selector{
 			Field: "moduleSource",
 			Args: []dagql.NamedInput{
 				{Name: "path", Value: dagql.String(filepath.ToSlash(filepath.Join("/", ref)))},
