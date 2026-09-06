@@ -2834,12 +2834,6 @@
 		},
 		{
 			"t": "M",
-			"n": "Dagger\\Client::moduleManifest",
-			"p": "Dagger/Client.html#method_moduleManifest",
-			"d": "<p>Construct or load a module manifest.</p>"
-		},
-		{
-			"t": "M",
 			"n": "Dagger\\Client::moduleRuntime",
 			"p": "Dagger/Client.html#method_moduleRuntime",
 			"d": null

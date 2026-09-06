@@ -15,26 +15,8 @@ dagger [options] [subcommand | file...]
 ### Options
 
 ```
-      --allow-llm strings            List of URLs of remote modules allowed to access LLM APIs, or 'all' to bypass restrictions for the entire session
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -c, --command string               Execute a dagger shell command
-  -d, --debug                        Show debug logs and full verbosity
-      --eager-runtime                load module runtime eagerly
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -m, --load-module string           Use a one-off module (local path or git ref)
-      --model string                 LLM model to use (e.g., 'claude-sonnet-4-5', 'gpt-4.1')
-  -E, --no-exit                      Leave the TUI running after completion
-  -M, --no-load-module               Don't load any module for this command
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -c, --command string   Execute a dagger shell command
+  -v, --verbose count    Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -44,11 +26,14 @@ dagger [options] [subcommand | file...]
 * [dagger check](#dagger-check)	 - Verify your project — tests, linters, type checks, security scans, etc.
 * [dagger cloud](#dagger-cloud)	 - Manage Dagger Cloud
 * [dagger generate](#dagger-generate)	 - Generate derived files for your project — code, SDKs, types, docs, etc.
+* [dagger install](#dagger-install)	 - Install a module into your workspace
 * [dagger llm](#dagger-llm)	 - Manage LLM configuration
 * [dagger module](#dagger-module)	 - Install, use, and develop Dagger modules
 * [dagger sdk](#dagger-sdk)	 - Inspect and configure SDKs
+* [dagger settings](#dagger-settings)	 - Get, set, or unset module settings (use --env for an env overlay)
 * [dagger setup](#dagger-setup)	 - Ensure Dagger is properly set up and operational in the workspace
 * [dagger terminal](#dagger-terminal)	 - Open a terminal for a container or directory in your project
+* [dagger uninstall](#dagger-uninstall)	 - Uninstall a module from your workspace
 * [dagger up](#dagger-up)	 - Run your project's services for local development — databases, APIs, dev servers, etc.
 * [dagger version](#dagger-version)	 - Print dagger version
 * [dagger workspace](#dagger-workspace)	 - Inspect or configure your workspace (cwd, remotes, config, etc.)
@@ -87,20 +72,17 @@ dagger agent [options] [name...]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -E, --no-exit            Leave the TUI running after completion
+      --progress string    Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
+  -q, --quiet count        Reduce verbosity (show progress, but clean up at the end)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -s, --silent             Do not show progress at all
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -w, --web                Open trace URL in a web browser
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -124,20 +106,7 @@ See https://docs.dagger.io/api for the full overview.
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -170,20 +139,18 @@ dagger api call [options] [function]...
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -y, --auto-apply         Automatically apply changes when an output is returned
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -E, --no-exit            Leave the TUI running after completion
+      --progress string    Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
+  -q, --quiet count        Reduce verbosity (show progress, but clean up at the end)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -s, --silent             Do not show progress at all
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -w, --web                Open trace URL in a web browser
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -224,20 +191,12 @@ dagger api functions [options] [function]...
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -294,20 +253,17 @@ EOF
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -E, --no-exit            Leave the TUI running after completion
+      --progress string    Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
+  -q, --quiet count        Reduce verbosity (show progress, but clean up at the end)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -s, --silent             Do not show progress at all
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -w, --web                Open trace URL in a web browser
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -358,20 +314,17 @@ dagger api with-session python main.py
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -E, --no-exit            Leave the TUI running after completion
+      --progress string    Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
+  -q, --quiet count        Reduce verbosity (show progress, but clean up at the end)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -s, --silent             Do not show progress at all
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -w, --web                Open trace URL in a web browser
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -414,20 +367,17 @@ dagger check [options] [pattern...]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -E, --no-exit            Leave the TUI running after completion
+      --progress string    Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
+  -q, --quiet count        Reduce verbosity (show progress, but clean up at the end)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -s, --silent             Do not show progress at all
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -w, --web                Open trace URL in a web browser
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -441,20 +391,7 @@ Manage Dagger Cloud
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -486,20 +423,7 @@ dagger cloud billing
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -525,21 +449,8 @@ dagger cloud billing manage [org]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-      --json                         Print JSON output
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+      --json            Print JSON output
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -557,21 +468,8 @@ dagger cloud billing plans
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-      --json                         Print JSON output
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+      --json            Print JSON output
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -589,20 +487,8 @@ dagger cloud check
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -630,20 +516,8 @@ dagger cloud check list [version]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -661,20 +535,8 @@ dagger cloud check off [name]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -692,20 +554,8 @@ dagger cloud check on [name]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -723,20 +573,8 @@ dagger cloud check status [name]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -760,20 +598,7 @@ dagger cloud integration
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -806,21 +631,8 @@ dagger cloud integration create github
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-      --json                         Print JSON output
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+      --json            Print JSON output
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -838,21 +650,8 @@ dagger cloud integration list [type]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-      --json                         Print JSON output
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+      --json            Print JSON output
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -870,21 +669,8 @@ dagger cloud integration rm <id>
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-      --json                         Print JSON output
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+      --json            Print JSON output
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -908,20 +694,7 @@ dagger cloud login [options] [org]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -939,20 +712,7 @@ dagger cloud logout
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -994,20 +754,7 @@ dagger cloud logs <trace-id> [--span <id> | --check <name> | --test <name>]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1031,20 +778,7 @@ dagger cloud org [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1065,21 +799,8 @@ dagger cloud org info [org] [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-      --json                         Print JSON output
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+      --json            Print JSON output
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1097,21 +818,8 @@ dagger cloud org list [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-      --json                         Print JSON output
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+      --json            Print JSON output
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1129,21 +837,8 @@ dagger cloud org use <org> [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-      --json                         Print JSON output
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+      --json            Print JSON output
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1190,25 +885,95 @@ dagger cloud rerun [--check NAME ...] [--failed | --all]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
 
 * [dagger cloud](#dagger-cloud)	 - Manage Dagger Cloud
+
+## dagger engine
+
+How to select the engine that runs your workflows
+
+### Synopsis
+
+Dagger runs your workflows on an engine. Use --engine to select one.
+
+VALUES
+
+  Dagger Cloud:
+    cloud
+
+  Start from an OCI image:
+    image://IMAGE
+    image+docker://IMAGE
+    image+apple://IMAGE
+    image+podman://IMAGE
+    image+finch://IMAGE
+    image+nerdctl://IMAGE
+
+  Use a running engine container:
+    container://NAME
+    container+docker://NAME
+    container+apple://NAME
+    container+podman://NAME
+    container+finch://NAME
+    container+nerdctl://NAME
+
+  Connect directly:
+    tcp://HOST:PORT (no authentication)
+    tls://HOST[:PORT]
+    ssh://[USER@]HOST[:PORT]
+    kube-pod://POD
+    unix://PATH
+
+  Legacy Docker schemes:
+    docker-image://IMAGE
+    docker-container://NAME
+
+PRIORITY
+
+  The CLI uses the first of these that is set:
+
+    1. --engine
+    2. --cloud (deprecated; the same as --engine=cloud)
+    3. DAGGER_ENGINE (takes the same values as --engine)
+    4. DAGGER_CLOUD_ENGINE (deprecated; any value selects Dagger Cloud)
+    5. _EXPERIMENTAL_DAGGER_RUNNER_HOST (deprecated)
+    6. The engine that this CLI version ships with
+
+  The two deprecated variables still work as a fallback, in the same way as
+  the deprecated --cloud flag. --engine and DAGGER_ENGINE replace them:
+
+    --engine=cloud  instead of DAGGER_CLOUD_ENGINE
+    --engine=URI    instead of _EXPERIMENTAL_DAGGER_RUNNER_HOST
+
+EXAMPLES
+
+  Run on Dagger Cloud:
+    dagger call --engine=cloud build
+
+  Run on an engine container that is already running:
+    dagger call --engine=container://dagger-engine build
+
+  Run on a remote host over SSH:
+    dagger call --engine=ssh://user@host build
+
+  Select an engine for every command in a shell session:
+    export DAGGER_ENGINE=cloud
+
+
+### Options inherited from parent commands
+
+```
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
+```
+
+### SEE ALSO
+
+* [dagger](#dagger)	 - A tool to run composable workflows in containers
 
 ## dagger generate
 
@@ -1241,20 +1006,64 @@ dagger generate [options] [pattern...]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -y, --auto-apply         Automatically apply changes when an output is returned
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -E, --no-exit            Leave the TUI running after completion
+      --progress string    Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
+  -q, --quiet count        Reduce verbosity (show progress, but clean up at the end)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -s, --silent             Do not show progress at all
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -w, --web                Open trace URL in a web browser
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
+```
+
+### SEE ALSO
+
+* [dagger](#dagger)	 - A tool to run composable workflows in containers
+
+## dagger install
+
+Install a module into your workspace
+
+### Synopsis
+
+Install a module into the current workspace.
+
+If no workspace config is selected, this creates one at the workspace root first.
+Use --here to create the workspace config at the workspace cwd instead.
+
+With --env the module is recorded in that env's overlay (env.&lt;name&gt;.modules.*)
+and the env is created if missing.
+
+```
+dagger install [options] <module>
+```
+
+### Examples
+
+```
+dagger module install github.com/shykes/daggerverse/hello@v0.3.0
+```
+
+### Options
+
+```
+      --here          Write workspace config at the selected workspace cwd
+  -n, --name string   Name to use for the module in the workspace. Defaults to the name of the module being installed.
+```
+
+### Options inherited from parent commands
+
+```
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -1272,20 +1081,7 @@ Manage LLM provider configuration, API keys, and default models.
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1321,20 +1117,7 @@ dagger llm add-key <provider>
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1352,20 +1135,7 @@ dagger llm config
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1383,20 +1153,7 @@ dagger llm remove-key <provider>
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1414,20 +1171,7 @@ dagger llm reset
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1445,20 +1189,7 @@ dagger llm set-default <provider> [model]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1476,20 +1207,7 @@ dagger llm setup
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1507,20 +1225,7 @@ dagger llm show-config
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1538,20 +1243,7 @@ dagger module
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1577,20 +1269,7 @@ dagger module client [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1613,20 +1292,18 @@ dagger module client add [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -y, --auto-apply         Automatically apply changes when an output is returned
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -E, --no-exit            Leave the TUI running after completion
+      --progress string    Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
+  -q, --quiet count        Reduce verbosity (show progress, but clean up at the end)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -s, --silent             Do not show progress at all
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -w, --web                Open trace URL in a web browser
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -1651,20 +1328,12 @@ dagger module client list [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -1686,20 +1355,18 @@ dagger module client rm <module> [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -y, --auto-apply         Automatically apply changes when an output is returned
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -E, --no-exit            Leave the TUI running after completion
+      --progress string    Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
+  -q, --quiet count        Reduce verbosity (show progress, but clean up at the end)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -s, --silent             Do not show progress at all
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -w, --web                Open trace URL in a web browser
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -1723,20 +1390,12 @@ dagger module client scope [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -1774,20 +1433,18 @@ dagger module client update
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -y, --auto-apply         Automatically apply changes when an output is returned
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -E, --no-exit            Leave the TUI running after completion
+      --progress string    Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
+  -q, --quiet count        Reduce verbosity (show progress, but clean up at the end)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -s, --silent             Do not show progress at all
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -w, --web                Open trace URL in a web browser
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -1816,20 +1473,18 @@ dagger module init SDK [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -y, --auto-apply         Automatically apply changes when an output is returned
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -E, --no-exit            Leave the TUI running after completion
+      --progress string    Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
+  -q, --quiet count        Reduce verbosity (show progress, but clean up at the end)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -s, --silent             Do not show progress at all
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -w, --web                Open trace URL in a web browser
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -1870,20 +1525,12 @@ dagger module install github.com/shykes/daggerverse/hello@v0.3.0
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -1901,20 +1548,12 @@ dagger module list [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -1950,20 +1589,7 @@ dagger module search wolfi
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -1989,20 +1615,12 @@ dagger module settings [module] [key] [value...] [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2038,20 +1656,12 @@ dagger module uninstall hello
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2078,20 +1688,12 @@ dagger module update [module...] [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2109,20 +1711,7 @@ dagger sdk
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -2142,20 +1731,12 @@ dagger sdk list [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2183,20 +1764,7 @@ dagger sdk scope [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -2224,21 +1792,13 @@ dagger sdk scope is-module [BOOL] [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --path string                  Select a scope by path instead of the workspace CWD
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+      --path string        Select a scope by path instead of the workspace CWD
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2264,21 +1824,13 @@ dagger sdk scope list [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --path string                  Select a scope by path instead of the workspace CWD
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+      --path string        Select a scope by path instead of the workspace CWD
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2302,21 +1854,13 @@ dagger sdk scope name [NAME] [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --path string                  Select a scope by path instead of the workspace CWD
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+      --path string        Select a scope by path instead of the workspace CWD
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2340,26 +1884,49 @@ dagger sdk scope sdk [SDK] [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --path string                  Select a scope by path instead of the workspace CWD
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+      --path string        Select a scope by path instead of the workspace CWD
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
 
 * [dagger sdk scope](#dagger-sdk-scope)	 - Inspect and configure SDK scopes
+
+## dagger settings
+
+Get, set, or unset module settings (use --env for an env overlay)
+
+```
+dagger settings [module] [key] [value...]
+```
+
+### Options
+
+```
+  -g, --global   Store the setting in user-level config instead of the repository, keyed by the workspace's git remote
+      --here     Write workspace config at the selected workspace cwd
+  -u, --unset    Remove the setting from workspace config
+```
+
+### Options inherited from parent commands
+
+```
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
+```
+
+### SEE ALSO
+
+* [dagger](#dagger)	 - A tool to run composable workflows in containers
 
 ## dagger setup
 
@@ -2403,20 +1970,12 @@ dagger setup
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -y, --auto-apply         Automatically apply changes when an output is returned
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2450,20 +2009,58 @@ dagger terminal [options] [pattern]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -E, --no-exit            Leave the TUI running after completion
+      --progress string    Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
+  -q, --quiet count        Reduce verbosity (show progress, but clean up at the end)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -s, --silent             Do not show progress at all
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -w, --web                Open trace URL in a web browser
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
+```
+
+### SEE ALSO
+
+* [dagger](#dagger)	 - A tool to run composable workflows in containers
+
+## dagger uninstall
+
+Uninstall a module from your workspace
+
+### Synopsis
+
+Uninstall a module from the current workspace, removing it from dagger.toml.
+
+With --env only the env's overlay entry is removed, never the base module.
+
+```
+dagger uninstall [options] <module>
+```
+
+### Examples
+
+```
+dagger module uninstall hello
+```
+
+### Options
+
+```
+      --here   Write workspace config at the selected workspace cwd
+```
+
+### Options inherited from parent commands
+
+```
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2497,20 +2094,17 @@ dagger up [options] [pattern...]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -E, --no-exit            Leave the TUI running after completion
+      --progress string    Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
+  -q, --quiet count        Reduce verbosity (show progress, but clean up at the end)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -s, --silent             Do not show progress at all
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -w, --web                Open trace URL in a web browser
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2535,19 +2129,7 @@ dagger version
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
@@ -2579,20 +2161,12 @@ dagger workspace
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2624,20 +2198,8 @@ dagger workspace activity [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2677,20 +2239,12 @@ dagger workspace config [key] [value] [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+      --env string         Apply a named env overlay; writes target it, creating it if missing
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2708,20 +2262,11 @@ dagger workspace config-file [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2739,20 +2284,11 @@ dagger workspace cwd [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2770,20 +2306,8 @@ dagger workspace remote [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2801,20 +2325,11 @@ dagger workspace remotes [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2832,20 +2347,11 @@ dagger workspace root [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -d, --debug              Enable engine and trace diagnostics
+      --engine string      Select the engine: cloud, image://, container://, tcp://, tls://, ssh://, kube-pod://, unix:// (or set DAGGER_ENGINE; run 'dagger help engine' for details)
+  -i, --shell-on-error     Open a shell when a container exec fails (needs an interactive terminal)
+  -v, --verbose count      Increase verbosity (use -vv or -vvv for more)
+  -W, --workspace string   Select the workspace location to load from (local path or git ref)
 ```
 
 ### SEE ALSO
@@ -2879,20 +2385,7 @@ dagger workspace update [flags]
 ### Options inherited from parent commands
 
 ```
-  -y, --auto-apply                   Automatically apply changes when a changeset is returned
-  -d, --debug                        Show debug logs and full verbosity
-      --env string                   Apply a named env overlay; writes target it, creating it if missing
-  -i, --interactive                  Spawn a terminal on container exec failure
-      --interactive-command string   Change the default command for interactive mode (default "/bin/sh")
-  -E, --no-exit                      Leave the TUI running after completion
-      --org string                   Dagger Cloud org name for Cloud-scoped commands
-      --progress string              Progress output format (auto, plain, tty, dots, logs, report) (default "auto")
-  -q, --quiet count                  Reduce verbosity (show progress, but clean up at the end)
-  -s, --silent                       Do not show progress at all
-  -v, --verbose count                Increase verbosity (use -vv or -vvv for more)
-  -w, --web                          Open trace URL in a web browser
-  -W, --workspace string             Select the workspace location to load from (local path or git ref)
-      --x-release string             Run an experimental release from a Dagger git ref
+  -v, --verbose count   Increase verbosity (use -vv or -vvv for more)
 ```
 
 ### SEE ALSO
