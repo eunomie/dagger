@@ -150,6 +150,57 @@ func (o *Optional[I]) UnmarshalJSON(p []byte) error {
 	return nil
 }
 
+// nullableSetter is implemented by the wrapper types that model "a value that
+// may be null", so assign can fill one from the value it wraps rather than
+// requiring the value to already be wrapped.
+type nullableSetter interface {
+	setNullableValue(val any) error
+}
+
+// derefNullableValue unwraps val down to the value a nullableSetter should
+// hold, reporting false when val represents null. Results and nullable
+// wrappers nest arbitrarily (a Result may hold a DynamicOptional holding a
+// String), so this peels one layer at a time until it reaches a plain value.
+func derefNullableValue(val any) (any, bool) {
+	for {
+		switch v := val.(type) {
+		case nil:
+			return nil, false
+		case Derefable:
+			inner, ok := v.Deref()
+			if !ok || inner == nil {
+				return nil, false
+			}
+			val = inner
+		case AnyResult:
+			inner := v.Unwrap()
+			if inner == nil {
+				return nil, false
+			}
+			val = inner
+		default:
+			return val, true
+		}
+	}
+}
+
+var _ nullableSetter = (*Optional[Input])(nil)
+
+func (o *Optional[I]) setNullableValue(val any) error {
+	inner, ok := derefNullableValue(val)
+	if !ok {
+		var zero I
+		o.Value = zero
+		o.Valid = false
+		return nil
+	}
+	if err := assign(reflect.ValueOf(&o.Value).Elem(), inner); err != nil {
+		return fmt.Errorf("optional: %w", err)
+	}
+	o.Valid = true
+	return nil
+}
+
 var _ Setter = Optional[Input]{}
 
 func (o Optional[I]) SetField(val reflect.Value) error {
@@ -354,6 +405,23 @@ func (n Nullable[T]) MarshalJSON() ([]byte, error) {
 		return json.Marshal(nil)
 	}
 	return json.Marshal(n.Value)
+}
+
+var _ nullableSetter = (*Nullable[Typed])(nil)
+
+func (n *Nullable[T]) setNullableValue(val any) error {
+	inner, ok := derefNullableValue(val)
+	if !ok {
+		var zero T
+		n.Value = zero
+		n.Valid = false
+		return nil
+	}
+	if err := assign(reflect.ValueOf(&n.Value).Elem(), inner); err != nil {
+		return fmt.Errorf("nullable: %w", err)
+	}
+	n.Valid = true
+	return nil
 }
 
 func (n *Nullable[T]) UnmarshalJSON(p []byte) error {

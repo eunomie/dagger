@@ -1873,10 +1873,19 @@ func (specs InputSpecs) Decode(inputs map[string]Input, dest any, view call.View
 }
 
 func assign(field reflect.Value, val any) error {
-	if reflect.TypeOf(val).AssignableTo(field.Type()) {
+	if val != nil && reflect.TypeOf(val).AssignableTo(field.Type()) {
 		field.Set(reflect.ValueOf(val))
 		return nil
-	} else if setter, ok := val.(Setter); ok {
+	}
+	// A Nullable/Optional destination knows how to wrap the value it is given,
+	// including an untyped nil. Scalar Setters only understand primitive Go
+	// kinds, so without this they reject a wrapper destination outright.
+	if field.CanAddr() {
+		if dest, ok := field.Addr().Interface().(nullableSetter); ok {
+			return dest.setNullableValue(val)
+		}
+	}
+	if setter, ok := val.(Setter); ok {
 		err := setter.SetField(field)
 		if err != nil {
 			return fmt.Errorf("assign: Setter.SetField %T to %s: %w", val, field.Type(), err)
@@ -1902,14 +1911,11 @@ func appendAssign(slice reflect.Value, val any) error {
 	if reflect.TypeOf(val).AssignableTo(slice.Type().Elem()) {
 		slice.Set(reflect.Append(slice, reflect.ValueOf(val)))
 		return nil
-	} else if setter, ok := val.(Setter); ok {
-		dst := reflect.New(slice.Type().Elem()).Elem()
-		if err := setter.SetField(dst); err != nil {
-			return fmt.Errorf("appendAssign: Setter.SetField: %w", err)
-		}
-		slice.Set(reflect.Append(slice, dst))
-		return nil
-	} else {
-		return fmt.Errorf("appendAssign: cannot assign %T to %s", val, slice.Type())
 	}
+	dst := reflect.New(slice.Type().Elem()).Elem()
+	if err := assign(dst, val); err != nil {
+		return fmt.Errorf("appendAssign to %s: %w", slice.Type(), err)
+	}
+	slice.Set(reflect.Append(slice, dst))
+	return nil
 }

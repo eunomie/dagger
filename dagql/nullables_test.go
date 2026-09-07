@@ -154,3 +154,76 @@ func TestAppendAssignNullElement(t *testing.T) {
 		assert.DeepEqual(t, dst, Array[String]{"", "hello"})
 	})
 }
+
+func TestAssignIntoNullableDest(t *testing.T) {
+	t.Parallel()
+
+	t.Run("plain value sets Valid", func(t *testing.T) {
+		t.Parallel()
+
+		var dst Nullable[String]
+		assert.NilError(t, assign(reflect.ValueOf(&dst).Elem(), NewString("hello")))
+		assert.Assert(t, dst.Valid)
+		assert.Equal(t, string(dst.Value), "hello")
+	})
+
+	t.Run("optional dest sets Valid", func(t *testing.T) {
+		t.Parallel()
+
+		var dst Optional[String]
+		assert.NilError(t, assign(reflect.ValueOf(&dst).Elem(), NewString("hello")))
+		assert.Assert(t, dst.Valid)
+		assert.Equal(t, string(dst.Value), "hello")
+	})
+
+	t.Run("valid wrapper is unwrapped", func(t *testing.T) {
+		t.Parallel()
+
+		var dst Nullable[String]
+		assert.NilError(t, assign(reflect.ValueOf(&dst).Elem(), DynamicOptional{
+			Elem:  NewString(""),
+			Value: NewString("hello"),
+			Valid: true,
+		}))
+		assert.Assert(t, dst.Valid)
+		assert.Equal(t, string(dst.Value), "hello")
+	})
+
+	t.Run("null wrapper clears Valid", func(t *testing.T) {
+		t.Parallel()
+
+		dst := NonNull(NewString("stale"))
+		assert.NilError(t, assign(reflect.ValueOf(&dst).Elem(), DynamicOptional{
+			Elem:  NewString(""),
+			Valid: false,
+		}))
+		assert.Assert(t, !dst.Valid)
+		assert.Equal(t, string(dst.Value), "")
+	})
+
+	t.Run("untyped nil clears Valid", func(t *testing.T) {
+		t.Parallel()
+
+		dst := NonNull(NewString("stale"))
+		assert.NilError(t, assign(reflect.ValueOf(&dst).Elem(), nil))
+		assert.Assert(t, !dst.Valid)
+		assert.Equal(t, string(dst.Value), "")
+	})
+
+	t.Run("matching wrapper still assigns directly", func(t *testing.T) {
+		t.Parallel()
+
+		var dst Nullable[String]
+		assert.NilError(t, assign(reflect.ValueOf(&dst).Elem(), NonNull(NewString("hello"))))
+		assert.Assert(t, dst.Valid)
+		assert.Equal(t, string(dst.Value), "hello")
+	})
+
+	t.Run("mismatched value still errors", func(t *testing.T) {
+		t.Parallel()
+
+		var dst Nullable[String]
+		err := assign(reflect.ValueOf(&dst).Elem(), NewInt(42))
+		assert.ErrorContains(t, err, "cannot set field of type")
+	})
+}

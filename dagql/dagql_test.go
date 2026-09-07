@@ -255,6 +255,14 @@ func TestSelectArray(t *testing.T) {
 				{X: 102, Y: 202},
 			}, nil
 		}),
+		dagql.Func("listOfNullableStrings", func(ctx context.Context, self Query, args struct {
+		}) (dagql.Array[dagql.Nullable[dagql.String]], error) {
+			return dagql.Array[dagql.Nullable[dagql.String]]{
+				dagql.NonNull(dagql.NewString("present")),
+				dagql.Null[dagql.String](),
+				dagql.NonNull(dagql.NewString("also present")),
+			}, nil
+		}),
 		dagql.Func("listOfNullableObjects", func(ctx context.Context, self Query, args struct {
 		}) (dagql.Array[dagql.Nullable[*points.Point]], error) {
 			return dagql.Array[dagql.Nullable[*points.Point]]{
@@ -398,6 +406,27 @@ func TestSelectArray(t *testing.T) {
 		assert.Assert(t, pts[2] != nil)
 		assert.Equal(t, pts[2].X, 303)
 		assert.Equal(t, pts[2].Y, 403)
+	})
+
+	t.Run("select array with null elements as nullables", func(t *testing.T) {
+		var strs dagql.Array[dagql.Nullable[dagql.String]]
+		assert.NilError(t, srv.Select(ctx, srv.Root(), &strs,
+			dagql.Selector{
+				Field: "listOfNullableStrings",
+			},
+		))
+		assert.Equal(t, len(strs), 3)
+
+		assert.Assert(t, strs[0].Valid)
+		assert.Equal(t, strs[0].Value.String(), "present")
+
+		assert.Assert(t, !strs[1].Valid)
+		nullJSON, err := json.Marshal(strs[1])
+		assert.NilError(t, err)
+		assert.Equal(t, string(nullJSON), "null")
+
+		assert.Assert(t, strs[2].Valid)
+		assert.Equal(t, strs[2].Value.String(), "also present")
 	})
 
 	t.Run("select array with null elements as instance array", func(t *testing.T) {
@@ -2901,6 +2930,41 @@ func TestNullResultCachePathDoesNotPanic(t *testing.T) {
 		}`, &res)
 		assert.Assert(t, res.AlwaysNull == nil)
 	}
+}
+
+// Mirrors core/sdkmodule.Provider.FindClientRoot, which selects a nullable
+// SDK-module field straight into a dagql.Nullable destination.
+func TestSelectIntoNullable(t *testing.T) {
+	ctx := testContext()
+	cache := newCache(t)
+	srv := newExternalDagqlServerForTest(t, Query{})
+	ctx = dagql.ContextWithCache(ctx, cache)
+
+	dagql.Fields[Query]{
+		dagql.Func("clientRoot", func(context.Context, Query, struct{}) (dagql.Nullable[dagql.String], error) {
+			return dagql.NonNull(dagql.NewString("/src/empty")), nil
+		}),
+		dagql.Func("noClientRoot", func(context.Context, Query, struct{}) (dagql.Nullable[dagql.String], error) {
+			return dagql.Null[dagql.String](), nil
+		}),
+	}.Install(srv)
+
+	t.Run("present value", func(t *testing.T) {
+		var result dagql.Nullable[dagql.String]
+		assert.NilError(t, srv.Select(ctx, srv.Root(), &result, dagql.Selector{
+			Field: "clientRoot",
+		}))
+		assert.Assert(t, result.Valid)
+		assert.Equal(t, result.Value.String(), "/src/empty")
+	})
+
+	t.Run("null value", func(t *testing.T) {
+		var result dagql.Nullable[dagql.String]
+		assert.NilError(t, srv.Select(ctx, srv.Root(), &result, dagql.Selector{
+			Field: "noClientRoot",
+		}))
+		assert.Assert(t, !result.Valid)
+	})
 }
 
 func TestCacheConfigReturnedIDRewritesExecutionArgs(t *testing.T) {
