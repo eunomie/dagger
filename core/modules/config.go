@@ -290,6 +290,15 @@ func (modCfg *ModuleConfig) UnmarshalJSON(data []byte) error {
 
 	loaded := ModuleConfig(tmp.alias)
 	normalizeLoadedModuleConfig(&loaded)
+	// Legacy dagger.json had no way to say "the source root" other than
+	// omitting source, so an absent source there means ".". Current TOML
+	// deliberately omits source for that same case (see the write side in
+	// core/schema/modulesource.go), so this stays on the legacy decoder:
+	// materializing it for TOML leaves every freshly initialized module with a
+	// pending one-line manifest rewrite.
+	if loaded.SDK != nil && loaded.SDK.Source != "" && loaded.Source == "" {
+		loaded.Source = "."
+	}
 	*modCfg = loaded
 	return nil
 }
@@ -297,12 +306,6 @@ func (modCfg *ModuleConfig) UnmarshalJSON(data []byte) error {
 func normalizeLoadedModuleConfig(modCfg *ModuleConfig) {
 	if modCfg == nil {
 		return
-	}
-
-	// Detect the case where SDK is set but Source isn't, which should only happen when loading an older config.
-	// For those cases, the Source was implicitly ".", so set it to that.
-	if modCfg.SDK != nil && modCfg.SDK.Source != "" && modCfg.Source == "" {
-		modCfg.Source = "."
 	}
 
 	// adapt exclude to include

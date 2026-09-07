@@ -223,3 +223,43 @@ func reflectedSchemaJSON(t *testing.T, v any) string {
 	require.NoError(t, err)
 	return strings.ReplaceAll(string(schema), `\"`, `"`)
 }
+
+// A current TOML config that omits source means "." implicitly, and must stay
+// that way through a load/write round trip. Materializing the implicit "."
+// leaves every freshly initialized module with a pending one-line manifest
+// rewrite, which `dagger generate` then tries to apply outside its cwd.
+func TestParseCurrentModuleConfigLeavesImplicitSourceUnset(t *testing.T) {
+	t.Parallel()
+
+	src := []byte(`name = "mod"
+engineVersion = "v1.0.0"
+
+[runtime]
+  source = "python"
+`)
+	cfg, err := ParseModuleConfigForFilename(src, Filename)
+	require.NoError(t, err)
+	require.Empty(t, cfg.Source)
+
+	out, err := MarshalModuleConfigForFilename(cfg, Filename)
+	require.NoError(t, err)
+	require.NotContains(t, string(out), "source = \".\"")
+
+	reparsed, err := ParseModuleConfigForFilename(out, Filename)
+	require.NoError(t, err)
+	require.Empty(t, reparsed.Source)
+}
+
+// Legacy dagger.json never wrote source explicitly, so an absent source there
+// still has to normalize to ".".
+func TestParseLegacyModuleConfigMaterializesImplicitSource(t *testing.T) {
+	t.Parallel()
+
+	cfg, err := ParseModuleConfigForFilename([]byte(`{
+		"name": "mod",
+		"engineVersion": "v0.18.0",
+		"sdk": {"source": "python"}
+	}`), LegacyFilename)
+	require.NoError(t, err)
+	require.Equal(t, ".", cfg.Source)
+}

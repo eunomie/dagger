@@ -120,8 +120,8 @@ func TestPlanMigrationConvertsModuleConfigInPlace(t *testing.T) {
 		wantSource string
 		installed  bool
 	}{
-		{name: "empty", source: "", wantSource: "."},
-		{name: "root", source: ".", wantSource: "."},
+		{name: "empty", source: "", wantSource: ""},
+		{name: "root", source: ".", wantSource: ""},
 		{name: "subdir", source: "ci", wantSource: "ci", installed: true},
 		{name: "nested subdir", source: "src/mod", wantSource: "src/mod", installed: true},
 		{name: "dot dagger", source: ".dagger", wantSource: ".dagger", installed: true},
@@ -144,8 +144,12 @@ func TestPlanMigrationConvertsModuleConfigInPlace(t *testing.T) {
 			cfg, err := modules.ParseModuleConfigForFilename(plan.MigratedModuleConfigData, ModuleConfigFileName)
 			require.NoError(t, err)
 			require.Equal(t, "myapp", cfg.Name)
-			// Parsing normalizes an omitted source to ".".
+			// A source of "." is the default, so the migrated TOML omits it
+			// and it stays unset on the way back in.
 			require.Equal(t, tc.wantSource, cfg.Source)
+			if tc.wantSource == "" {
+				require.NotContains(t, string(plan.MigratedModuleConfigData), "\nsource =")
+			}
 
 			wsCfg, err := ParseConfig(plan.WorkspaceConfigData)
 			require.NoError(t, err)
