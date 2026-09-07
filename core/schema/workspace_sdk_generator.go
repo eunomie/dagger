@@ -319,17 +319,13 @@ func planSDKModuleScopes(
 	plan := &sdkModuleGeneratorPlan{
 		invocationCWD: cleanWorkspaceRelPath(invocationCWD),
 	}
+	// Only scopes the invocation actually selected are generated. Pulling a
+	// dependency in transitively would regenerate a module the caller never
+	// asked about, and when that module sits outside the invocation cwd its
+	// output cannot be expressed in the cwd-rooted changeset at all, so the
+	// whole run fails. Dependencies still order the graph below; a dependency
+	// outside the selection is consumed as it already is on disk.
 	required := map[string]bool{}
-	var requireScope func(*sdkModuleGraphScope)
-	requireScope = func(node *sdkModuleGraphScope) {
-		if required[node.key] {
-			return
-		}
-		required[node.key] = true
-		for _, dependency := range node.dependencies {
-			requireScope(dependency)
-		}
-	}
 	for _, node := range scopes {
 		if !selectedProviders[node.sdkName] || !sdkGenerationScopeApplies(plan.invocationCWD, node.path) {
 			continue
@@ -337,7 +333,7 @@ func planSDKModuleScopes(
 		if !node.scope.IsModule && len(node.scope.Clients) == 0 {
 			continue
 		}
-		requireScope(node)
+		required[node.key] = true
 	}
 	for _, node := range ordered {
 		if required[node.key] {

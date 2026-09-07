@@ -360,9 +360,27 @@ func TestPlanSDKModuleScopes(t *testing.T) {
 
 	tests := []struct {
 		name   string
+		cwd    string
 		scopes map[string]workspace.SDKScope
 		want   []string
 	}{
+		{
+			name: "a dependency outside the invocation cwd is left alone",
+			cwd:  "mods/a",
+			scopes: map[string]workspace.SDKScope{
+				"mods/a": {IsModule: true, Name: "a", Clients: []string{"mods/b"}},
+				"mods/b": {IsModule: true, Name: "b"},
+			},
+			want: []string{"mods/a"},
+		},
+		{
+			name: "the same graph at the workspace root still runs both",
+			scopes: map[string]workspace.SDKScope{
+				"mods/a": {IsModule: true, Name: "a", Clients: []string{"mods/b"}},
+				"mods/b": {IsModule: true, Name: "b"},
+			},
+			want: []string{"mods/b", "mods/a"},
+		},
 		{
 			name: "root dependency runs once and first",
 			scopes: map[string]workspace.SDKScope{
@@ -390,7 +408,11 @@ func TestPlanSDKModuleScopes(t *testing.T) {
 			cfg := &workspace.Config{SDKs: map[string]workspace.SDKEntry{
 				"go": {Module: "go-sdk", Scopes: test.scopes},
 			}}
-			plan, err := planSDKModuleScopes(".", cfg, ".", map[string]bool{"go": true})
+			cwd := test.cwd
+			if cwd == "" {
+				cwd = "."
+			}
+			plan, err := planSDKModuleScopes(cwd, cfg, ".", map[string]bool{"go": true})
 			require.NoError(t, err)
 
 			paths := make([]string, len(plan.ordered))
