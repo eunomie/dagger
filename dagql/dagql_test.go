@@ -255,6 +255,14 @@ func TestSelectArray(t *testing.T) {
 				{X: 102, Y: 202},
 			}, nil
 		}),
+		dagql.Func("listOfNullableObjects", func(ctx context.Context, self Query, args struct {
+		}) (dagql.Array[dagql.Nullable[*points.Point]], error) {
+			return dagql.Array[dagql.Nullable[*points.Point]]{
+				dagql.NonNull(&points.Point{X: 301, Y: 401}),
+				dagql.Null[*points.Point](),
+				dagql.NonNull(&points.Point{X: 303, Y: 403}),
+			}, nil
+		}),
 	}.Install(srv)
 
 	dagql.Fields[*points.Point]{
@@ -370,6 +378,40 @@ func TestSelectArray(t *testing.T) {
 		))
 		assert.Equal(t, points[0].X, 5)
 		assert.Equal(t, points[0].Y, 7)
+	})
+
+	t.Run("select array with null elements", func(t *testing.T) {
+		var pts dagql.Array[*points.Point]
+		assert.NilError(t, srv.Select(ctx, srv.Root(), &pts,
+			dagql.Selector{
+				Field: "listOfNullableObjects",
+			},
+		))
+		assert.Equal(t, len(pts), 3)
+
+		assert.Assert(t, pts[0] != nil)
+		assert.Equal(t, pts[0].X, 301)
+		assert.Equal(t, pts[0].Y, 401)
+
+		assert.Assert(t, cmp.Nil(pts[1]))
+
+		assert.Assert(t, pts[2] != nil)
+		assert.Equal(t, pts[2].X, 303)
+		assert.Equal(t, pts[2].Y, 403)
+	})
+
+	t.Run("select array with null elements as instance array", func(t *testing.T) {
+		var pts dagql.ResultArray[*points.Point]
+		assert.NilError(t, srv.Select(ctx, srv.Root(), &pts,
+			dagql.Selector{
+				Field: "listOfNullableObjects",
+			},
+		))
+		assert.Equal(t, len(pts), 3)
+
+		assert.Equal(t, pts[0].Self().X, 301)
+		assert.Assert(t, cmp.Nil(pts[1].Self()))
+		assert.Equal(t, pts[2].Self().X, 303)
 	})
 
 	t.Run("select all as instance array", func(t *testing.T) {

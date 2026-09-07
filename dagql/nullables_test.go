@@ -2,6 +2,7 @@ package dagql
 
 import (
 	"encoding/json"
+	"reflect"
 	"testing"
 
 	"gotest.tools/v3/assert"
@@ -105,4 +106,51 @@ func TestDynamicNullableJSONRoundTripSetsValid(t *testing.T) {
 	assert.Assert(t, out.Value == nil)
 	_, ok = out.Elem.(String)
 	assert.Assert(t, ok)
+}
+
+func TestAppendAssignNullElement(t *testing.T) {
+	t.Parallel()
+
+	t.Run("nullable element type reads as null", func(t *testing.T) {
+		t.Parallel()
+
+		dst := Array[Nullable[String]]{}
+		slice := reflect.ValueOf(&dst).Elem()
+		assert.NilError(t, appendAssign(slice, nil))
+		assert.NilError(t, appendAssign(slice, nil))
+
+		assert.Equal(t, len(dst), 2)
+		for _, elem := range dst {
+			assert.Assert(t, !elem.Valid)
+
+			_, ok := elem.Deref()
+			assert.Assert(t, !ok)
+
+			payload, err := json.Marshal(elem)
+			assert.NilError(t, err)
+			assert.Equal(t, string(payload), "null")
+		}
+	})
+
+	t.Run("pointer element type appends nil", func(t *testing.T) {
+		t.Parallel()
+
+		dst := []*String{}
+		slice := reflect.ValueOf(&dst).Elem()
+		assert.NilError(t, appendAssign(slice, nil))
+
+		assert.Equal(t, len(dst), 1)
+		assert.Assert(t, dst[0] == nil)
+	})
+
+	t.Run("non-nil values still assign", func(t *testing.T) {
+		t.Parallel()
+
+		dst := Array[String]{}
+		slice := reflect.ValueOf(&dst).Elem()
+		assert.NilError(t, appendAssign(slice, nil))
+		assert.NilError(t, appendAssign(slice, NewString("hello")))
+
+		assert.DeepEqual(t, dst, Array[String]{"", "hello"})
+	})
 }

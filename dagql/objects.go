@@ -1891,6 +1891,14 @@ func appendAssign(slice reflect.Value, val any) error {
 	if slice.Kind() != reflect.Slice {
 		return fmt.Errorf("appendAssign: expected slice, got %v", slice.Kind())
 	}
+	if val == nil {
+		// A null array element carries no dynamic type, so the only thing it
+		// can become is the element type's own zero value: a nil pointer, or a
+		// Nullable[T]/Optional[T] with Valid false. Falling through would call
+		// AssignableTo on the nil reflect.Type of an untyped nil and panic.
+		slice.Set(reflect.Append(slice, reflect.Zero(slice.Type().Elem())))
+		return nil
+	}
 	if reflect.TypeOf(val).AssignableTo(slice.Type().Elem()) {
 		slice.Set(reflect.Append(slice, reflect.ValueOf(val)))
 		return nil
