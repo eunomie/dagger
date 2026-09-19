@@ -7,7 +7,8 @@ body: |
   is code the module's author chose, and it runs when the module is loaded, so
   it could read any file in the workspace of whoever loaded the module. A
   module that needs the caller's workspace declares a `Workspace` argument on
-  a function.
+  a function. A local module registered under an SDK scope in the caller's
+  config still gets the local clients that scope declares.
 time: 2026-09-18T23:00:00Z
 custom:
   Author: eunomie
