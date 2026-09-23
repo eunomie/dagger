@@ -162,13 +162,13 @@ Defines and calls one Dagger module.
 interface ModuleEntrypoint {
   """Return all types defined by the module."""
   types(
-    """The workspace that contains the module implementation."""
+    """The module workspace, with its working directory at the module."""
     workspace: Workspace!
   ): [TypeDef!]!
 
   """Call one object constructor or function and return its JSON result."""
   call(
-    """The workspace in which to run the call."""
+    """The module workspace, with its working directory at the module."""
     workspace: Workspace!
 
     """The original name of the receiver object type."""
@@ -193,9 +193,28 @@ The entrypoint and its driver use the same engine session. `Workspace` and
 `TypeDef` values are normal Dagger object references. The driver passes their
 object IDs. It does not copy these objects between client schemas.
 
-The engine passes the same module workspace to `types` and `call`. The
-workspace boundary can be above the module directory. Thus, the entrypoint can
-read a file such as `go.mod` above the module directory.
+The engine passes the same module workspace to `types` and `call`. It is a
+synthetic workspace built from the module's own context, with its working
+directory at the module directory. It is the module's workspace, not the
+caller's, whichever source the module was loaded from. A module function that
+declares a `Workspace` argument receives the caller's workspace through that
+argument, which the caller supplies.
+
+The workspace root is the module's context, so the entrypoint can read above
+the module directory within that context. For a module loaded by Git ref the
+context is the repository at the pinned commit. For a directory source it is
+the directory the source was created from. For a local module, or a module
+loaded from a workspace, it is the context the engine loaded for the module:
+its manifest, its own files, and the paths its includes name. A local module
+that needs a file above its directory, such as the `go.mod` of a nested Go
+root, declares it in its includes.
+
+When the caller's workspace config registers a local module under an SDK
+scope, the module workspace also holds the local clients that scope declares,
+their local dependencies, and a config that names only that SDK and scope. The
+engine reads the caller's config itself, so the scope follows that
+configuration. The entrypoint resolves those clients through
+`Workspace.moduleSource` as it would in the caller's workspace.
 
 ### Type rules
 
