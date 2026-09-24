@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"path/filepath"
+	"slices"
 
 	"github.com/dagger/dagger/core/workspace"
 	"github.com/dagger/dagger/dagql"
@@ -99,6 +101,20 @@ func workspaceLocalClients(ctx context.Context, src *ModuleSource) (*localClient
 	if err := dag.Select(ctx, dag.Root(), &wsRes, dagql.Selector{Field: "currentWorkspace"}); err != nil {
 		return nil, err
 	}
+	merge := func(ctx context.Context, into, dir dagql.ObjectResult[*Directory]) (dagql.ObjectResult[*Directory], error) {
+		dirID, err := dir.ID()
+		if err != nil {
+			return into, err
+		}
+		err = dag.Select(ctx, into, &into, dagql.Selector{
+			Field: "withDirectory",
+			Args: []dagql.NamedInput{
+				{Name: "path", Value: dagql.String(".")},
+				{Name: "source", Value: dagql.NewID[*Directory](dirID)},
+			},
+		})
+		return into, err
+	}
 	var loadedFiles func(ctx context.Context, path string) (dagql.ObjectResult[*Directory], string, error)
 	loadedFiles = func(ctx context.Context, path string) (dagql.ObjectResult[*Directory], string, error) {
 		var dir dagql.ObjectResult[*Directory]
@@ -120,17 +136,7 @@ func workspaceLocalClients(ctx context.Context, src *ModuleSource) (*localClient
 			if err != nil {
 				return dir, "", fmt.Errorf("load local dependency %q: %w", dep.Self().SourceRootSubpath, err)
 			}
-			depDirID, err := depDir.ID()
-			if err != nil {
-				return dir, "", err
-			}
-			if err := dag.Select(ctx, dir, &dir, dagql.Selector{
-				Field: "withDirectory",
-				Args: []dagql.NamedInput{
-					{Name: "path", Value: dagql.String(".")},
-					{Name: "source", Value: dagql.NewID[*Directory](depDirID)},
-				},
-			}); err != nil {
+			if dir, err = merge(ctx, dir, depDir); err != nil {
 				return dir, "", err
 			}
 		}
@@ -142,11 +148,55 @@ func workspaceLocalClients(ctx context.Context, src *ModuleSource) (*localClient
 		declared:   ws.ModuleClients,
 		load: func(ctx context.Context, path string) (dagql.ObjectResult[*ModuleSource], error) {
 			var client dagql.ObjectResult[*ModuleSource]
-			dir, sourceRootPath, err := loadedFiles(ctx, path)
+			tree, sourceRootPath, err := loadedFiles(ctx, path)
 			if err != nil {
 				return client, err
 			}
-			err = dag.Select(ctx, dir, &client, dagql.Selector{
+			// A client served from this tree finds its own clients among its
+			// files, with a config that declares them, since it has no
+			// workspace to read them from.
+			closure := map[string]bool{path: true}
+			declared := map[string][]string{}
+			pending := []string{path}
+			for len(pending) > 0 {
+				current := pending[0]
+				pending = pending[1:]
+				targets := ws.ModuleClients(current)
+				if len(targets) == 0 {
+					continue
+				}
+				declared[current] = targets
+				for _, target := range targets {
+					if !closure[target] {
+						closure[target] = true
+						pending = append(pending, target)
+					}
+				}
+			}
+			for _, member := range slices.Sorted(maps.Keys(closure)) {
+				if member == path {
+					continue
+				}
+				dir, _, err := loadedFiles(ctx, member)
+				if err != nil {
+					return client, fmt.Errorf("load local client %q: %w", member, err)
+				}
+				if tree, err = merge(ctx, tree, dir); err != nil {
+					return client, err
+				}
+			}
+			if len(declared) > 0 {
+				if err := dag.Select(ctx, tree, &tree, dagql.Selector{
+					Field: "withNewFile",
+					Args: []dagql.NamedInput{
+						{Name: "path", Value: dagql.String(workspace.ConfigFileName)},
+						{Name: "contents", Value: dagql.String(workspace.LocalClientsConfig(declared))},
+					},
+				}); err != nil {
+					return client, err
+				}
+			}
+			err = dag.Select(ctx, tree, &client, dagql.Selector{
 				Field: "asModuleSource",
 				Args:  []dagql.NamedInput{{Name: "sourceRootPath", Value: dagql.String(sourceRootPath)}},
 			})
