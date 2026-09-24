@@ -328,3 +328,134 @@ func (m *Caller) Plain() string {
 		require.Contains(t, out, "does not contain a dagger config file")
 	})
 }
+
+// localClientsCaller is a Go module that serves the one local client the engine
+// hands it and returns the message of the module that client installs as
+// field.
+func localClientsCaller(name, field string) map[string]string {
+	typeName := strings.ToUpper(name[:1]) + name[1:]
+	return map[string]string{
+		"dagger.json": `{"name":"` + name + `","engineVersion":"latest","sdk":{"source":"go"},"source":"."}`,
+		"main.go": `package main
+
+import (
+	"context"
+	"fmt"
+
+	"dagger/` + name + `/internal/dagger"
+)
+
+type ` + typeName + ` struct{}
+
+func (m *` + typeName + `) Message(ctx context.Context) (string, error) {
+	var clients []struct{ Id dagger.ID }
+	if err := dag.QueryBuilder().Select("currentModule").Select("localClients").Select("id").Bind(&clients).Execute(ctx); err != nil {
+		return "", err
+	}
+	if len(clients) != 1 {
+		return "", fmt.Errorf("want one local client, got %d", len(clients))
+	}
+	if err := dagger.Ref[*dagger.ModuleSource](dag, clients[0].Id).AsModule().Serve(ctx); err != nil {
+		return "", err
+	}
+	var message string
+	return message, dag.QueryBuilder().Select("` + field + `").Select("message").Bind(&message).Execute(ctx)
+}
+`,
+	}
+}
+
+// A module that no workspace loaded declares its local clients in the config
+// of its own files, so the caller's workspace declares nothing for it.
+func (ModuleLoadingSuite) TestModuleLocalClients(ctx context.Context, t *testctx.T) {
+	withFiles := func(dir *dagger.Directory, root string, files map[string]string) *dagger.Directory {
+		for path, contents := range files {
+			dir = dir.WithNewFile(root+"/"+path, contents)
+		}
+		return dir
+	}
+	ownTree := func(c *dagger.Client) *dagger.Directory {
+		return withFiles(c.Directory().
+			WithNewFile("dagger.toml", `[modules.go]
+source = "go"
+
+[sdks.go]
+module = "go"
+
+[sdks.go.scopes."modules/owner"]
+is-module = true
+clients = ["./modules/ownlib"]
+`).
+			WithNewFile("modules/ownlib/dagger-module.toml", serveModuleHelloManifest).
+			WithNewFile("modules/ownlib/main.dang", strings.ReplaceAll(serveModuleHelloSource, "hi from hello", "hi from ownlib")),
+			"modules/owner", localClientsCaller("owner", "hello"))
+	}
+	requireMessage := func(t *testctx.T, c *dagger.Client, src *dagger.ModuleSource) {
+		t.Helper()
+		require.NoError(t, src.AsModule().Serve(ctx))
+		res, err := testutil.QueryWithClient[struct {
+			Owner struct {
+				Message string
+			}
+		}](c, t, `{owner{message}}`, nil)
+		require.NoError(t, err)
+		require.Equal(t, "hi from ownlib", res.Owner.Message)
+	}
+
+	t.Run("git source", func(ctx context.Context, t *testctx.T) {
+		c := connect(ctx, t)
+		repo := c.Container().From(alpineImage).
+			WithExec([]string{"apk", "add", "git"}).
+			With(gitUserConfig).
+			WithDirectory("/src", ownTree(c)).
+			WithWorkdir("/src").
+			WithExec([]string{"git", "init", "-b", "main"}).
+			WithExec([]string{"git", "add", "."}).
+			WithExec([]string{"git", "commit", "-m", "init"})
+		remote := newRemoteWorkspace(ctx, t, c, repo.Directory("/src"))
+
+		caller := connect(ctx, t, dagger.WithWorkdir(t.TempDir()))
+		requireMessage(t, caller, caller.ModuleSource(remote.repoURL+"#main:modules/owner"))
+	})
+
+	t.Run("directory source", func(ctx context.Context, t *testctx.T) {
+		c := connect(ctx, t, dagger.WithWorkdir(t.TempDir()))
+		requireMessage(t, c, ownTree(c).AsModuleSource(dagger.DirectoryAsModuleSourceOpts{SourceRootPath: "modules/owner"}))
+	})
+
+	t.Run("a local client serves its own local client", func(ctx context.Context, t *testctx.T) {
+		c := connect(ctx, t)
+		ctr := goGitBase(t, c).
+			WithNewFile("dagger.toml", `[modules.caller]
+source = ".dagger/modules/caller"
+
+[modules.go]
+source = "go"
+
+[sdks.go]
+module = "go"
+
+[sdks.go.scopes.".dagger/modules/caller"]
+is-module = true
+clients = ["./.dagger/modules/lib"]
+
+[sdks.go.scopes.".dagger/modules/lib"]
+is-module = true
+clients = ["./.dagger/modules/hello"]
+`).
+			WithNewFile(".dagger/modules/hello/dagger-module.toml", serveModuleHelloManifest).
+			WithNewFile(".dagger/modules/hello/main.dang", serveModuleHelloSource)
+		for root, files := range map[string]map[string]string{
+			".dagger/modules/caller": localClientsCaller("caller", "lib"),
+			".dagger/modules/lib":    localClientsCaller("lib", "hello"),
+		} {
+			for path, contents := range files {
+				ctr = ctr.WithNewFile(root+"/"+path, contents)
+			}
+		}
+
+		out, err := ctr.With(daggerCallAt("caller", "message")).Stdout(ctx)
+		require.NoError(t, err)
+		require.Equal(t, "hi from hello", out)
+	})
+}
