@@ -101,6 +101,25 @@ func TreeModuleScopeLocalClients(
 	return ModuleScopeLocalClients(cfg, configDir), nil
 }
 
+// LocalClientsConfig writes a config that declares only the given local
+// clients, keyed by module scope, with every path relative to the directory the
+// config sits in. TreeModuleScopeLocalClients reads the same map back from it.
+func LocalClientsConfig(clients map[string][]string) []byte {
+	const sdk = "local-clients"
+	scopes := make(map[string]SDKScope, len(clients))
+	for scope, targets := range clients {
+		declared := SDKScope{IsModule: true}
+		for _, target := range targets {
+			declared.Clients = append(declared.Clients, "/"+target)
+		}
+		scopes[scope] = declared
+	}
+	return SerializeConfig(&Config{
+		Modules: map[string]ModuleEntry{sdk: {Source: "."}},
+		SDKs:    map[string]SDKEntry{sdk: {Module: sdk, Scopes: scopes}},
+	})
+}
+
 // ReconcileSDKScopes merges compatible records for the same SDK and resolved
 // workspace path. It retains the first key in sorted order. On conflict, cfg
 // remains unchanged. Returned messages describe every reconciled record.
