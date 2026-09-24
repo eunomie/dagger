@@ -428,6 +428,13 @@ func (s *moduleSchema) Install(dag *dagql.Server) {
 		dagql.NodeFunc("source", s.currentModuleSource).
 			Doc(`The directory containing the module's source code loaded into the engine (plus any generated code that may have been created).`),
 
+		dagql.NodeFunc("localClients", s.currentModuleLocalClients).
+			View(AfterVersion("v1.0.0-0")).
+			WithInput(dagql.PerCallInput).
+			Doc(`The local clients declared for the module, each as a module source over the files the engine loaded for that client.`,
+				`A module loaded from the current workspace takes them from that workspace's config; a module loaded from git or from a directory takes them from the config in its own files.`,
+				`The sources hold no workspace, so they cannot read any other file of the caller's workspace or of the module's.`),
+
 		dagql.NodeFunc("workdir", s.currentModuleWorkdir).
 			WithInput(dagql.PerClientInput).
 			Doc(`Load a directory from the module's scratch working directory, including any changes that may have been made to it during module function execution.`).
@@ -2997,6 +3004,18 @@ func (s *moduleSchema) currentModuleDependencies(
 		}
 	}
 	return depMods, nil
+}
+
+func (s *moduleSchema) currentModuleLocalClients(
+	ctx context.Context,
+	curMod dagql.ObjectResult[*core.CurrentModule],
+	_ struct{},
+) (dagql.ObjectResultArray[*core.ModuleSource], error) {
+	src := curMod.Self().Module.Self().Source.Value
+	if src.Self() == nil {
+		return nil, errors.New("invalid unset current module source")
+	}
+	return core.ModuleLocalClients(ctx, src.Self())
 }
 
 func (s *moduleSchema) currentModuleSource(
