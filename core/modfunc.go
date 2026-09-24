@@ -2,15 +2,19 @@ package core
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 
 	"github.com/dagger/dagger/internal/buildkit/util/bklog"
 	"github.com/dagger/dagger/util/gitutil"
+	"github.com/dagger/dagger/util/hashutil"
 	telemetry "github.com/dagger/otel-go"
 	"golang.org/x/sync/errgroup"
 
@@ -26,6 +30,11 @@ const (
 	MaxFunctionCacheTTLSeconds = 7 * 24 * 60 * 60 // 1 week
 	MinFunctionCacheTTLSeconds = 1
 )
+
+// localClientsInput puts a module's local clients into the cache identity of
+// its function calls. The module serves them at run time, after the cache
+// lookup, so nothing else in the key changes when they do.
+const localClientsInput = "localClients"
 
 type ModuleFunction struct {
 	mod    dagql.ObjectResult[*Module]
@@ -802,7 +811,60 @@ func (fn *ModuleFunction) DynamicInputsForCall(
 		}
 	}
 
-	return nil
+	clientsDigest := fn.localClientsDigest(ctx)
+	if clientsDigest == "" {
+		return nil
+	}
+	return req.SetImplicitInput(ctx, localClientsInput, dagql.NewString(clientsDigest))
+}
+
+// localClientsDigest digests the local clients declared for the function's
+// module, and theirs in turn, as the module is handed them. It is empty when
+// there are none.
+func (fn *ModuleFunction) localClientsDigest(ctx context.Context) string {
+	mod := fn.mod.Self()
+	if !mod.Source.Valid || mod.Source.Value.Self() == nil {
+		return ""
+	}
+	// A client that cannot be resolved must not fail calls that never serve
+	// it, nor let a result computed meanwhile be reused.
+	unresolved := "unresolved:" + rand.Text()
+	clients, err := moduleLocalClients(ctx, mod.Source.Value.Self())
+	if err != nil {
+		return unresolved
+	}
+	if clients == nil {
+		return ""
+	}
+	dag, err := CurrentDagqlServer(ctx)
+	if err != nil {
+		return unresolved
+	}
+
+	targets := map[string]bool{}
+	pending := slices.Clone(clients.declared(clients.modulePath))
+	for len(pending) > 0 {
+		target := pending[0]
+		pending = pending[1:]
+		if targets[target] {
+			continue
+		}
+		targets[target] = true
+		pending = append(pending, clients.declared(target)...)
+	}
+
+	inputs := []string{localClientsInput}
+	for _, target := range slices.Sorted(maps.Keys(targets)) {
+		targetDigest := unresolved
+		if client, err := clients.load(ctx, target); err == nil {
+			var digest string
+			if err := dag.Select(ctx, client, &digest, dagql.Selector{Field: "digest"}); err == nil {
+				targetDigest = digest
+			}
+		}
+		inputs = append(inputs, target, targetDigest)
+	}
+	return hashutil.HashStrings(inputs...).String()
 }
 
 func (fn *ModuleFunction) loadFunctionRuntime(ctx context.Context) (_ ModuleRuntime, rerr error) {
