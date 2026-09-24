@@ -145,3 +145,25 @@ clients = ["./modules/lib", "github.com/example/remote@v1"]
 	require.NoError(t, err)
 	require.Nil(t, clients)
 }
+
+func TestLocalClientsConfig(t *testing.T) {
+	clients := map[string][]string{
+		".dagger/modules/lib":  {".dagger/modules/lib2"},
+		".dagger/modules/lib2": {".dagger/modules/lib3", "shared"},
+	}
+	files := map[string]string{
+		"/dagger.toml": string(LocalClientsConfig(clients)),
+		"/.dagger/modules/lib/dagger-module.toml": "",
+	}
+	pathExists := func(_ context.Context, path string) (string, bool, error) {
+		_, ok := files[path]
+		return filepath.Dir(path), ok, nil
+	}
+	readFile := func(_ context.Context, path string) ([]byte, error) {
+		return []byte(files[path]), nil
+	}
+
+	read, err := TreeModuleScopeLocalClients(t.Context(), pathExists, readFile, ".dagger/modules/lib")
+	require.NoError(t, err)
+	require.Equal(t, clients, read)
+}
