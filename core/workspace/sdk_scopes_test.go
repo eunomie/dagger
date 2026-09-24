@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"context"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -110,4 +111,37 @@ func TestModuleScopeLocalClients(t *testing.T) {
 		"nested/app": {"nested/lib", "nested/py", "shared"},
 		"nested/lib": {"nested/lib2"},
 	}, ModuleScopeLocalClients(cfg, "nested"))
+}
+
+func TestTreeModuleScopeLocalClients(t *testing.T) {
+	files := map[string]string{
+		"/dagger.toml": `[modules.python-sdk]
+source = "github.com/example/python-sdk@v1"
+
+[sdks.python]
+module = "python-sdk"
+
+[sdks.python.scopes."modules/caller"]
+is-module = true
+clients = ["./modules/lib", "github.com/example/remote@v1"]
+`,
+		"/modules/caller/dagger-module.toml": "",
+		"/modules/lib/dagger-module.toml":    "",
+	}
+	pathExists := func(_ context.Context, path string) (string, bool, error) {
+		_, ok := files[path]
+		return filepath.Dir(path), ok, nil
+	}
+	readFile := func(_ context.Context, path string) ([]byte, error) {
+		return []byte(files[path]), nil
+	}
+
+	clients, err := TreeModuleScopeLocalClients(t.Context(), pathExists, readFile, "modules/caller")
+	require.NoError(t, err)
+	require.Equal(t, map[string][]string{"modules/caller": {"modules/lib"}}, clients)
+
+	delete(files, "/dagger.toml")
+	clients, err = TreeModuleScopeLocalClients(t.Context(), pathExists, readFile, "modules/caller")
+	require.NoError(t, err)
+	require.Nil(t, clients)
 }
