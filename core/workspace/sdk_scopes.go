@@ -72,6 +72,35 @@ func ModuleScopeLocalClients(cfg *Config, configDir string) map[string][]string 
 	return clients
 }
 
+// TreeModuleScopeLocalClients does what ModuleScopeLocalClients does for a
+// module that no workspace loaded, such as one from a git repository or a
+// directory. The tree is rooted at "/", and the config is the one workspace
+// detection selects from modulePath. It returns nil when there is no config.
+func TreeModuleScopeLocalClients(
+	ctx context.Context,
+	pathExists PathExistsFunc,
+	readFile func(context.Context, string) ([]byte, error),
+	modulePath string,
+) (map[string][]string, error) {
+	ws, err := DetectInRoot(ctx, pathExists, filepath.Join("/", modulePath), "/")
+	if err != nil {
+		return nil, err
+	}
+	if ws.ConfigFile == "" {
+		return nil, nil
+	}
+	data, err := readFile(ctx, filepath.Join("/", ws.ConfigFile))
+	if err != nil {
+		return nil, err
+	}
+	configDir := filepath.Dir(ws.ConfigFile)
+	cfg, err := ParseConfigAt(ctx, data, configDir)
+	if err != nil {
+		return nil, err
+	}
+	return ModuleScopeLocalClients(cfg, configDir), nil
+}
+
 // ReconcileSDKScopes merges compatible records for the same SDK and resolved
 // workspace path. It retains the first key in sorted order. On conflict, cfg
 // remains unchanged. Returned messages describe every reconciled record.
